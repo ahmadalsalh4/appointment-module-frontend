@@ -1,20 +1,32 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLoginMutation } from "../../hooks/auth";
 import Error from "../../components/Error";
 import type { LoginShape } from "../../api/auth";
+import { useAuth } from "../../contexts/auth/useAuth";
+import { Link } from "react-router";
 
 export default function Login2() {
-  const [form, setFroem] = useState<LoginShape>({
+  const [form, setForm] = useState<LoginShape>({
     email: "",
     password: "",
     role: "customer",
   });
-  const { mutate: login, data, isPending, isError, error } = useLoginMutation();
 
-  function handleSubmit() {
+  const { mutate: login, isPending, isError, error, data } = useLoginMutation();
+
+  const { saveRole, saveToken } = useAuth();
+
+  function handleSubmit(e: React.SubmitEvent) {
+    e.preventDefault();
     login(form);
-    console.log(data);
   }
+
+  useEffect(() => {
+    if (data) {
+      saveRole(data.role);
+      saveToken(data.token);
+    }
+  }, [data, saveRole, saveToken]);
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-back">
@@ -28,9 +40,13 @@ export default function Login2() {
           </p>
           <div className="mt-4 h-1 w-16 mx-auto rounded-full bg-deep"></div>
         </div>
-
-        {isError && <Error message={error.message}></Error>}
-
+        {isError && (
+          <div className="mb-6">
+            <Error
+              message={error.response?.data.message || "Giriş başarısız oldu."}
+            />
+          </div>
+        )}
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label
@@ -42,13 +58,15 @@ export default function Login2() {
 
             <select
               id="role"
-              value={String(form?.role)}
-              onChange={(e) => setFroem({ ...form, role: e.target.value })}
+              value={form.role || "customer"}
+              onChange={(e) =>
+                setForm({ ...form, role: e.target.value as LoginShape["role"] })
+              }
               className="w-full px-4 py-3 rounded-lg border border-main/20 bg-back text-main outline-none transition-all focus:border-deep focus:ring-2 focus:ring-deep/20"
             >
-              <option value="customer">musteri</option>
-              <option value="staff">personel</option>
-              <option value="admin">admin</option>
+              <option value="customer">Müşteri</option>
+              <option value="staff">Personel</option>
+              <option value="admin">Admin</option>
             </select>
           </div>
 
@@ -62,8 +80,8 @@ export default function Login2() {
             <input
               id="email"
               type="email"
-              value={form?.email}
-              onChange={(e) => setFroem({ ...form, email: e.target.value })}
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
               className="w-full px-4 py-3 rounded-lg border border-main/20 bg-back text-main outline-none transition-all focus:border-deep focus:ring-2 focus:ring-deep/20"
               placeholder="ornek@sirket.com"
               required
@@ -80,8 +98,8 @@ export default function Login2() {
             <input
               id="password"
               type="password"
-              value={form?.password}
-              onChange={(e) => setFroem({ ...form, password: e.target.value })}
+              value={form.password}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
               className="w-full px-4 py-3 rounded-lg border border-main/20 bg-back text-main outline-none transition-all focus:border-deep focus:ring-2 focus:ring-deep/20"
               placeholder="••••••••"
               required
@@ -91,24 +109,22 @@ export default function Login2() {
           <button
             type="submit"
             disabled={isPending}
-            className="w-full py-3 px-4 rounded-lg font-semibold text-white bg-deep hover:opacity-90 transition-all focus:outline-none focus:ring-2 focus:ring-deep/50 focus:ring-offset-2 disabled:opacity-50"
+            className="w-full py-3 px-4 rounded-lg font-semibold text-white bg-deep hover:opacity-90 transition-all focus:outline-none focus:ring-2 focus:ring-deep/50 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isPending ? "Giriş yapılıyor..." : "Giriş Yap"}
           </button>
         </form>
-
         <div
-          className={`${form?.role !== "customer"}? visible : bg-amber-50 + "mt-6 text-center text-sm text-main/70"`}
+          className={`${form.role === "customer" ? "visible" : "invisible"} mt-6 text-center text-sm text-main/70 p-3 rounded-lg`}
         >
-          Hesabınız yok mu?{" "}
-          <a
-            href="/register"
+          Hesabınız yok mu?
+          <Link
+            to="/register"
             className="font-semibold text-waiting hover:underline"
           >
             Kayıt Olun
-          </a>
+          </Link>
         </div>
-
         <p className="mt-8 text-center text-xs text-completed/80">
           © 2026 Ahmad Alsaleh. Tüm hakları saklıdır.
         </p>

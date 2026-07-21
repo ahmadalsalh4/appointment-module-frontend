@@ -35,6 +35,7 @@ export default function App() {
       <Route path="/register" element={<Register />} />
       <Route path="/unauthorized" element={<UnauthorizedPage />} />
       <Route path="*" element={<NotFoundPage />} />
+      
 
       <Route element={<ProtectedRoute allowedRole={"customer"} />}>
         <Route element={<CustomerLayout />}>

@@ -1,16 +1,12 @@
-import { useState } from "react";
-import { Link } from "react-router";
-
-interface RegisterShape {
-  name: string;
-  surname: string;
-  email: string;
-  phone_number: string;
-  password: string;
-  password_confirmation: string;
-}
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router";
+import { useRegisterMutation } from "../../hooks/auth";
+import Error from "../../components/Error";
+import type { RegisterShape } from "../../api/auth";
+import { useAuth } from "../../contexts/auth/useAuth";
 
 export default function Register() {
+  const navigate = useNavigate();
   const [form, setForm] = useState<RegisterShape>({
     name: "",
     surname: "",
@@ -19,42 +15,43 @@ export default function Register() {
     password: "",
     password_confirmation: "",
   });
-  const [error, setError] = useState("");
+  const { saveRole, saveToken } = useAuth();
 
-  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setError("");
+  const {
+    mutate: register,
+    data,
+    isPending,
+    isError,
+    error,
+  } = useRegisterMutation();
 
-    if (
-      !form.name ||
-      !form.surname ||
-      !form.email ||
-      !form.phone_number ||
-      !form.password ||
-      !form.password_confirmation
-    ) {
-      setError("Lütfen tüm alanları doldurunuz.");
-      return;
-    }
-
-    if (form.password !== form.password_confirmation) {
-      setError("Şifreler birbiriyle eşleşmiyor.");
-      return;
-    }
-
-    if (form.password.length < 6) {
-      setError("Şifre en az 6 karakter olmalıdır.");
-      return;
-    }
-
-    console.log("Müşteri Kayıt Olunuyor:", form);
-    alert("Kayıt başarılı! (Bu sadece bir demo)");
-  };
-
-  // Helper function to handle input changes cleanly
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.id]: e.target.value });
   };
+
+  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    register(form, {
+      onSuccess: (data) => {
+        console.log("Registration Success:", data);
+        navigate("/login");
+      },
+    });
+  };
+  useEffect(() => {
+    if (data) {
+      saveRole(data.role);
+      saveToken(data.token);
+
+      if (data.role === "customer") {
+        navigate("/");
+      } else if (data.role === "staff") {
+        navigate("/staff");
+      } else if (data.role === "admin") {
+        navigate("/admin");
+      }
+    }
+  }, [data, saveRole, saveToken, navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 bg-back">
@@ -69,11 +66,8 @@ export default function Register() {
           <div className="mt-4 h-1 w-16 mx-auto rounded-full bg-deep"></div>
         </div>
 
-        {error && (
-          <div className="mb-6 border-l-4 border-canceld py-2 pl-3">
-            <p className="text-sm font-medium text-canceld">{error}</p>
-          </div>
-        )}
+        {/* Show Backend Validation Errors (e.g. Email already exists) */}
+        {isError && <Error message={error?.response?.data?.message} />}
 
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Name */}
@@ -133,7 +127,7 @@ export default function Register() {
             />
           </div>
 
-          {/* Phone Number - FIXED: Proper id, type, and state */}
+          {/* Phone */}
           <div>
             <label
               htmlFor="phone_number"
@@ -190,11 +184,13 @@ export default function Register() {
             />
           </div>
 
+          {/* Submit Button */}
           <button
             type="submit"
-            className="w-full py-3 px-4 rounded-lg font-semibold text-white bg-deep hover:opacity-90 transition-all focus:outline-none focus:ring-2 focus:ring-deep/50 focus:ring-offset-2 mt-2"
+            disabled={isPending}
+            className="w-full py-3 px-4 rounded-lg font-semibold text-white bg-deep hover:opacity-90 transition-all focus:outline-none focus:ring-2 focus:ring-deep/50 focus:ring-offset-2 mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Kayıt Ol
+            {isPending ? "Kayıt Yapılıyor..." : "Kayıt Ol"}
           </button>
         </form>
 

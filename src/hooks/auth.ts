@@ -1,8 +1,13 @@
 import { useMutation } from "@tanstack/react-query";
 import authApi from "../api/auth";
-import type { LoginResponse, LoginShape, RegisterResponse, RegisterShape } from "../api/auth";
+import type { LoginResponse, LoginShape, RegisterShape } from "../api/auth";
 import type { AxiosError } from "axios";
-import type { LaravelErrorResponse } from "../other/types";
+
+
+export interface LaravelErrorResponse {
+  message: string;
+  errors?: Record<string, string[]>;
+}
 
 export const useLoginMutation = () => {
   return useMutation<
@@ -19,13 +24,13 @@ export const useLoginMutation = () => {
 
 export const useRegisterMutation = () => {
   return useMutation<
-    RegisterResponse,
+    LoginResponse,
     AxiosError<LaravelErrorResponse>,
     RegisterShape
   >({
     mutationFn: async (formData) => {
       const res = await authApi.register(formData);
-      return res.data;
+      return res;
     },
   });
 };

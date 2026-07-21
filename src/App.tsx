@@ -27,6 +27,7 @@ import AdminLayout from "./pages/layouts/AdminLayout";
 import ProtectedRoute from "./other/ProtectedRoute";
 import Login from "./pages/shared/Login";
 import Register from "./pages/shared/Register";
+import GeneralLayout from "./pages/layouts/GeneralLayout";
 
 export default function App() {
   return (
@@ -35,65 +36,67 @@ export default function App() {
       <Route path="/register" element={<Register />} />
       <Route path="/unauthorized" element={<UnauthorizedPage />} />
       <Route path="*" element={<NotFoundPage />} />
-      
-
-      <Route element={<ProtectedRoute allowedRole={"customer"} />}>
-        <Route element={<CustomerLayout />}>
-          <Route path="/" element={<Navigate to="/services" replace />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/services" element={<ServicesPage />} />
-          <Route path="/services/:id" element={<ServiceDetailPage />} />
-          <Route path="/my-appointments" element={<MyAppointmentsPage />} />
-          <Route
-            path="/my-appointments/:id"
-            element={<MyAppointmentDetailPage />}
-          />
+      <Route element={<GeneralLayout />}>
+        <Route element={<ProtectedRoute allowedRole={"customer"} />}>
+          <Route element={<CustomerLayout />}>
+            <Route path="/" element={<ServicesPage />} />
+            <Route path="/customer/profile" element={<ProfilePage />} />
+            <Route path="/services/:id" element={<ServiceDetailPage />} />
+            <Route path="/my-appointments" element={<MyAppointmentsPage />} />
+            <Route
+              path="/my-appointments/:id"
+              element={<MyAppointmentDetailPage />}
+            />
+          </Route>
         </Route>
-      </Route>
-      <Route element={<ProtectedRoute allowedRole={"staff"} />}>
-        <Route element={<StaffLayout />}>
-          <Route
-            path="/staff"
-            element={<Navigate to="/staff/appointments" replace />}
-          />
-          <Route
-            path="/staff/appointments"
-            element={<StaffAppointmentsPage />}
-          />
-          <Route path="/staff/profile" element={<StaffProfilePage />} />
+        <Route element={<ProtectedRoute allowedRole={"staff"} />}>
+          <Route element={<StaffLayout />}>
+            <Route
+              path="/staff"
+              element={<Navigate to="/staff/appointments" replace />}
+            />
+            <Route
+              path="/staff/appointments"
+              element={<StaffAppointmentsPage />}
+            />
+            <Route path="/staff/profile" element={<StaffProfilePage />} />
+          </Route>
         </Route>
-      </Route>
-      <Route element={<ProtectedRoute allowedRole={"admin"} />}>
-        <Route element={<AdminLayout />}>
-          <Route
-            path="/admin"
-            element={<Navigate to="/admin/staff" replace />}
-          />
-          <Route path="/admin/profile" element={<AdminProfilePage />} />
+        <Route element={<ProtectedRoute allowedRole={"admin"} />}>
+          <Route element={<AdminLayout />}>
+            <Route path="/admin" element={<AdminProfilePage />} />
+            <Route path="/admin/profile" element={<AdminProfilePage />} />
 
-          <Route path="/admin/services" element={<AdminServicesList />} />
-          <Route path="/admin/services/add" element={<AdminServiceAdd />} />
-          <Route path="/admin/services/:id" element={<AdminServiceDetail />} />
-          <Route
-            path="/admin/services/:id/edit"
-            element={<AdminServiceEdit />}
-          />
+            <Route path="/admin/services" element={<AdminServicesList />} />
+            <Route path="/admin/services/add" element={<AdminServiceAdd />} />
+            <Route
+              path="/admin/services/:id"
+              element={<AdminServiceDetail />}
+            />
+            <Route
+              path="/admin/services/:id/edit"
+              element={<AdminServiceEdit />}
+            />
 
-          <Route path="/admin/categories" element={<AdminCategoriesList />} />
-          <Route path="/admin/categories/add" element={<AdminCategoryAdd />} />
-          <Route
-            path="/admin/categories/:id"
-            element={<AdminCategoryDetail />}
-          />
-          <Route
-            path="/admin/categories/:id/edit"
-            element={<AdminCategoryEdit />}
-          />
+            <Route path="/admin/categories" element={<AdminCategoriesList />} />
+            <Route
+              path="/admin/categories/add"
+              element={<AdminCategoryAdd />}
+            />
+            <Route
+              path="/admin/categories/:id"
+              element={<AdminCategoryDetail />}
+            />
+            <Route
+              path="/admin/categories/:id/edit"
+              element={<AdminCategoryEdit />}
+            />
 
-          <Route path="/admin/staff" element={<AdminStaffList />} />
-          <Route path="/admin/staff/add" element={<AdminStaffAdd />} />
-          <Route path="/admin/staff/:id" element={<AdminStaffDetail />} />
-          <Route path="/admin/staff/:id/edit" element={<AdminStaffEdit />} />
+            <Route path="/admin/staff" element={<AdminStaffList />} />
+            <Route path="/admin/staff/add" element={<AdminStaffAdd />} />
+            <Route path="/admin/staff/:id" element={<AdminStaffDetail />} />
+            <Route path="/admin/staff/:id/edit" element={<AdminStaffEdit />} />
+          </Route>
         </Route>
       </Route>
     </Routes>

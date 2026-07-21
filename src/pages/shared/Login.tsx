@@ -3,7 +3,7 @@ import { useLoginMutation } from "../../hooks/auth";
 import Error from "../../components/Error";
 import type { LoginShape } from "../../api/auth";
 import { useAuth } from "../../contexts/auth/useAuth";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 
 export default function Login2() {
   const [form, setForm] = useState<LoginShape>({
@@ -15,8 +15,9 @@ export default function Login2() {
   const { mutate: login, isPending, isError, error, data } = useLoginMutation();
 
   const { saveRole, saveToken } = useAuth();
+  const navigate = useNavigate();
 
-  function handleSubmit(e: React.SubmitEvent) {
+  function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     login(form);
   }
@@ -25,8 +26,16 @@ export default function Login2() {
     if (data) {
       saveRole(data.role);
       saveToken(data.token);
+
+      if (data.role === "customer") {
+        navigate("/");
+      } else if (data.role === "staff") {
+        navigate("/staff");
+      } else if (data.role === "admin") {
+        navigate("/admin");
+      }
     }
-  }, [data, saveRole, saveToken]);
+  }, [data, saveRole, saveToken, navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-back">

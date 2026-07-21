@@ -24,7 +24,7 @@ import AdminStaffEdit from "./pages/admin/staff/AdminStaffEdit";
 import CustomerLayout from "./pages/layouts/CustomerLayout";
 import StaffLayout from "./pages/layouts/StaffLayout";
 import AdminLayout from "./pages/layouts/AdminLayout";
-import ProtectedRoute from "./auth/ProtectedRoute";
+import ProtectedRoute from "./other/ProtectedRoute";
 import Login from "./pages/shared/Login";
 import Register from "./pages/shared/Register";
 
@@ -36,7 +36,7 @@ export default function App() {
       <Route path="/unauthorized" element={<UnauthorizedPage />} />
       <Route path="*" element={<NotFoundPage />} />
 
-      <Route element={<ProtectedRoute allowedRoles={["customer"]} />}>
+      <Route element={<ProtectedRoute allowedRole={"customer"} />}>
         <Route element={<CustomerLayout />}>
           <Route path="/" element={<Navigate to="/services" replace />} />
           <Route path="/profile" element={<ProfilePage />} />
@@ -49,7 +49,7 @@ export default function App() {
           />
         </Route>
       </Route>
-      <Route element={<ProtectedRoute allowedRoles={["staff", "admin"]} />}>
+      <Route element={<ProtectedRoute allowedRole={"staff"} />}>
         <Route element={<StaffLayout />}>
           <Route
             path="/staff"
@@ -62,7 +62,7 @@ export default function App() {
           <Route path="/staff/profile" element={<StaffProfilePage />} />
         </Route>
       </Route>
-      <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
+      <Route element={<ProtectedRoute allowedRole={"admin"} />}>
         <Route element={<AdminLayout />}>
           <Route
             path="/admin"

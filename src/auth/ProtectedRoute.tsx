@@ -1,25 +1,22 @@
-import { Navigate, useLocation } from "react-router";
+import { Navigate, Outlet, useLocation } from "react-router";
 import { useAuth } from "./useAuth";
-import { type ReactNode } from "react";
+import type { Role } from "../other/types";
 
 interface ProtectedRouteProps {
-  children: ReactNode;
-  allowedRoles: string[];
+  allowedRoles?: Role[];
 }
 
-const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
-  const { userRole } = useAuth();
+export default function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
+  const { userRole, token } = useAuth();
   const location = useLocation();
 
-  if (!userRole) {
-    return <Navigate to="/" state={{ from: location }} replace />;
+  if (!token || !userRole) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (!allowedRoles.includes(userRole)) {
-    return <Navigate to="/yetkisiz" replace />;
+  if (allowedRoles && !allowedRoles.includes(userRole)) {
+    return <Navigate to="/unauthorized" replace />;
   }
 
-  return children;
-};
-
-export default ProtectedRoute;
+  return <Outlet />;
+}

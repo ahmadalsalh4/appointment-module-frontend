@@ -1,64 +1,20 @@
-import { useState, type FormEvent } from "react";
-import { useNavigate } from "react-router";
-import { useMutation } from "@tanstack/react-query";
-import { useAuth } from "../../auth/useAuth";
-import type { Role } from "../../other/types";
-
-const ROLE_OPTIONS: { value: Role; label: string }[] = [
-  { value: "customer", label: "Müşteri" },
-  { value: "staff", label: "Personel" },
-  { value: "admin", label: "Admin" },
-];
-
-const HOME_PATH: Record<Role, string> = {
-  customer: "/services",
-  staff: "/staff/appointments",
-  admin: "/admin/staff",
-};
-
-interface LoginPayload {
-  email: string;
-  password: string;
-  role: Role;
-}
+import { useState } from "react";
+import { useLoginMutation } from "../../hooks/auth";
+import Error from "../../components/Error";
+import type { LoginShape } from "../../api/auth";
 
 export default function Login2() {
-  const [role, setRole] = useState<Role>("customer");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [formError, setFormError] = useState("");
-
-  const { login } = useAuth();
-  const navigate = useNavigate();
-
-  const loginMutation = useMutation({
-    mutationFn: ({ email, password, role }: LoginPayload) =>
-      login(email, password, role),
-    onSuccess: (result) => {
-      if (!result.success) {
-        setFormError(result.message ?? "Giriş başarısız");
-        return;
-      }
-      navigate(HOME_PATH[role], { replace: true });
-    },
-    onError: () => {
-      setFormError("Sunucuya ulaşılamadı");
-    },
+  const [form, setFroem] = useState<LoginShape>({
+    email: "",
+    password: "",
+    role: "customer",
   });
+  const { mutate: login, data, isPending, isError, error } = useLoginMutation();
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    setFormError("");
-
-    if (!email || !password) {
-      setFormError("Lütfen e-posta ve şifre alanlarını doldurunuz.");
-      return;
-    }
-
-    loginMutation.mutate({ email, password, role });
-  };
-
-  const displayError = formError;
+  function handleSubmit() {
+    login(form);
+    console.log(data);
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-back">
@@ -73,11 +29,7 @@ export default function Login2() {
           <div className="mt-4 h-1 w-16 mx-auto rounded-full bg-deep"></div>
         </div>
 
-        {displayError && (
-          <div className="mb-6 p-3 rounded-lg text-sm text-center text-canceld bg-canceld/10">
-            {displayError}
-          </div>
-        )}
+        {isError && <Error message={error.message}></Error>}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
@@ -87,17 +39,16 @@ export default function Login2() {
             >
               Giriş Türü
             </label>
+
             <select
               id="role"
-              value={role}
-              onChange={(e) => setRole(e.target.value as Role)}
+              value={String(form?.role)}
+              onChange={(e) => setFroem({ ...form, role: e.target.value })}
               className="w-full px-4 py-3 rounded-lg border border-main/20 bg-back text-main outline-none transition-all focus:border-deep focus:ring-2 focus:ring-deep/20"
             >
-              {ROLE_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
+              <option value="customer">musteri</option>
+              <option value="staff">personel</option>
+              <option value="admin">admin</option>
             </select>
           </div>
 
@@ -111,8 +62,8 @@ export default function Login2() {
             <input
               id="email"
               type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={form?.email}
+              onChange={(e) => setFroem({ ...form, email: e.target.value })}
               className="w-full px-4 py-3 rounded-lg border border-main/20 bg-back text-main outline-none transition-all focus:border-deep focus:ring-2 focus:ring-deep/20"
               placeholder="ornek@sirket.com"
               required
@@ -129,8 +80,8 @@ export default function Login2() {
             <input
               id="password"
               type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              value={form?.password}
+              onChange={(e) => setFroem({ ...form, password: e.target.value })}
               className="w-full px-4 py-3 rounded-lg border border-main/20 bg-back text-main outline-none transition-all focus:border-deep focus:ring-2 focus:ring-deep/20"
               placeholder="••••••••"
               required
@@ -139,24 +90,24 @@ export default function Login2() {
 
           <button
             type="submit"
-            disabled={loginMutation.isPending}
+            disabled={isPending}
             className="w-full py-3 px-4 rounded-lg font-semibold text-white bg-deep hover:opacity-90 transition-all focus:outline-none focus:ring-2 focus:ring-deep/50 focus:ring-offset-2 disabled:opacity-50"
           >
-            {loginMutation.isPending ? "Giriş yapılıyor..." : "Giriş Yap"}
+            {isPending ? "Giriş yapılıyor..." : "Giriş Yap"}
           </button>
         </form>
 
-        {role === "customer" && (
-          <div className="mt-6 text-center text-sm text-main/70">
-            Hesabınız yok mu?{" "}
-            <a
-              href="/register"
-              className="font-semibold text-waiting hover:underline"
-            >
-              Kayıt Olun
-            </a>
-          </div>
-        )}
+        <div
+          className={`${form?.role !== "customer"}? visible : bg-amber-50 + "mt-6 text-center text-sm text-main/70"`}
+        >
+          Hesabınız yok mu?{" "}
+          <a
+            href="/register"
+            className="font-semibold text-waiting hover:underline"
+          >
+            Kayıt Olun
+          </a>
+        </div>
 
         <p className="mt-8 text-center text-xs text-completed/80">
           © 2026 Ahmad Alsaleh. Tüm hakları saklıdır.

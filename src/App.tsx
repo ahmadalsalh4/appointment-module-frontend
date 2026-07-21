@@ -1,13 +1,11 @@
 import { Navigate, Route, Routes } from "react-router";
 import UnauthorizedPage from "./pages/shared/UnauthorizedPage";
-import ProfilePage from "./pages/customer/ProfilePage";
 import ServicesPage from "./pages/customer/ServicesPage";
 import ServiceDetailPage from "./pages/customer/ServiceDetailPage";
 import MyAppointmentsPage from "./pages/customer/MyAppointmentsPage";
 import MyAppointmentDetailPage from "./pages/customer/MyAppointmentDetailPage";
 import StaffAppointmentsPage from "./pages/staff/StaffAppointmentsPage";
-import StaffProfilePage from "./pages/staff/StaffProfilePage";
-import AdminProfilePage from "./pages/admin/AdminProfilePage";
+
 import NotFoundPage from "./pages/shared/NotFoundPage";
 import AdminServicesList from "./pages/admin/services/AdminServicesList";
 import AdminServiceAdd from "./pages/admin/services/AdminServiceAdd";
@@ -28,16 +26,22 @@ import ProtectedRoute from "./other/ProtectedRoute";
 import Login from "./pages/shared/Login";
 import Register from "./pages/shared/Register";
 import GeneralLayout from "./pages/layouts/GeneralLayout";
+import ProfilePage from "./pages/shared/ProfilePage";
+import StaffAppointmentDetailPage from "./pages/staff/StaffAppointmentDetailPage";
 
 export default function App() {
   return (
     <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/unauthorized" element={<UnauthorizedPage />} />
-      <Route path="*" element={<NotFoundPage />} />
+      {/* Wrap EVERYTHING in GeneralLayout so Header/Footer always show */}
       <Route element={<GeneralLayout />}>
-        <Route element={<ProtectedRoute allowedRole={"customer"} />}>
+        {/* --- PUBLIC ROUTES --- */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/unauthorized" element={<UnauthorizedPage />} />
+        <Route path="*" element={<NotFoundPage />} />
+
+        {/* --- CUSTOMER ROUTES --- */}
+        <Route element={<ProtectedRoute allowedRole="customer" />}>
           <Route element={<CustomerLayout />}>
             <Route path="/" element={<ServicesPage />} />
             <Route path="/customer/profile" element={<ProfilePage />} />
@@ -49,7 +53,9 @@ export default function App() {
             />
           </Route>
         </Route>
-        <Route element={<ProtectedRoute allowedRole={"staff"} />}>
+
+        {/* Inside Staff Routes */}
+        <Route element={<ProtectedRoute allowedRole="staff" />}>
           <Route element={<StaffLayout />}>
             <Route
               path="/staff"
@@ -59,14 +65,26 @@ export default function App() {
               path="/staff/appointments"
               element={<StaffAppointmentsPage />}
             />
-            <Route path="/staff/profile" element={<StaffProfilePage />} />
+            <Route
+              path="/staff/appointments/:id"
+              element={<StaffAppointmentDetailPage />}
+            />{" "}
+            {/* BUNU EKLE */}
+            <Route path="/staff/profile" element={<ProfilePage />} />
           </Route>
         </Route>
-        <Route element={<ProtectedRoute allowedRole={"admin"} />}>
-          <Route element={<AdminLayout />}>
-            <Route path="/admin" element={<AdminProfilePage />} />
-            <Route path="/admin/profile" element={<AdminProfilePage />} />
 
+        {/* --- ADMIN ROUTES --- */}
+        <Route element={<ProtectedRoute allowedRole="admin" />}>
+          <Route element={<AdminLayout />}>
+            {/* Changed this from AdminProfilePage to a Navigate redirect to match your sidebar structure */}
+            <Route
+              path="/admin"
+              element={<Navigate to="/admin/services" replace />}
+            />
+            <Route path="/admin/profile" element={<ProfilePage />} />
+
+            {/* Services */}
             <Route path="/admin/services" element={<AdminServicesList />} />
             <Route path="/admin/services/add" element={<AdminServiceAdd />} />
             <Route
@@ -78,6 +96,7 @@ export default function App() {
               element={<AdminServiceEdit />}
             />
 
+            {/* Categories */}
             <Route path="/admin/categories" element={<AdminCategoriesList />} />
             <Route
               path="/admin/categories/add"
@@ -92,6 +111,7 @@ export default function App() {
               element={<AdminCategoryEdit />}
             />
 
+            {/* Staff */}
             <Route path="/admin/staff" element={<AdminStaffList />} />
             <Route path="/admin/staff/add" element={<AdminStaffAdd />} />
             <Route path="/admin/staff/:id" element={<AdminStaffDetail />} />

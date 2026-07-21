@@ -1,64 +1,43 @@
 import { Link, useLocation } from "react-router";
 import { useState } from "react";
 
+// 1. SVG'leri dışarı çıkardık (React 19 static-component hatasını çözer)
+const CalendarIcon = () => (
+  <svg
+    className="h-5 w-5"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    strokeWidth={2}
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+    />
+  </svg>
+);
+
+const ProfileIcon = () => (
+  <svg
+    className="h-5 w-5"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    strokeWidth={2}
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+    />
+  </svg>
+);
+
+// 2. Linkleri sadece veri olarak tuttuk
 const navLinks = [
-  {
-    label: "Randevularım",
-    path: "/staff/appointments",
-    icon: (
-      <svg
-        className="h-5 w-5"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        strokeWidth={2}
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-        />
-      </svg>
-    ),
-  },
-  {
-    label: "Randevu Ara",
-    path: "/staff/search-appointments",
-    icon: (
-      <svg
-        className="h-5 w-5"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        strokeWidth={2}
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-        />
-      </svg>
-    ),
-  },
-  {
-    label: "Profilim",
-    path: "/staff/profile",
-    icon: (
-      <svg
-        className="h-5 w-5"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        strokeWidth={2}
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-        />
-      </svg>
-    ),
-  },
+  { label: "Randevularım", path: "/staff/appointments", Icon: CalendarIcon },
+  { label: "Profilim", path: "/staff/profile", Icon: ProfileIcon },
 ];
 
 interface SidebarContentProps {
@@ -67,6 +46,8 @@ interface SidebarContentProps {
 
 function SidebarContent({ onClose }: SidebarContentProps) {
   const location = useLocation();
+
+  // 3. /staff/appointments/1 gibi detay sayfalarında da aktif kalması için startsWith kullanıyoruz
   const isActive = (path: string) => location.pathname.startsWith(path);
 
   return (
@@ -93,19 +74,19 @@ function SidebarContent({ onClose }: SidebarContentProps) {
 
       {/* Navigation Links */}
       <nav className="flex-1 space-y-1 px-3">
-        {navLinks.map((link) => (
+        {navLinks.map(({ label, path, Icon }) => (
           <Link
-            key={link.path}
-            to={link.path}
+            key={path}
+            to={path}
             onClick={onClose}
             className={`flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all ${
-              isActive(link.path)
-                ? "bg-deep/10 text-deep"
-                : "text-main/70 hover:bg-main/5 hover:text-main"
+              isActive(path)
+                ? "bg-deep/10 text-deep" // Aktifse koyu renk
+                : "text-main/70 hover:bg-main/5 hover:text-main" // Değilse soluk
             }`}
           >
-            {link.icon}
-            {link.label}
+            <Icon />
+            {label}
           </Link>
         ))}
       </nav>
@@ -157,7 +138,7 @@ export default function StaffSidebar() {
       </div>
 
       {/* DESKTOP: Static Sidebar */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:z-30 lg:flex lg:w-64 lg:flex-col">
+      <div className="hidden lg:fixed lg:inset-y-15 lg:z-30 lg:flex lg:w-64 lg:flex-col">
         <SidebarContent />
       </div>
     </>

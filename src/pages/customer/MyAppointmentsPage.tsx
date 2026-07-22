@@ -1,18 +1,30 @@
 import { Link } from "react-router";
 import { useCustomerGetAppointmentsQuery } from "../../hooks/useAppointmentQueries";
 
-// Helper to format ISO date to a readable string
+// REPLACE your old formatDateTime function with this one:
+
 const formatDateTime = (isoString: string) => {
-  const date = new Date(isoString);
-  return (
-    date.toLocaleDateString("tr-TR", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    }) +
-    " - " +
-    date.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" })
-  );
+  // 1. Split date and time
+  const [datePart, timePart] = isoString.split("T");
+
+  // 2. Remove milliseconds/Z, THEN split by ':' to get hours and minutes
+  // "15:45:00" -> ["15", "45", "00"] -> "15:45"
+  const timeWithoutSeconds = timePart
+    .split(".")[0]
+    .split(":")
+    .slice(0, 2)
+    .join(":");
+
+  // 3. Format the date safely
+  const dateObj = new Date(datePart + "T00:00:00");
+  const formattedDate = dateObj.toLocaleDateString("tr-TR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+
+  // 4. Combine
+  return `${formattedDate} - ${timeWithoutSeconds}`;
 };
 
 // Badge colors based on appointment state

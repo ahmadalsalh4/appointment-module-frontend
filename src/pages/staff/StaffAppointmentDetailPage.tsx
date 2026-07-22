@@ -1,21 +1,31 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router";
-import { useStaffGetAppointmentByIdQuery, useStaffUpdateStateMutation } from "../../hooks/useAppointmentQueries";
+import {
+  useStaffGetAppointmentByIdQuery,
+  useStaffUpdateStateMutation,
+} from "../../hooks/useAppointmentQueries";
 
 import Loading from "../components/Loading";
 import Error from "../components/Error";
 
-const formatTime = (isoDate: string) =>
-  new Date(isoDate).toLocaleTimeString("tr-TR", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-const formatDate = (isoDate: string) =>
-  new Date(isoDate).toLocaleDateString("tr-TR", {
+// Zaman formatlayıcı (15:45:00.000000Z -> 15:45)
+const formatTime = (isoDate: string) => {
+  const timePart = isoDate.split("T")[1]; // "15:45:00.000000Z" alır
+  if (!timePart) return "";
+  // Milisaniyeleri at, saat:dakikaayı al
+  return timePart.split(".")[0].split(":").slice(0, 2).join(":");
+};
+
+// Tarih formatlayıcı (2026-07-23T15:00:00.000000Z -> 23 Temmuz 2026)
+const formatDate = (isoDate: string) => {
+  const datePart = isoDate.split("T")[0]; // "2026-07-23" alır
+  // Saat kısmını "T00:00:00" yaparak JavaScript'in saat kayması yapmasını engelleriz
+  return new Date(datePart + "T00:00:00").toLocaleDateString("tr-TR", {
     day: "numeric",
     month: "long",
     year: "numeric",
   });
+};
 
 export default function StaffAppointmentDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -110,7 +120,9 @@ export default function StaffAppointmentDetailPage() {
             </div>
             <div>
               <dt className="text-xs text-main/50">Telefon</dt>
-              <dd className="text-main">{apt?.customer?.person.phone_number}</dd>
+              <dd className="text-main">
+                {apt?.customer?.person.phone_number}
+              </dd>
             </div>
             <div>
               <dt className="text-xs text-main/50">E-posta</dt>

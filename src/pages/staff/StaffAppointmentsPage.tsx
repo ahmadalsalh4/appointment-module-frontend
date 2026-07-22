@@ -37,17 +37,19 @@ const getStatusLabel = (statusName: string) => {
   }
 };
 
-// Zaman formatlayıcı (15:00:00 -> 15:00)
+// Zaman formatlayıcı (15:45:00.000000Z -> 15:45)
 const formatTime = (isoDate: string) => {
-  return new Date(isoDate).toLocaleTimeString("tr-TR", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  const timePart = isoDate.split("T")[1]; // "15:45:00.000000Z" alır
+  if (!timePart) return "";
+  // Milisaniyeleri at, saat:dakikaayı al
+  return timePart.split(".")[0].split(":").slice(0, 2).join(":");
 };
 
-// Tarih formatlayıcı
+// Tarih formatlayıcı (2026-07-23T15:00:00.000000Z -> 23 Temmuz 2026)
 const formatDate = (isoDate: string) => {
-  return new Date(isoDate).toLocaleDateString("tr-TR", {
+  const datePart = isoDate.split("T")[0]; // "2026-07-23" alır
+  // Saat kısmını "T00:00:00" yaparak JavaScript'in saat kayması yapmasını engelleriz
+  return new Date(datePart + "T00:00:00").toLocaleDateString("tr-TR", {
     day: "numeric",
     month: "long",
     year: "numeric",

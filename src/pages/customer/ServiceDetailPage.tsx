@@ -60,14 +60,15 @@ export default function ServiceDetailPage() {
   const handleFinalBooking = async () => {
     if (!selectedTime || !selectedStaff || !selectedDate || !id) return;
 
-    // Combine date and time into the exact format Laravel expects
+    // 1. Keep the exact format Laravel wants
     const start_date = `${selectedDate}T${selectedTime}:00.000000Z`;
 
     try {
+      // 2. CONVERT IDs TO NUMBERS using Number()
       await createAppointment.mutateAsync({
-        staff_id: selectedStaff,
-        service_id: id,
-        start_date,
+        staff_id: Number(selectedStaff),
+        service_id: Number(id),
+        start_date: start_date,
       });
 
       // Success! Redirect to "My Appointments" page

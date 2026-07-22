@@ -1,6 +1,6 @@
 import { Navigate, Outlet } from "react-router";
 import type { Role } from "./types";
-import { useAuth } from "../contexts/auth/useAuth";
+import { useAuth } from "../contexts/auth/useAuthCTX";
 
 interface ProtectedRouteProps {
   allowedRole: Role;

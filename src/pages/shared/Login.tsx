@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useLoginMutation } from "../../hooks/useAuth";
-import Error from "../../components/Error";
+import Error from "../components/Error";
 import type { LoginShape } from "../../api/auth";
-import { useAuth } from "../../contexts/auth/useAuth";
+import { useAuth } from "../../contexts/auth/useAuthCTX";
 import { Link, useNavigate } from "react-router";
 
 export default function Login2() {

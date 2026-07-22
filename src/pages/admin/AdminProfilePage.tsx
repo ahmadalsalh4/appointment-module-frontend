@@ -1,4 +1,4 @@
-import Loading, { InlineLoading } from "../../components/Loading";
+import Loading, { InlineLoading } from "../components/Loading";
 
 export default function AdminProfilePage() {
   return (

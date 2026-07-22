@@ -1,8 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { type AxiosError } from "axios";
 import customerApi from "../api/customer";
-import type { CreateAppointmentShape } from "../other/types";
-import type { LaravelErrorResponse } from "./useAuth";
+import type {
+  CreateAppointmentShape,
+  LaravelErrorResponse,
+} from "../other/types";
 
 export const useServices = () => {
   return useQuery({

@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { useRegisterMutation } from "../../hooks/useAuth";
-import Error from "../../components/Error";
+import Error from "../components/Error";
 import type { RegisterShape } from "../../api/auth";
-import { useAuth } from "../../contexts/auth/useAuth";
+import { useAuth } from "../../contexts/auth/useAuthCTX";
 
 export default function Register() {
   const navigate = useNavigate();

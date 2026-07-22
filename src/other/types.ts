@@ -15,6 +15,7 @@ export type LoginResponse = {
     };
   };
 };
+export type LogoutResponse = { message: string };
 
 export interface RegisterShape {
   name: string;

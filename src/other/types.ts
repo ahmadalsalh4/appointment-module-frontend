@@ -303,3 +303,21 @@ export interface LaravelErrorResponse {
   message: string;
   errors?: Record<string, string[]>;
 }
+// ==========================================
+// DISCRIMINATED UNIONS FOR MULTI-ROLE LOGIC
+// ==========================================
+
+/** A union of all possible login/register responses */
+export type AnyAuthResponse =
+  | { role: "customer"; customer: CustomerProfile; token: string }
+  | { role: "admin"; admin: AdminProfile; token: string }
+  | { role: "staff"; staff: StaffProfile; token: string };
+
+/** A union of all possible profile shapes */
+export type AnyProfileResponse =
+  | { role: "customer"; data: CustomerProfile }
+  | { role: "admin"; data: AdminProfile }
+  | { role: "staff"; data: StaffProfile };
+
+/** A utility type that extracts the actual user data regardless of role */
+export type AnyUser = CustomerProfile | AdminProfile | StaffProfile;

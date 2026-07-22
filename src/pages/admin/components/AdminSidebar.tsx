@@ -1,8 +1,70 @@
 import { Link, useLocation } from "react-router";
 import { useState } from "react";
 
-// Define the menu structure with nested children
 const menuItems = [
+  {
+    label: "Dashboard",
+    path: "/admin", // Direct link
+    icon: (
+      <svg
+        className="h-5 w-5"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth={2}
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+        />
+      </svg>
+    ),
+  },
+  {
+    label: "Randevular",
+    icon: (
+      <svg
+        className="h-5 w-5"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth={2}
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+        />
+      </svg>
+    ),
+    children: [
+      { label: "Tüm Randevular", path: "/admin/appointments" },
+      // { label: "Randevu Ekle", path: "/admin/appointments/add" }, // Usually admins don't add, customers do.
+    ],
+  },
+  {
+    label: "Personel",
+    icon: (
+      <svg
+        className="h-5 w-5"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth={2}
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
+        />
+      </svg>
+    ),
+    children: [
+      { label: "Personel Listesi", path: "/admin/staff" },
+      { label: "Personel Ekle", path: "/admin/staff/add" },
+    ],
+  },
   {
     label: "Hizmetler",
     icon: (
@@ -48,30 +110,8 @@ const menuItems = [
     ],
   },
   {
-    label: "Personel",
-    icon: (
-      <svg
-        className="h-5 w-5"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        strokeWidth={2}
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
-        />
-      </svg>
-    ),
-    children: [
-      { label: "Personel Listesi", path: "/admin/staff" },
-      { label: "Personel Ekle", path: "/admin/staff/add" },
-    ],
-  },
-  {
     label: "Profilim",
-    path: "/admin/profile", // No children, direct link
+    path: "/admin/profile", // Points to the shared profile page
     icon: (
       <svg
         className="h-5 w-5"
@@ -108,9 +148,11 @@ function SidebarContent({ onClose }: SidebarContentProps) {
 
   const isActive = (path: string) => location.pathname === path;
 
-  // Check if any child of a parent menu is currently active
   const isParentActive = (item: (typeof menuItems)[0]) => {
     if (!item.children) return false;
+    // Handle exact match for direct links like /admin
+    if (item.path) return location.pathname === item.path;
+    // Handle prefix match for children
     return item.children.some((child) =>
       location.pathname.startsWith(child.path),
     );
@@ -138,16 +180,24 @@ function SidebarContent({ onClose }: SidebarContentProps) {
         </button>
       </div>
 
-      <nav className="flex-1 space-y-1 px-3 overflow-y-auto">
+      {/* Desktop Logo/Title */}
+      <div className="mb-8 hidden px-6 lg:block">
+        <h1 className="text-xl font-extrabold tracking-tight text-deep">
+          Admin Panel
+        </h1>
+        <p className="text-xs text-main/50 mt-1">Yönetim Merkezi</p>
+      </div>
+
+      <nav className="flex-1 space-y-1 px-3 overflow-y-auto pb-4">
         {menuItems.map((item) => (
           <div key={item.label}>
-            {/* Parent Item */}
             {item.children ? (
+              // Dropdown Menu
               <button
                 onClick={() => toggleMenu(item.label)}
                 className={`flex w-full items-center justify-between rounded-lg px-4 py-3 text-sm font-medium transition-all ${
                   isParentActive(item)
-                    ? "text-deep"
+                    ? "text-deep bg-deep/5"
                     : "text-main/70 hover:bg-main/5 hover:text-main"
                 }`}
               >
@@ -155,7 +205,6 @@ function SidebarContent({ onClose }: SidebarContentProps) {
                   {item.icon}
                   {item.label}
                 </div>
-                {/* Dropdown Arrow */}
                 <svg
                   className={`h-4 w-4 transform transition-transform ${openMenus.includes(item.label) ? "rotate-180" : ""}`}
                   fill="none"
@@ -171,13 +220,13 @@ function SidebarContent({ onClose }: SidebarContentProps) {
                 </svg>
               </button>
             ) : (
-              // Direct Link (Profile)
+              // Direct Link
               <Link
                 to={item.path!}
                 onClick={onClose}
                 className={`flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all ${
                   isActive(item.path!)
-                    ? "bg-deep/10 text-deep"
+                    ? "bg-deep text-surface shadow-sm" // Filled style for main active page
                     : "text-main/70 hover:bg-main/5 hover:text-main"
                 }`}
               >
@@ -186,13 +235,13 @@ function SidebarContent({ onClose }: SidebarContentProps) {
               </Link>
             )}
 
-            {/* Children Items (Dropdown) */}
+            {/* Children Items */}
             {item.children && (
               <div
-                className={`overflow-hidden transition-all duration-200 ${
+                className={`overflow-hidden transition-all duration-200 ease-in-out ${
                   openMenus.includes(item.label) || isParentActive(item)
-                    ? "max-h-96 mt-1"
-                    : "max-h-0"
+                    ? "max-h-96 mt-1 opacity-100"
+                    : "max-h-0 opacity-0"
                 }`}
               >
                 <div className="ml-8 flex flex-col space-y-1 border-l-2 border-main/10 pl-4">
@@ -203,7 +252,7 @@ function SidebarContent({ onClose }: SidebarContentProps) {
                       onClick={onClose}
                       className={`rounded-lg px-3 py-2 text-sm transition-all ${
                         isActive(child.path)
-                          ? "font-semibold text-deep"
+                          ? "font-semibold text-deep bg-deep/5"
                           : "text-main/60 hover:text-main hover:bg-main/5"
                       }`}
                     >
@@ -264,7 +313,7 @@ export default function AdminSidebar() {
       </div>
 
       {/* DESKTOP: Static Sidebar */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:z-30 lg:flex lg:w-64 lg:flex-col">
+      <div className="hidden lg:fixed lg:inset-y-15 lg:z-30 lg:flex lg:w-64 lg:flex-col">
         <SidebarContent />
       </div>
     </>

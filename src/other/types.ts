@@ -8,6 +8,11 @@ export interface ApiTimestamps {
   updated_at: string;
 }
 
+/** Generic { message: string } response used by delete/logout/etc endpoints */
+export interface MessageResponse {
+  message: string;
+}
+
 /** The core person details shared across ALL user types */
 export interface Person extends ApiTimestamps {
   id: number;
@@ -15,6 +20,14 @@ export interface Person extends ApiTimestamps {
   surname: string;
   phone_number: string;
 }
+
+// ==========================================
+// ROLE / AUTH SHARED TYPES
+// ==========================================
+
+/** Canonical role type. `Role` is kept as an alias for backward compatibility with existing hooks. */
+export type UserRole = "customer" | "admin" | "staff";
+export type Role = UserRole;
 
 // ==========================================
 // ENTITY INTERFACES (Standalone Profile Data)
@@ -54,6 +67,9 @@ export interface StaffProfile extends ApiTimestamps {
   managing_admin: ManagingAdminLight;
 }
 
+/** A utility type that extracts the actual user data regardless of role */
+export type AnyUser = CustomerProfile | AdminProfile | StaffProfile;
+
 // ==========================================
 // AUTH REQUEST BODIES
 // ==========================================
@@ -72,12 +88,13 @@ export interface LoginBody {
   role: UserRole;
 }
 
+/** Aliases kept so existing hooks (useAuth.ts) don't need renaming */
+export type LoginShape = LoginBody;
+export type RegisterShape = CustomerRegisterBody;
+
 // ==========================================
 // AUTH RESPONSE INTERFACES
 // ==========================================
-
-/** Helper type to make role strictly typed */
-export type UserRole = "customer" | "admin" | "staff";
 
 /** Base Auth Response structure */
 interface BaseAuthResponse {
@@ -87,25 +104,60 @@ interface BaseAuthResponse {
 
 /** Customer Register & Login Response */
 export interface CustomerAuthResponse extends BaseAuthResponse {
+  role: "customer";
   customer: CustomerProfile;
 }
 
 /** Admin Login Response */
 export interface AdminAuthResponse extends BaseAuthResponse {
+  role: "admin";
   admin: AdminProfile;
 }
 
 /** Staff Login Response */
 export interface StaffAuthResponse extends BaseAuthResponse {
+  role: "staff";
   staff: StaffProfile;
 }
+
+/** A union of all possible login/register responses (discriminated by `role`) */
+export type AnyAuthResponse =
+  | CustomerAuthResponse
+  | AdminAuthResponse
+  | StaffAuthResponse;
+
+/**
+ * Generic alias used by hooks that don't care which specific role responded
+ * (e.g. useLoginMutation, useRegisterMutation). If a hook targets a single
+ * known role, prefer the specific *AuthResponse type instead.
+ */
+export type LoginResponse = AnyAuthResponse;
+
+/** A union of all possible profile shapes, discriminated by `role` */
+export type AnyProfileResponse =
+  | { role: "customer"; data: CustomerProfile }
+  | { role: "admin"; data: AdminProfile }
+  | { role: "staff"; data: StaffProfile };
 
 // ==========================================
 // MISC RESPONSES
 // ==========================================
 
-export interface LogoutResponse {
+export type LogoutResponse = MessageResponse;
+
+export interface LaravelErrorResponse {
   message: string;
+  errors?: Record<string, string[]>;
+}
+
+export interface AuthContextValue {
+  user: AnyUser | null;
+  token: string | null;
+  role: UserRole | null;
+  handleLoginSuccess: (data: AnyAuthResponse) => void;
+  handleLogout: () => void;
+  saveToken: (token: string | null) => void;
+  saveRole: (role: UserRole | null) => void;
 }
 
 // ==========================================
@@ -128,19 +180,21 @@ export interface CategoryRequestBody {
   name: string;
 }
 
-/** Delete Category Response */
-export interface DeleteCategoryResponse {
-  message: string;
-}
+export type DeleteCategoryResponse = MessageResponse;
 
 // ==========================================
 // SERVICE TYPES
 // ==========================================
 
-/** Base Service shape */
+/**
+ * Base Service shape.
+ * NOTE: `catagory_id` is a backend typo (should be `category_id`) kept as-is
+ * to match the actual API response. Do not "fix" the spelling here without
+ * confirming the backend field name has also changed.
+ */
 export interface Service extends ApiTimestamps {
   id: number;
-  catagory_id: number | string; // Backend sends string on POST, number on GET
+  catagory_id: number;
   name: string;
   duration: number;
 }
@@ -150,17 +204,18 @@ export interface ServiceWithCategory extends Service {
   category: Category;
 }
 
-/** Post / Put Service Request Body */
+/**
+ * Post / Put Service Request Body.
+ * `catagory_id` is allowed as string|number here because it may come
+ * straight from a <select> or form input before being sent to the API.
+ */
 export interface ServiceRequestBody {
   catagory_id: string | number;
   name: string;
   duration: number;
 }
 
-/** Delete Service Response */
-export interface DeleteServiceResponse {
-  message: string;
-}
+export type DeleteServiceResponse = MessageResponse;
 
 // ==========================================
 // STAFF MANAGEMENT TYPES
@@ -207,10 +262,7 @@ export interface UpdateStaffResponse extends ApiTimestamps {
   admin_id: number;
 }
 
-/** Delete Staff Response */
-export interface DeleteStaffResponse {
-  message: string;
-}
+export type DeleteStaffResponse = MessageResponse;
 
 // ==========================================
 // APPOINTMENT STATUS
@@ -228,21 +280,19 @@ export interface AppointmentStatus extends ApiTimestamps {
 
 /**
  * Base Appointment shape.
- * We use Partial<> for staff and customer because:
+ * `staff` and `customer` are optional because:
  * - Customer endpoints DON'T return the 'customer' object
  * - Staff endpoints DON'T return the 'staff' object
  * - Admin endpoints return BOTH
  */
-export interface Appointment {
+export interface Appointment extends ApiTimestamps {
   id: number;
-  staff_id: number | string;
+  staff_id: number;
   customer_id: number;
   service_id: number;
   state_id: number;
   start_date: string;
   end_date: string;
-  created_at: string;
-  updated_at: string;
 
   service: Service;
   status: AppointmentStatus;
@@ -277,47 +327,13 @@ export interface GetAvailabilityBody {
 // ==========================================
 
 /** Response for Customer Cancel */
-export interface CancelAppointmentResponse {
-  message: string;
+export interface CancelAppointmentResponse extends MessageResponse {
   appointment: Appointment;
 }
 
-/** Response for Admin Delete */
-export interface DeleteAppointmentResponse {
-  message: string;
-}
+export type DeleteAppointmentResponse = MessageResponse;
 
 /** Response for Availability Check */
 export interface AvailabilityResponse {
   available_slots: string[]; // Array of "HH:mm" strings
 }
-
-export interface AuthContextValue {
-  token: string | null;
-  role: UserRole | null;
-  saveToken: (token: string | null) => void;
-  saveRole: (role: UserRole | null) => void;
-}
-
-export interface LaravelErrorResponse {
-  message: string;
-  errors?: Record<string, string[]>;
-}
-// ==========================================
-// DISCRIMINATED UNIONS FOR MULTI-ROLE LOGIC
-// ==========================================
-
-/** A union of all possible login/register responses */
-export type AnyAuthResponse =
-  | { role: "customer"; customer: CustomerProfile; token: string }
-  | { role: "admin"; admin: AdminProfile; token: string }
-  | { role: "staff"; staff: StaffProfile; token: string };
-
-/** A union of all possible profile shapes */
-export type AnyProfileResponse =
-  | { role: "customer"; data: CustomerProfile }
-  | { role: "admin"; data: AdminProfile }
-  | { role: "staff"; data: StaffProfile };
-
-/** A utility type that extracts the actual user data regardless of role */
-export type AnyUser = CustomerProfile | AdminProfile | StaffProfile;

@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
-import { useRegisterMutation } from "../../hooks/useAuth";
 import Error from "../components/Error";
-import { useAuthCTX } from "../../contexts/auth/useAuthCTX";
-import type { RegisterShape } from "../../other/typesold";
+import { useRegisterMutation } from "../../hooks/useAuthQueries";
+import { useAuth } from "../../contexts/auth/useAuth";
+import type { RegisterShape } from "../../other/types";
+
 
 export default function Register() {
   const navigate = useNavigate();
@@ -15,7 +16,7 @@ export default function Register() {
     password: "",
     password_confirmation: "",
   });
-  const { saveRole, saveToken } = useAuthCTX();
+  const { saveRole, saveToken } = useAuth();
 
   const {
     mutate: register,
@@ -34,7 +35,7 @@ export default function Register() {
     register(form, {
       onSuccess: (data) => {
         console.log("Registration Success:", data);
-        navigate("/login");
+        // navigate("/login");
       },
     });
   };
@@ -197,7 +198,7 @@ export default function Register() {
         <div className="mt-6 text-center text-sm text-main/70">
           Zaten hesabınız var mı?{" "}
           <Link
-            to="/login"
+            // to="/login"
             className="font-semibold text-waiting hover:underline"
           >
             Giriş Yapın

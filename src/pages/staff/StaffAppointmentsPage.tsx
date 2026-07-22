@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Link } from "react-router";
-import { useStaffAppointments } from "../../hooks/useStaffAppointments";
 import Loading from "../components/Loading";
 import Error from "../components/Error";
 import type {

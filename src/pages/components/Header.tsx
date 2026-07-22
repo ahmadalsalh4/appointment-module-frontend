@@ -1,9 +1,10 @@
 import { useNavigate } from "react-router";
-import { useAuthCTX } from "../../contexts/auth/useAuthCTX";
-import { useLogoutMutation } from "../../hooks/useAuth";
+import { useAuth } from "../../contexts/auth/useAuth";
+import { useLogoutMutation } from "../../hooks/useAuthQueries";
+
 
 export default function Header() {
-  const { token, role } = useAuthCTX();
+  const { token, role } = useAuth();
   const navigate = useNavigate();
   const { mutate: logout } = useLogoutMutation();
 
@@ -68,7 +69,7 @@ export default function Header() {
           </div>
         ) : (
           <button
-            onClick={() => navigate("/login")}
+            // onClick={() => navigate("/login")}
             className="rounded-lg bg-deep px-4 py-2 text-sm font-semibold text-surface transition hover:bg-deep/90"
           >
             Giriş Yap

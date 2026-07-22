@@ -1,12 +1,9 @@
 import { useContext } from "react";
 import { AuthContext } from "./Authcontext";
 
-export const useAuthCTX = () => {
+export const useAuth = () => {
   const context = useContext(AuthContext);
-
-  if (context === null) {
-    throw new Error("useAuth hook'u AuthProvider içinde kullanılmalıdır!");
-  }
-
+  if (context === undefined)
+    throw new Error("useAuth must be used within an AuthProvider");
   return context;
 };

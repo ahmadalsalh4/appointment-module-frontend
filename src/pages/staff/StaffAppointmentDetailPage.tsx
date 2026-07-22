@@ -1,9 +1,6 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router";
-import {
-  useStaffAppointmentDetail,
-  useUpdateAppointmentStatus,
-} from "../../hooks/useStaffAppointments";
+
 import Loading from "../components/Loading";
 import Error from "../components/Error";
 

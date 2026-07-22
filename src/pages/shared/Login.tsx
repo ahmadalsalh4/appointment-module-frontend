@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { useLoginMutation } from "../../hooks/useAuth";
 import Error from "../components/Error";
-import { useAuthCTX } from "../../contexts/auth/useAuthCTX";
 import { Link, useNavigate } from "react-router";
-import type { LoginShape } from "../../other/typesold";
+import type { LoginShape } from "../../other/types";
+import { useLoginMutation } from "../../hooks/useAuthQueries";
+import { useAuth } from "../../contexts/auth/useAuth";
 
 export default function Login2() {
   const [form, setForm] = useState<LoginShape>({
@@ -14,7 +14,7 @@ export default function Login2() {
 
   const { mutate: login, isPending, isError, error, data } = useLoginMutation();
 
-  const { saveRole, saveToken } = useAuthCTX();
+  const { saveRole, saveToken } = useAuth();
   const navigate = useNavigate();
 
   function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {

@@ -39,7 +39,7 @@ export default function UnauthorizedPage() {
         </Link>
 
         <Link
-          to="/login"
+          to="/test"
           className="inline-flex items-center justify-center gap-2 rounded-lg border border-main/20 bg-surface px-6 py-3 text-sm font-semibold text-main transition-all hover:bg-main/5 active:scale-95"
         >
           Farklı Hesapla Giriş Yap

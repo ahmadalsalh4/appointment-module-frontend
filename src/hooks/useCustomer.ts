@@ -4,7 +4,7 @@ import customerApi from "../api/customer";
 import type {
   CreateAppointmentShape,
   LaravelErrorResponse,
-} from "../other/types";
+} from "../other/typesold";
 
 export const useServices = () => {
   return useQuery({

@@ -1,5 +1,5 @@
 import api from ".";
-import type { CreateAppointmentShape } from "../other/types";
+import type { CreateAppointmentBody } from "../other/types";
 
 export default {
   getServices: async () => {
@@ -22,7 +22,7 @@ export default {
     return res.data;
   },
 
-  createAppointment: async (data: CreateAppointmentShape) => {
+  createAppointment: async (data: CreateAppointmentBody) => {
     const res = await api.post("/customer/appointments", data);
     return res.data;
   },

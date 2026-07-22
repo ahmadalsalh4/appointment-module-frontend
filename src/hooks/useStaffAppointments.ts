@@ -4,7 +4,7 @@ import appointmentsApi from "../api/appointments";
 import type {
   StaffAppointmentsFilters,
   StaffAppointmentDetail,
-} from "../other/types";
+} from "../other/typesold";
 
 export const useStaffAppointments = (filters?: StaffAppointmentsFilters) => {
   return useQuery({

@@ -1,6 +1,6 @@
 import { Route } from "react-router";
 import ProtectedRoute from "../other/ProtectedRoute";
-import type { Role } from "../other/types";
+import type { Role } from "../other/typesold";
 
 type RouteConfig = { path: string; element: React.ReactNode };
 

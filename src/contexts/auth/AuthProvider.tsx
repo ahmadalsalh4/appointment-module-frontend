@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from "react";
 import { AuthContext } from "./Authcontext";
+import type { UserRole } from "../../other/types";
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -10,8 +11,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     return localStorage.getItem("token");
   });
 
-  const [role, setRole] = useState<string | null>(() => {
-    return localStorage.getItem("role");
+  const [role, setRole] = useState<UserRole | null>(() => {
+    return localStorage.getItem("role") as UserRole;
   });
 
   const saveToken = (newToken: string | null) => {
@@ -23,7 +24,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setToken(newToken);
   };
 
-  const saveRole = (newRole: string | null) => {
+  const saveRole = (newRole: UserRole | null) => {
     if (newRole) {
       localStorage.setItem("role", newRole);
     } else {

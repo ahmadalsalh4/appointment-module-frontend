@@ -6,7 +6,7 @@ import Error from "../components/Error";
 import type {
   StaffAppointmentsFilters,
   StaffAppointment,
-} from "../../other/types";
+} from "../../other/typesold";
 
 // Durum isimlerini Türkçeye çeviren ve renk veren fonksiyon
 const getStatusStyle = (statusName: string) => {

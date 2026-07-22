@@ -1,5 +1,4 @@
 import api from ".";
-import type { StaffAppointmentsFilters } from "../other/types";
 
 export default {
   getStaffAppointments: async (filters?: StaffAppointmentsFilters) => {

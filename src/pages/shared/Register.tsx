@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { useRegisterMutation } from "../../hooks/useAuth";
 import Error from "../components/Error";
-import type { RegisterShape } from "../../api/auth";
-import { useAuth } from "../../contexts/auth/useAuthCTX";
+import { useAuthCTX } from "../../contexts/auth/useAuthCTX";
+import type { RegisterShape } from "../../other/typesold";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -15,7 +15,7 @@ export default function Register() {
     password: "",
     password_confirmation: "",
   });
-  const { saveRole, saveToken } = useAuth();
+  const { saveRole, saveToken } = useAuthCTX();
 
   const {
     mutate: register,

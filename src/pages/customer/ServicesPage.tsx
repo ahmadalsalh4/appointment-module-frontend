@@ -56,7 +56,7 @@ export default function ServicesPage() {
               className="group relative bg-white rounded-2xl shadow-sm border border-gray-100 p-8 hover:shadow-xl hover:border-indigo-100 transition-all duration-300 flex flex-col"
             >
               {/* Decorative top gradient bar */}
-              <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-t-2xl transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
+              <div className="absolute inset-x-0 top-0 h-1 bg-linear-to-r from-indigo-500 to-purple-500 rounded-t-2xl transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
 
               {/* Category Tag */}
               {service.category && (
@@ -70,7 +70,7 @@ export default function ServicesPage() {
                 {service.name}
               </h3>
 
-              <p className="text-gray-500 text-sm mb-6 flex-grow">
+              <p className="text-gray-500 text-sm mb-6 grow">
                 Bu hizmet hakkında detaylı bilgi almak ve müsait saatleri görmek
                 için tıklayın.
               </p>

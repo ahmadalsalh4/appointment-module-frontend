@@ -6,13 +6,14 @@ import type {
   CustomerRegisterBody,
   LaravelErrorResponse,
   LoginBody,
+  LoginResponse,
   LogoutResponse,
   UserRole,
 } from "../other/types";
 
 export const useLoginMutation = () => {
   return useMutation<
-    CustomerAuthResponse, // Note: You might want to make a Union type here if Admin/Staff login returns different shapes, but keeping it as is based on your example
+    LoginResponse,
     AxiosError<LaravelErrorResponse>,
     LoginBody
   >({

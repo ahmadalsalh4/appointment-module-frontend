@@ -9,7 +9,7 @@ export default function Header() {
   const { mutate: logout } = useLogoutMutation();
 
   const handleLogout = () => {
-    logout(role);
+    if (role) logout(role);
   };
   return (
     <header className="sticky top-0 z-50 w-full border-b border-main/10 bg-surface shadow-sm">

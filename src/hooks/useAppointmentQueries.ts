@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import appointmentsApi from "../api/appointments";
+import appointmentsApi, { type AppointmentFilters } from "../api/appointments";
 
 import type { AxiosError } from "axios";
 import type {
@@ -14,11 +14,11 @@ import type {
 } from "../other/types";
 
 // --- CUSTOMER HOOKS ---
-export const useCustomerGetAppointmentsQuery = () => {
+export const useCustomerGetAppointmentsQuery = (params?: AppointmentFilters) => {
   return useQuery<Appointment[], AxiosError<LaravelErrorResponse>>({
-    queryKey: ["appointments", "customer"],
+    queryKey: ["appointments", "customer", params],
     queryFn: async () => {
-      return await appointmentsApi.myAppointments(); // DÜZELTİLDİ
+      return await appointmentsApi.myAppointments(params);
     },
   });
 };
@@ -27,7 +27,7 @@ export const useCustomerGetAppointmentByIdQuery = (id: number | string) => {
   return useQuery<Appointment, AxiosError<LaravelErrorResponse>>({
     queryKey: ["appointments", "customer", id],
     queryFn: async () => {
-      return await appointmentsApi.myAppointmentDetail(id); // DÜZELTİLDİ
+      return await appointmentsApi.myAppointmentDetail(id);
     },
     enabled: !!id,
   });
@@ -40,7 +40,7 @@ export const useCreateAppointmentMutation = () => {
     CreateAppointmentBody
   >({
     mutationFn: async (data) => {
-      return await appointmentsApi.create(data); // DÜZELTİLDİ
+      return await appointmentsApi.create(data);
     },
   });
 };
@@ -52,17 +52,17 @@ export const useCancelAppointmentMutation = () => {
     number | string
   >({
     mutationFn: async (id) => {
-      return await appointmentsApi.cancel(id); // DÜZELTİLDİ
+      return await appointmentsApi.cancel(id);
     },
   });
 };
 
 // --- STAFF HOOKS ---
-export const useStaffGetAppointmentsQuery = () => {
+export const useStaffGetAppointmentsQuery = (params?: AppointmentFilters) => {
   return useQuery<Appointment[], AxiosError<LaravelErrorResponse>>({
-    queryKey: ["appointments", "staff"],
+    queryKey: ["appointments", "staff", params],
     queryFn: async () => {
-      return await appointmentsApi.staffAppointments(); // DÜZELTİLDİ
+      return await appointmentsApi.staffAppointments(params);
     },
   });
 };
@@ -71,7 +71,7 @@ export const useStaffGetAppointmentByIdQuery = (id: number | string) => {
   return useQuery<Appointment, AxiosError<LaravelErrorResponse>>({
     queryKey: ["appointments", "staff", id],
     queryFn: async () => {
-      return await appointmentsApi.staffAppointmentDetail(id); // DÜZELTİLDİ
+      return await appointmentsApi.staffAppointmentDetail(id);
     },
     enabled: !!id,
   });
@@ -84,17 +84,17 @@ export const useStaffUpdateStateMutation = () => {
     { id: number | string; data: UpdateAppointmentStateBody }
   >({
     mutationFn: async ({ id, data }) => {
-      return await appointmentsApi.staffUpdateStatus({ id, data }); // DOĞRU
+      return await appointmentsApi.staffUpdateStatus({ id, data });
     },
   });
 };
 
 // --- ADMIN HOOKS ---
-export const useAdminGetAppointmentsQuery = () => {
+export const useAdminGetAppointmentsQuery = (params?: AppointmentFilters) => {
   return useQuery<Appointment[], AxiosError<LaravelErrorResponse>>({
-    queryKey: ["appointments", "admin"],
+    queryKey: ["appointments", "admin", params],
     queryFn: async () => {
-      return await appointmentsApi.adminAppointments(); // DÜZELTİLDİ
+      return await appointmentsApi.adminAppointments(params);
     },
   });
 };
@@ -103,7 +103,7 @@ export const useAdminGetAppointmentByIdQuery = (id: number | string) => {
   return useQuery<Appointment, AxiosError<LaravelErrorResponse>>({
     queryKey: ["appointments", "admin", id],
     queryFn: async () => {
-      return await appointmentsApi.adminAppointmentDetail(id); // DÜZELTİLDİ
+      return await appointmentsApi.adminAppointmentDetail(id);
     },
     enabled: !!id,
   });
@@ -116,7 +116,7 @@ export const useAdminUpdateStateMutation = () => {
     { id: number | string; data: UpdateAppointmentStateBody }
   >({
     mutationFn: async ({ id, data }) => {
-      return await appointmentsApi.adminUpdateState({ id, data }); // DOĞRU
+      return await appointmentsApi.adminUpdateState({ id, data });
     },
   });
 };
@@ -128,7 +128,7 @@ export const useAdminDeleteAppointmentMutation = () => {
     number | string
   >({
     mutationFn: async (id) => {
-      return await appointmentsApi.adminDelete(id); // DOĞRU
+      return await appointmentsApi.adminDelete(id);
     },
   });
 };
@@ -141,7 +141,7 @@ export const useGetAvailabilityMutation = () => {
     GetAvailabilityBody
   >({
     mutationFn: async (data) => {
-      return await appointmentsApi.getAvailability(data); // DOĞRU
+      return await appointmentsApi.getAvailability(data);
     },
   });
 };

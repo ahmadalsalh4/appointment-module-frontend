@@ -1,9 +1,17 @@
 import api from ".";
 import type { UserRole, AnyProfileResponse } from "../other/types";
 
+export interface ProfileUpdateBody {
+  email?: string;
+  password?: string;
+  name?: string;
+  surname?: string;
+  phone_number?: string;
+  job_title?: string;
+}
+
 export default {
   get: async (role: UserRole): Promise<AnyProfileResponse> => {
-    // We manually wrap the response in our discriminated union shape
     let data: any;
 
     if (role === "customer") {
@@ -17,7 +25,15 @@ export default {
       data = res.data;
     }
 
-    // Return the exact shape defined in types.ts: { role: "...", data: {...} }
     return { role, data };
+  },
+
+  update: async (role: UserRole, data: ProfileUpdateBody) => {
+    let endpoint = "/customer/profile";
+    if (role === "staff") endpoint = "/staff/profile";
+    if (role === "admin") endpoint = "/admin/profile";
+
+    const res = await api.put(endpoint, data);
+    return { role, data: res.data };
   },
 };

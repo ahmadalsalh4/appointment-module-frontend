@@ -2,10 +2,9 @@ import { useState } from "react";
 import { Link } from "react-router";
 import Loading from "../components/Loading";
 import Error from "../components/Error";
-import type {
-  StaffAppointmentsFilters,
-  StaffAppointment,
-} from "../../other/typesold";
+import { useStaffGetAppointmentsQuery } from "../../hooks/useAppointmentQueries";
+import type { AppointmentFilters } from "../../api/appointments";
+import type { Appointment } from "../../other/types";
 
 // Durum isimlerini Türkçeye çeviren ve renk veren fonksiyon
 const getStatusStyle = (statusName: string) => {
@@ -56,13 +55,13 @@ const formatDate = (isoDate: string) => {
 };
 
 export default function StaffAppointmentsPage() {
-  const [filters, setFilters] = useState<StaffAppointmentsFilters>({});
+  const [filters, setFilters] = useState<AppointmentFilters>({});
   const {
     data: appointments,
     isPending,
     isError,
     error,
-  } = useStaffAppointments(filters);
+  } = useStaffGetAppointmentsQuery(filters);
 
   const handleFilter = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -155,10 +154,10 @@ export default function StaffAppointmentsPage() {
                 </td>
               </tr>
             ) : (
-              appointments?.map((apt: StaffAppointment) => (
+              appointments?.map((apt: Appointment) => (
                 <tr key={apt.id} className="hover:bg-back/30 transition">
                   <td className="px-6 py-4 font-medium text-main">
-                    {apt.customer.person.name} {apt.customer.person.surname}
+                    {apt.customer?.person.name} {apt.customer?.person.surname}
                   </td>
                   <td className="px-6 py-4 text-main/80">
                     <div>{formatDate(apt.start_date)}</div>

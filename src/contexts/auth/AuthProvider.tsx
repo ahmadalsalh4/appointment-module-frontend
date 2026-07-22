@@ -55,10 +55,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Custom function to call on logout
   const handleLogout = () => {
-    // saveToken(null);
-    // saveRole(null);
-    // setUser(null);
-    // window.location.href = "/login";
+    saveToken(null);
+    saveRole(null);
+    setUser(null);
   };
 
   return (

@@ -119,7 +119,7 @@ export const TestPage: React.FC = () => {
       admin: "admin@test.com",
       staff: "ahmad32@example.com",
     };
-    const body = { email: emails[r], password: "admin123", role: r as const };
+    const body = { email: emails[r], password: "admin123", role: r };
     try {
       const res = await loginMut.mutateAsync(body);
       handleLoginSuccess!(res as AnyAuthResponse);

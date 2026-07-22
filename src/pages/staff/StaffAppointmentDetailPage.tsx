@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router";
+import { useStaffGetAppointmentByIdQuery, useStaffUpdateStateMutation } from "../../hooks/useAppointmentQueries";
 
 import Loading from "../components/Loading";
 import Error from "../components/Error";
@@ -24,8 +25,8 @@ export default function StaffAppointmentDetailPage() {
     isPending,
     isError,
     error,
-  } = useStaffAppointmentDetail(Number(id));
-  const updateStatus = useUpdateAppointmentStatus();
+  } = useStaffGetAppointmentByIdQuery(Number(id));
+  const updateStatus = useStaffUpdateStateMutation();
 
   const [selectedStatus, setSelectedStatus] = useState<string>("");
 
@@ -34,7 +35,7 @@ export default function StaffAppointmentDetailPage() {
     if (!selectedStatus || !id) return;
 
     updateStatus.mutate(
-      { id: Number(id), statusId: Number(selectedStatus) },
+      { id: Number(id), data: { state_id: Number(selectedStatus) } },
       { onSuccess: () => navigate("/staff/appointments") },
     );
   };
@@ -104,16 +105,16 @@ export default function StaffAppointmentDetailPage() {
             <div>
               <dt className="text-xs text-main/50">Ad Soyad</dt>
               <dd className="text-lg font-semibold text-main">
-                {apt?.customer.person.name} {apt?.customer.person.surname}
+                {apt?.customer?.person.name} {apt?.customer?.person.surname}
               </dd>
             </div>
             <div>
               <dt className="text-xs text-main/50">Telefon</dt>
-              <dd className="text-main">{apt?.customer.person.phone_number}</dd>
+              <dd className="text-main">{apt?.customer?.person.phone_number}</dd>
             </div>
             <div>
               <dt className="text-xs text-main/50">E-posta</dt>
-              <dd className="text-main">{apt?.customer.email}</dd>
+              <dd className="text-main">{apt?.customer?.email}</dd>
             </div>
           </div>
 

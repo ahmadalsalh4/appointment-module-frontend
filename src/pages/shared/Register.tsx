@@ -198,7 +198,7 @@ export default function Register() {
         <div className="mt-6 text-center text-sm text-main/70">
           Zaten hesabınız var mı?{" "}
           <Link
-            // to="/login"
+            to="/login"
             className="font-semibold text-waiting hover:underline"
           >
             Giriş Yapın

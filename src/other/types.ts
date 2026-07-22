@@ -80,6 +80,7 @@ export interface CustomerRegisterBody {
   email: string;
   phone_number: string;
   password: string;
+  password_confirmation?: string;
 }
 
 export interface LoginBody {

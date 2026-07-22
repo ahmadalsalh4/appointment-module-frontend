@@ -1,5 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
-import profilesApi from "../api/profiles";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import profilesApi, { type ProfileUpdateBody } from "../api/profiles";
 import type { AxiosError } from "axios";
 import type {
   AnyProfileResponse,
@@ -15,5 +15,17 @@ export const useGetProfileQuery = (role: UserRole | null) => {
       return await profilesApi.get(role);
     },
     enabled: !!role, // Don't run if we don't know the role yet
+  });
+};
+
+export const useUpdateProfileMutation = () => {
+  return useMutation<
+    AnyProfileResponse,
+    AxiosError<LaravelErrorResponse>,
+    { role: UserRole; data: ProfileUpdateBody }
+  >({
+    mutationFn: async ({ role, data }) => {
+      return await profilesApi.update(role, data);
+    },
   });
 };

@@ -16,32 +16,31 @@ import NotFoundPage from "./pages/shared/NotFoundPage";
 import { TestPage } from "./pages/TestPage";
 
 export default function App() {
-  return <TestPage></TestPage>;
-  // return (
-  //   <Routes>
-  //     <Route path="/test" element={<TestPage />} />
-  //     {/* <Route element={<GeneralLayout />}>
-  //       <Route path="/login" element={<Login />} />
-  //       <Route path="/register" element={<Register />} />
-  //       <Route path="/unauthorized" element={<UnauthorizedPage />} />
-  //       <Route path="*" element={<NotFoundPage />} />
+  return (
+    <Routes>
+      <Route path="/test" element={<TestPage />} />
+      <Route element={<GeneralLayout />}>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
-  //       {RoleRoutes({
-  //         allowedRole: "customer",
-  //         layout: CustomerLayout,
-  //         routes: customerRoutes,
-  //       })}
-  //       {RoleRoutes({
-  //         allowedRole: "staff",
-  //         layout: StaffLayout,
-  //         routes: staffRoutes,
-  //       })}
-  //       {RoleRoutes({
-  //         allowedRole: "admin",
-  //         layout: AdminLayout,
-  //         routes: adminRoutes,
-  //       })}
-  //     </Route> */}
-  //   </Routes>
-  // );
+        {RoleRoutes({
+          allowedRole: "customer",
+          layout: CustomerLayout,
+          routes: customerRoutes,
+        })}
+        {RoleRoutes({
+          allowedRole: "staff",
+          layout: StaffLayout,
+          routes: staffRoutes,
+        })}
+        {RoleRoutes({
+          allowedRole: "admin",
+          layout: AdminLayout,
+          routes: adminRoutes,
+        })}
+        <Route path="*" element={<NotFoundPage />} />
+      </Route>
+    </Routes>
+  );
 }

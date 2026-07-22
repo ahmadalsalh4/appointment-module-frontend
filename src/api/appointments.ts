@@ -5,10 +5,16 @@ import type {
   GetAvailabilityBody,
 } from "../other/types";
 
+export interface AppointmentFilters {
+  date?: string;
+  status_id?: string | number;
+  customer_name?: string;
+}
+
 export default {
   // --- PUBLIC ---
   getAvailability: async (data: GetAvailabilityBody) => {
-    const res = await api.post("/availability", data);
+    const res = await api.get("/availability", { params: data });
     return res.data;
   },
 
@@ -23,8 +29,8 @@ export default {
     return res.data;
   },
 
-  myAppointments: async () => {
-    const res = await api.get("/my-appointments");
+  myAppointments: async (params?: AppointmentFilters) => {
+    const res = await api.get("/my-appointments", { params });
     return res.data;
   },
 
@@ -34,8 +40,8 @@ export default {
   },
 
   // --- STAFF ROUTES ---
-  staffAppointments: async () => {
-    const res = await api.get("/staff/appointments");
+  staffAppointments: async (params?: AppointmentFilters) => {
+    const res = await api.get("/staff/appointments", { params });
     return res.data;
   },
 
@@ -56,8 +62,8 @@ export default {
   },
 
   // --- ADMIN ROUTES ---
-  adminAppointments: async () => {
-    const res = await api.get("/appointments");
+  adminAppointments: async (params?: AppointmentFilters) => {
+    const res = await api.get("/appointments", { params });
     return res.data;
   },
 

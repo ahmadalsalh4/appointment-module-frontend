@@ -36,7 +36,7 @@ const ProfileIcon = () => (
 
 // 2. Linkleri sadece veri olarak tuttuk
 const navLinks = [
-  { label: "Randevularım", path: "/staff/appointments", Icon: CalendarIcon },
+  { label: "Randevularım", path: "/staff", Icon: CalendarIcon },
   { label: "Profilim", path: "/staff/profile", Icon: ProfileIcon },
 ];
 

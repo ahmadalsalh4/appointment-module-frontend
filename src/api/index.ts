@@ -17,13 +17,13 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
-    if (error.response?.status === 401) {
+    if (error.response?.status === 401 && localStorage.getItem("token")) {
       console.error("Token geçersiz veya süresi dolmuş. Çıkış yapılıyor...");
 
-      // localStorage.removeItem("token");
-      // localStorage.removeItem("role");
+      localStorage.removeItem("token");
+      localStorage.removeItem("role");
 
-      // window.location.href = "/login";
+      window.location.href = "/login";
     }
 
     return Promise.reject(error);

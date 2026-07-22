@@ -35,9 +35,9 @@ export const useLogoutMutation = () => {
       return res;
     },
     onSuccess: () => {
-      // localStorage.removeItem("token");
-      // localStorage.removeItem("role");
-      // window.location.href = "/login";
+      localStorage.removeItem("token");
+      localStorage.removeItem("role");
+      window.location.href = "/login";
     },
     onError: (error) => {
       console.error("Logout başarısız:", error.response?.data);

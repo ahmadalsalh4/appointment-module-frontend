@@ -36,7 +36,7 @@ export default function StaffAppointmentDetailPage() {
 
     updateStatus.mutate(
       { id: Number(id), data: { state_id: Number(selectedStatus) } },
-      { onSuccess: () => navigate("/staff/appointments") },
+      { onSuccess: () => navigate("/staff") },
     );
   };
 

@@ -1,6 +1,17 @@
 import { Link } from "react-router";
+import { useAuth } from "../../contexts/auth/useAuth";
 
 export default function UnauthorizedPage() {
+  const { role } = useAuth();
+  const linkTo =
+    role === "customer"
+      ? "/"
+      : role === "admin"
+        ? "/admin"
+        : role === "staff"
+          ? "/staff"
+          : "/login";
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-back p-6 text-center">
       {/* Icon Circle */}
@@ -32,14 +43,14 @@ export default function UnauthorizedPage() {
       {/* Action Buttons */}
       <div className="mt-8 flex flex-col gap-3 sm:flex-row">
         <Link
-          to="/"
+          to={linkTo}
           className="inline-flex items-center justify-center gap-2 rounded-lg bg-deep px-6 py-3 text-sm font-semibold text-surface shadow-md transition-all hover:bg-deep/90 hover:shadow-lg active:scale-95"
         >
           Ana Sayfaya Dön
         </Link>
 
         <Link
-          to="/test"
+          to="/login"
           className="inline-flex items-center justify-center gap-2 rounded-lg border border-main/20 bg-surface px-6 py-3 text-sm font-semibold text-main transition-all hover:bg-main/5 active:scale-95"
         >
           Farklı Hesapla Giriş Yap

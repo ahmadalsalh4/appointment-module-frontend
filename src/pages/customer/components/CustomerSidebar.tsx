@@ -5,7 +5,7 @@ import { useState } from "react";
 const navLinks = [
   {
     label: "Hizmetler",
-    path: "/",
+    path: "/services",
     icon: (
       <svg
         className="h-5 w-5"
@@ -24,7 +24,7 @@ const navLinks = [
   },
   {
     label: "Randevularım",
-    path: "/my-appointments",
+    path: "/appointments",
     icon: (
       <svg
         className="h-5 w-5"
@@ -43,7 +43,7 @@ const navLinks = [
   },
   {
     label: "Profilim",
-    path: "/customer/profile",
+    path: "/profile",
     icon: (
       <svg
         className="h-5 w-5"

@@ -5,7 +5,7 @@ import type { LoginShape } from "../../other/types";
 import { useLoginMutation } from "../../hooks/useAuthQueries";
 import { useAuth } from "../../contexts/auth/useAuth";
 
-export default function Login2() {
+export default function Login() {
   const [form, setForm] = useState<LoginShape>({
     email: "",
     password: "",

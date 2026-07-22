@@ -13,16 +13,22 @@ import Login from "./pages/shared/Login";
 import Register from "./pages/shared/Register";
 import UnauthorizedPage from "./pages/shared/UnauthorizedPage";
 import NotFoundPage from "./pages/shared/NotFoundPage";
-import { TestPage } from "./pages/TestPage";
+
+// 1. IMPORT SERVICE PAGES HERE
+import ServicesPage from "./pages/customer/ServicesPage";
+import ServiceDetailPage from "./pages/customer/ServiceDetailPage";
 
 export default function App() {
   return (
     <Routes>
-      <Route path="/test" element={<TestPage />} />
       <Route element={<GeneralLayout />}>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
+
+        {/* 2. ADD PUBLIC SERVICE ROUTES HERE (No login required) */}
+        <Route path="/services" element={<ServicesPage />} />
+        <Route path="/services/:id" element={<ServiceDetailPage />} />
 
         {RoleRoutes({
           allowedRole: "customer",

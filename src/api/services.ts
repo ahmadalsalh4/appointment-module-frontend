@@ -12,6 +12,10 @@ export default {
     const res = await api.get(`/services/${id}`);
     return res.data;
   },
+  getServiceStaff: async (serviceId: number | string) => {
+    const res = await api.get(`/services/${serviceId}/staff`);
+    return res.data;
+  },
 
   // ADMIN ONLY
   create: async (data: ServiceRequestBody) => {

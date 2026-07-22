@@ -7,6 +7,7 @@ import type {
   ServiceRequestBody,
   DeleteServiceResponse,
   LaravelErrorResponse,
+  StaffEntity,
 } from "../other/types";
 
 export const useGetAllServicesQuery = () => {
@@ -61,5 +62,14 @@ export const useDeleteServiceMutation = () => {
     mutationFn: async (id) => {
       return await servicesApi.delete(id);
     },
+  });
+};
+export const useGetServiceStaffQuery = (serviceId: string | number) => {
+  return useQuery<StaffEntity[], AxiosError<LaravelErrorResponse>>({
+    queryKey: ["services", serviceId, "staff"],
+    queryFn: async () => {
+      return await servicesApi.getServiceStaff(serviceId);
+    },
+    enabled: !!serviceId, // Always fetch if we have an ID (it's a public endpoint)
   });
 };

@@ -1,4 +1,4 @@
-import  { useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router";
 import {
   useAdminGetAppointmentsQuery,
@@ -37,20 +37,6 @@ const getStatusStyle = (statusName: string) => {
     case "pending":
     default:
       return "bg-yellow-100 text-yellow-800";
-  }
-};
-
-const getStatusText = (statusName: string) => {
-  switch (statusName) {
-    case "confirmed":
-      return "Onaylandı";
-    case "completed":
-      return "Tamamlandı";
-    case "cancelled":
-      return "İptal Edildi";
-    case "pending":
-    default:
-      return "Beklemede";
   }
 };
 

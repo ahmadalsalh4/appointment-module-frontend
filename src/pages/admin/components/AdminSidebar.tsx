@@ -149,13 +149,19 @@ function SidebarContent({ onClose }: SidebarContentProps) {
   const isActive = (path: string) => location.pathname === path;
 
   const isParentActive = (item: (typeof menuItems)[0]) => {
-    if (!item.children) return false;
-    // Handle exact match for direct links like /admin
-    if (item.path) return location.pathname === item.path;
-    // Handle prefix match for children
-    return item.children.some((child) =>
-      location.pathname.startsWith(child.path),
-    );
+    // Eğer children yoksa VE path varsa, direkt eşleştiğini kontrol et
+    if (!item.children && "path" in item) {
+      return location.pathname === (item as { path: string }).path;
+    }
+
+    // Eğer children varsa, alt linklerden herhangi birine eşleşiyor mu diye bak
+    if (item.children) {
+      return item.children.some((child) =>
+        location.pathname.startsWith(child.path),
+      );
+    }
+
+    return false;
   };
 
   return (

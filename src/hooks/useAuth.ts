@@ -1,13 +1,12 @@
 import { useMutation } from "@tanstack/react-query";
 import authApi from "../api/auth";
-import type { LoginResponse, LoginShape, RegisterShape } from "../api/auth";
 import type { AxiosError } from "axios";
-
-
-export interface LaravelErrorResponse {
-  message: string;
-  errors?: Record<string, string[]>;
-}
+import type {
+  LaravelErrorResponse,
+  LoginResponse,
+  LoginShape,
+  RegisterShape,
+} from "../other/types";
 
 export const useLoginMutation = () => {
   return useMutation<

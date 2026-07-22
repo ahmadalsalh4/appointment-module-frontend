@@ -1,4 +1,34 @@
 export type Role = "staff" | "admin" | "customer";
+
+export type LoginShape = {
+  email: string;
+  password: string;
+  role: Role;
+};
+export type LoginResponse = {
+  token: string;
+  role: Role;
+  customer: {
+    person: {
+      name: string;
+      surname: string;
+    };
+  };
+};
+
+export interface RegisterShape {
+  name: string;
+  surname: string;
+  email: string;
+  phone_number: string;
+  password: string;
+  password_confirmation: string;
+}
+
+export interface LaravelErrorResponse {
+  message: string;
+  errors?: Record<string, string[]>;
+}
 export interface ProfileShape {
   id: number;
   person_id: number;
@@ -13,7 +43,7 @@ export interface ProfileShape {
     created_at: string;
     updated_at: string;
   };
-} // Staff Appointments
+}
 export interface StaffAppointment {
   id: number;
   date: string;
@@ -36,7 +66,7 @@ export interface StaffAppointmentDetail extends StaffAppointment {
   customer_email?: string;
   created_at: string;
 }
-// Staff Appointment List Item
+
 export interface StaffAppointment {
   id: number;
   staff_id: number;
@@ -70,13 +100,12 @@ export interface StaffAppointment {
   };
 }
 
-// Filter Shape
 export interface StaffAppointmentsFilters {
   date?: string;
   customer_name?: string;
   status_id?: string;
 }
-// Customer Services
+
 export interface Service {
   id: number;
   catagory_id: number;
@@ -85,7 +114,6 @@ export interface Service {
   description?: string;
 }
 
-// Customer Appointments
 export interface CustomerAppointment {
   id: number;
   staff_id: number;
@@ -112,6 +140,6 @@ export interface CustomerAppointment {
 
 export interface CreateAppointmentShape {
   service_id: number;
-  date: string; // YYYY-MM-DD formatında olmalı
-  start_time: string; // HH:mm formatında olmalı
+  date: string;
+  start_time: string;
 }

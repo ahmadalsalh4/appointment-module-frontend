@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
-import { useRegisterMutation } from "../../hooks/auth";
+import { useRegisterMutation } from "../../hooks/useAuth";
 import Error from "../../components/Error";
 import type { RegisterShape } from "../../api/auth";
 import { useAuth } from "../../contexts/auth/useAuth";

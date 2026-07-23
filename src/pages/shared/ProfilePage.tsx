@@ -107,6 +107,12 @@ export default function ProfilePage() {
                   {profileData.data.job_title}
                 </p>
               </div>
+              <div>
+                <p className="text-sm text-blue-600">Kategori</p>
+                <p className="text-lg font-semibold text-gray-900">
+                  {profileData.data.category?.name ?? "Atanmamış"}
+                </p>
+              </div>
               {profileData.data.managing_admin && (
                 <div>
                   <p className="text-sm text-blue-600">Yöneticisi</p>

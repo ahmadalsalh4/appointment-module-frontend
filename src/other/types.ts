@@ -65,7 +65,8 @@ export interface StaffProfile extends ApiTimestamps {
   admin_id: number;
   person: Person;
   managing_admin: ManagingAdminLight;
-  catagory_id?: string | number;
+  catagory_id?: string | number | null;
+  category?: Category | null;
 }
 
 /** A utility type that extracts the actual user data regardless of role */
@@ -231,7 +232,8 @@ export interface StaffEntity extends ApiTimestamps {
   email: string;
   admin_id: number;
   person: Person;
-  catagory_id?: string | number;
+  catagory_id?: string | number | null;
+  category?: Category | null;
 }
 
 /** Get Staff By ID (Includes the managing admin) */

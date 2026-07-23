@@ -127,6 +127,12 @@ export default function AdminStaffDetail() {
             </h2>
             <div className="bg-gray-50 p-4 rounded-xl space-y-3 text-sm">
               <div className="flex justify-between">
+                <span className="text-gray-500">Kategori:</span>
+                <span className="font-medium text-gray-900">
+                  {staff.category?.name ?? "Atanmamış"}
+                </span>
+              </div>
+              <div className="flex justify-between">
                 <span className="text-gray-500">Kayıt Tarihi:</span>
                 <span className="font-medium text-gray-900">
                   {new Date(

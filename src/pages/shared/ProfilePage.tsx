@@ -215,47 +215,49 @@ export default function ProfilePage() {
   return (
     <div className="max-w-4xl mx-auto p-4 sm:p-6 space-y-6">
       {/* HERO HEADER */}
-      <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+      <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+        {/* Banner with gradient + Edit button overlay */}
         <div
-          className={`h-28 sm:h-32 bg-gradient-to-br ${roleGradient[currentRole]}`}
-        />
-        <div className="px-4 sm:px-6 pb-6">
-          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 -mt-12 sm:-mt-14">
-            <div className="flex flex-col sm:flex-row sm:items-end gap-4 min-w-0">
-              <div className="shrink-0 w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-white dark:bg-gray-800 p-1.5 shadow-lg">
-                <div
-                  className={`w-full h-full rounded-xl bg-gradient-to-br ${roleGradient[currentRole]} flex items-center justify-center text-white text-3xl sm:text-4xl font-extrabold`}
-                >
-                  {initials}
-                </div>
-              </div>
-              <div className="min-w-0 pb-1">
-                <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-gray-100 break-words">
-                  {person.name} {person.surname}
-                </h1>
-                <div className="mt-2 flex flex-wrap items-center gap-2">
-                  <span
-                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-full ring-1 ring-inset ${roleBadgeStyle[currentRole]}`}
-                  >
-                    <span className="w-1.5 h-1.5 rounded-full bg-current opacity-70" />
-                    {roleLabel[currentRole]}
-                  </span>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
-                    #{profileData.data.id}
-                  </span>
-                </div>
-              </div>
-            </div>
+          className={`relative h-28 sm:h-32 bg-gradient-to-br ${roleGradient[currentRole]} rounded-t-2xl`}
+        >
+          <div className="absolute top-3 right-3 sm:top-4 sm:right-4">
+            <button
+              onClick={() => alert("Profil düzenleme yakında aktif olacak.")}
+              className="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold text-white bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-lg shadow-sm transition"
+            >
+              <PencilIcon />
+              <span className="hidden sm:inline">Profili Düzenle</span>
+              <span className="sm:hidden">Düzenle</span>
+            </button>
+          </div>
+        </div>
 
-            <div className="flex sm:pb-1">
-              <button
-                onClick={() => alert("Profil düzenleme yakında aktif olacak.")}
-                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-deep hover:opacity-90 rounded-lg shadow-sm transition"
-              >
-                <PencilIcon />
-                Profili Düzenle
-              </button>
-            </div>
+        {/* Avatar overlapping the banner */}
+        <div className="px-4 sm:px-6">
+          <div
+            className={`relative w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-gradient-to-br ${roleGradient[currentRole]} ring-4 ring-white dark:ring-gray-800 shadow-lg -mt-12 sm:-mt-14 flex items-center justify-center text-white text-3xl sm:text-4xl font-extrabold`}
+          >
+            {initials}
+          </div>
+        </div>
+
+        {/* Name + role badge — on the white card area, not on the gradient */}
+        <div className="px-4 sm:px-6 pt-4 pb-6">
+          <div className="flex flex-wrap items-center gap-2">
+            <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-gray-100 break-words">
+              {person.name} {person.surname}
+            </h1>
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              #{profileData.data.id}
+            </span>
+          </div>
+          <div className="mt-2">
+            <span
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-full ring-1 ring-inset ${roleBadgeStyle[currentRole]}`}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-current opacity-70" />
+              {roleLabel[currentRole]}
+            </span>
           </div>
         </div>
       </div>

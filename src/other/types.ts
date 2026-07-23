@@ -65,6 +65,7 @@ export interface StaffProfile extends ApiTimestamps {
   admin_id: number;
   person: Person;
   managing_admin: ManagingAdminLight;
+  catagory_id?: string | number;
 }
 
 /** A utility type that extracts the actual user data regardless of role */
@@ -230,6 +231,7 @@ export interface StaffEntity extends ApiTimestamps {
   email: string;
   admin_id: number;
   person: Person;
+  catagory_id?: string | number;
 }
 
 /** Get Staff By ID (Includes the managing admin) */
@@ -245,7 +247,7 @@ export interface CreateStaffRequestBody {
   phone_number: string;
   password: string;
   job_title: string;
-  job_email: string;
+  catagory_id?: string | number;
 }
 
 /** Put Staff Request Body (Partial update) */
@@ -261,6 +263,7 @@ export interface UpdateStaffResponse extends ApiTimestamps {
   job_title: string;
   email: string;
   admin_id: number;
+  catagory_id?: string | number;
 }
 
 export type DeleteStaffResponse = MessageResponse;

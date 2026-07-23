@@ -3,11 +3,13 @@ import { useNavigate, Link } from "react-router";
 import { useCreateStaffMutation } from "../../../hooks/useStaffQueries";
 import { useQueryClient } from "@tanstack/react-query";
 import type { CreateStaffRequestBody } from "../../../other/types";
+import { useGetAllCategoriesQuery } from "../../../hooks/useCategoryQueries"; // BUNU EKLEYİN
 
 export default function AdminStaffAdd() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const createMut = useCreateStaffMutation();
+  const { data: categories } = useGetAllCategoriesQuery(); // BUNU EKLEYİN
 
   const [formData, setFormData] = useState<CreateStaffRequestBody>({
     name: "",
@@ -15,8 +17,8 @@ export default function AdminStaffAdd() {
     email: "",
     phone_number: "",
     password: "",
+    catagory_id: "", // BUNU EKLEYİN
     job_title: "",
-    job_email: "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -76,7 +78,6 @@ export default function AdminStaffAdd() {
               />
             </div>
           </div>
-
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               Telefon Numarası
@@ -90,7 +91,6 @@ export default function AdminStaffAdd() {
               placeholder="05555555555"
             />
           </div>
-
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               Şifre
@@ -106,6 +106,26 @@ export default function AdminStaffAdd() {
             />
           </div>
 
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              İlgili Olduğu Kategori
+            </label>
+            <select
+              value={formData.catagory_id}
+              onChange={(e) => updateField("catagory_id", e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-white"
+            >
+              <option value="">Kategori Seçin (Opsiyonel)</option>
+              {categories?.map((cat) => (
+                <option key={cat.id} value={String(cat.id)}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+            <p className="mt-1 text-xs text-gray-500">
+              Personelin hangi kategoride hizmet vereceğini seçin.
+            </p>
+          </div>
           <div className="border-t border-gray-100 pt-6 mt-6">
             <h3 className="text-md font-bold text-gray-800 mb-4">
               İş Bilgileri
@@ -127,7 +147,7 @@ export default function AdminStaffAdd() {
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Kişisel E-Posta
+                  E-Posta
                 </label>
                 <input
                   type="email"
@@ -137,25 +157,8 @@ export default function AdminStaffAdd() {
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                 />
               </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  İş E-Posta
-                </label>
-                <input
-                  type="email"
-                  required
-                  value={formData.job_email}
-                  onChange={(e) => updateField("job_email", e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                />
-                <p className="mt-1 text-xs text-gray-500">
-                  Personelin sisteme giriş yapacağı e-posta adresi.
-                </p>
-              </div>
             </div>
           </div>
-
           <div className="flex items-center justify-end gap-4 pt-4 border-t">
             <Link
               to="/admin/staff"

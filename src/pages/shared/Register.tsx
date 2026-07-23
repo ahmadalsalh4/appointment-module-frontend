@@ -16,7 +16,7 @@ export default function Register() {
     password: "",
     password_confirmation: "",
   });
-  const { saveRole, saveToken } = useAuth();
+  const { handleLoginSuccess } = useAuth();
 
   const {
     mutate: register,
@@ -35,24 +35,18 @@ export default function Register() {
     register(form, {
       onSuccess: (data) => {
         console.log("Registration Success:", data);
-        // navigate("/login");
       },
     });
   };
   useEffect(() => {
     if (data) {
-      saveRole(data.role);
-      saveToken(data.token);
+      handleLoginSuccess(data);
 
       if (data.role === "customer") {
         navigate("/");
-      } else if (data.role === "staff") {
-        navigate("/staff");
-      } else if (data.role === "admin") {
-        navigate("/admin");
       }
     }
-  }, [data, saveRole, saveToken, navigate]);
+  }, [data, handleLoginSuccess, navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 bg-back">

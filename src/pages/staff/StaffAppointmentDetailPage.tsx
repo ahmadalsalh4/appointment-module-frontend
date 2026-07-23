@@ -90,10 +90,8 @@ export default function StaffAppointmentDetailPage() {
               className="rounded-lg border border-main/20 bg-surface px-3 py-2 text-sm text-main outline-none focus:border-deep"
             >
               <option value="">Durum Seçin</option>
-              <option value="1">Beklemede</option>
               <option value="2">Onaylandı</option>
               <option value="3">Tamamlandı</option>
-              <option value="4">İptal Edildi</option>
             </select>
             <button
               type="submit"

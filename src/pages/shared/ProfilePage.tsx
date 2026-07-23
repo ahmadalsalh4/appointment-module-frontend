@@ -1,3 +1,4 @@
+import { Link } from "react-router";
 import { useAuth } from "../../contexts/auth/useAuth";
 import { useGetProfileQuery } from "../../hooks/useProfileQueries";
 import Loading from "../components/Loading";
@@ -126,9 +127,12 @@ export default function ProfilePage() {
               Bu panel üzerinden randevularınızı oluşturabilir, görüntüleyebilir
               ve iptal edebilirsiniz.
             </p>
-            <button className="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">
+            <Link
+              to="/appointments"
+              className="mt-4 inline-block px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
+            >
               Randevularım
-            </button>
+            </Link>
           </div>
         )}
       </div>

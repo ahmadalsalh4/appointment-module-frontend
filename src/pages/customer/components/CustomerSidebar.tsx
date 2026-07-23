@@ -1,6 +1,7 @@
 import { Link, useLocation } from "react-router";
 import { useState } from "react";
 import { useAuth } from "../../../contexts/auth/useAuth";
+import { useLogoutMutation } from "../../../hooks/useAuthQueries";
 
 const menuItems = [
   {
@@ -68,7 +69,8 @@ interface SidebarContentProps {
 
 function SidebarContent({ onClose }: SidebarContentProps) {
   const location = useLocation();
-  const { handleLogout } = useAuth();
+  const { role } = useAuth();
+  const { mutate: logout } = useLogoutMutation();
   const [openMenus, setOpenMenus] = useState<string[]>([]);
 
   const toggleMenu = (label: string) => {
@@ -201,7 +203,7 @@ function SidebarContent({ onClose }: SidebarContentProps) {
       {/* Logout Button */}
       <div className="mt-auto p-3 border-t border-main/10">
         <button
-          onClick={handleLogout}
+          onClick={() => role && logout(role)}
           className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
         >
           <svg

@@ -14,7 +14,7 @@ export default function Login() {
 
   const { mutate: login, isPending, isError, error, data } = useLoginMutation();
 
-  const { saveRole, saveToken } = useAuth();
+  const { handleLoginSuccess } = useAuth();
   const navigate = useNavigate();
 
   function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
@@ -24,8 +24,7 @@ export default function Login() {
 
   useEffect(() => {
     if (data) {
-      saveRole(data.role);
-      saveToken(data.token);
+      handleLoginSuccess(data);
 
       if (data.role === "customer") {
         navigate("/");
@@ -35,7 +34,7 @@ export default function Login() {
         navigate("/admin");
       }
     }
-  }, [data, saveRole, saveToken, navigate]);
+  }, [data, handleLoginSuccess, navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-back">

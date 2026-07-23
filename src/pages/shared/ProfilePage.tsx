@@ -29,18 +29,18 @@ export default function ProfilePage() {
   const { person } = profileData.data;
 
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md mt-8 transition-colors">
+    <div className="max-w-2xl mx-auto p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md mt-8 transition-colors">
       <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-8 border-b border-gray-200 dark:border-gray-700 pb-4">
         Profil Bilgileri
       </h1>
 
       <div className="space-y-6">
-        <div className="flex items-center space-x-6 mb-8">
-          <div className="w-20 h-20 bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-300 rounded-full flex items-center justify-center text-2xl font-bold">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:space-x-6 sm:gap-0 mb-8">
+          <div className="w-20 h-20 bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-300 rounded-full flex items-center justify-center text-2xl font-bold shrink-0">
             {person.name.charAt(0)}
             {person.surname.charAt(0)}
           </div>
-          <div>
+          <div className="min-w-0">
             <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
               {person.name} {person.surname}
             </h2>
@@ -50,7 +50,7 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50 dark:bg-gray-700/50 p-6 rounded-lg">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50 dark:bg-gray-700/50 p-4 sm:p-6 rounded-lg">
           <div>
             <p className="text-sm text-gray-500 dark:text-gray-400">Telefon</p>
             <p className="text-lg font-medium text-gray-900 dark:text-gray-100">
@@ -91,7 +91,7 @@ export default function ProfilePage() {
             <h3 className="font-bold text-blue-800 dark:text-blue-300">
               Personel Bilgileri
             </h3>
-            <div className="grid grid-cols-2 gap-4 mt-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
               <div>
                 <p className="text-sm text-blue-600 dark:text-blue-300">
                   Pozisyon / Görev

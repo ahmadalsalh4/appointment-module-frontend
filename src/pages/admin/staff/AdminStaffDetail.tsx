@@ -41,7 +41,7 @@ export default function AdminStaffDetail() {
 
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
         {/* Header */}
-        <div className="p-8 bg-indigo-50 dark:bg-indigo-900/40 border-b border-indigo-100 dark:border-indigo-800">
+        <div className="p-4 sm:p-6 lg:p-8 bg-indigo-50 dark:bg-indigo-900/40 border-b border-indigo-100 dark:border-indigo-800">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
             <div className="flex items-center gap-6">
               <div className="w-20 h-20 bg-indigo-200 dark:bg-indigo-800 text-indigo-700 dark:text-indigo-300 rounded-full flex items-center justify-center text-3xl font-bold">
@@ -66,7 +66,7 @@ export default function AdminStaffDetail() {
           </div>
         </div>
 
-        <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="p-4 sm:p-6 lg:p-8 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
           <div className="space-y-6">
             <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 border-b pb-2">
               İletişim Bilgileri

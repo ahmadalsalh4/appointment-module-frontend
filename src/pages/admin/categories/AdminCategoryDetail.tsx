@@ -41,7 +41,7 @@ export default function AdminCategoryDetail() {
         <span className="text-gray-900 dark:text-gray-100 font-medium">{category.name}</span>
       </nav>
 
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-8">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 sm:p-6 lg:p-8">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8 border-b border-gray-100 dark:border-gray-700 pb-6">
           <div className="flex items-center gap-4">
             <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-xl text-purple-600 dark:text-purple-400">

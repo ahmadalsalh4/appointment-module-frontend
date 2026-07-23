@@ -136,7 +136,7 @@ export default function AdminAppointmentDetail() {
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
         {/* Header Status Bar */}
         <div
-          className={`p-6 border-b ${getStatusStyle(appointment.status.name)}`}
+          className={`p-4 sm:p-6 border-b ${getStatusStyle(appointment.status.name)}`}
         >
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div>
@@ -168,7 +168,7 @@ export default function AdminAppointmentDetail() {
           </div>
         </div>
 
-        <div className="p-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="p-4 sm:p-6 lg:p-8 grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
           {/* LEFT: Appointment Details */}
           <div className="md:col-span-2 space-y-8">
             <div>

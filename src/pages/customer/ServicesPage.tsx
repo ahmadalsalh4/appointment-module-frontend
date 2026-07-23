@@ -53,7 +53,7 @@ export default function ServicesPage() {
             <Link
               to={`/services/${service.id}`}
               key={service.id}
-              className="group relative bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-8 hover:shadow-xl hover:border-indigo-100 dark:hover:border-indigo-800 transition-all duration-300 flex flex-col"
+              className="group relative bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 sm:p-6 lg:p-8 hover:shadow-xl hover:border-indigo-100 dark:hover:border-indigo-800 transition-all duration-300 flex flex-col"
             >
               {/* Decorative top gradient bar */}
               <div className="absolute inset-x-0 top-0 h-1 bg-linear-to-r from-indigo-500 to-purple-500 rounded-t-2xl transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
@@ -76,7 +76,7 @@ export default function ServicesPage() {
               </p>
 
               {/* Footer Info */}
-              <div className="flex items-center justify-between pt-6 border-t border-gray-100 dark:border-gray-700 mt-auto">
+              <div className="flex items-center justify-between pt-4 sm:pt-6 border-t border-gray-100 dark:border-gray-700 mt-auto">
                 <div className="flex items-center text-gray-600 dark:text-gray-300">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"

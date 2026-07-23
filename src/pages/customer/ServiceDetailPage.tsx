@@ -114,7 +114,7 @@ export default function ServiceDetailPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
         {/* LEFT: Service Details */}
         <div className="lg:col-span-1">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-8 sticky top-8">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 sm:p-6 lg:p-8 lg:sticky lg:top-8">
             {service.category && (
               <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 uppercase tracking-wide mb-6">
                 {service.category.name}
@@ -178,7 +178,7 @@ export default function ServiceDetailPage() {
 
         {/* RIGHT: Booking Area */}
         <div className="lg:col-span-2">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-8">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 sm:p-6 lg:p-8">
             {/* --- GATE: Check if user is logged in --- */}
             {!token ? (
               <div className="text-center py-16 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-200 dark:border-gray-600">
@@ -294,7 +294,7 @@ export default function ServiceDetailPage() {
                     <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">
                       Müsait Saatler ({selectedDate})
                     </h3>
-                    <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-3">
+                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2 sm:gap-3">
                       {slots.map((time) => (
                         <button
                           key={time}

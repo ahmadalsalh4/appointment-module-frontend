@@ -85,7 +85,7 @@ export default function StaffAppointmentsPage() {
       {/* FİLTRELEME FORMU */}
       <form
         onSubmit={handleFilter}
-        className="mb-8 grid grid-cols-1 gap-4 rounded-xl bg-surface p-6 shadow-sm border border-main/10 sm:grid-cols-4"
+        className="mb-8 grid grid-cols-1 gap-4 rounded-xl bg-surface p-4 sm:p-6 shadow-sm border border-main/10 sm:grid-cols-2 lg:grid-cols-4"
       >
         <div>
           <label className="mb-1 block text-xs font-medium text-main/70">
@@ -135,59 +135,74 @@ export default function StaffAppointmentsPage() {
 
       {/* TABLO */}
       <div className="overflow-hidden rounded-xl bg-surface shadow-sm border border-main/10">
-        <table className="w-full text-left text-sm">
-          <thead className="border-b border-main/10 bg-back/50">
-            <tr>
-              <th className="px-6 py-4 font-medium text-main/70">Müşteri</th>
-              <th className="px-6 py-4 font-medium text-main/70">
-                Tarih / Saat
-              </th>
-              <th className="px-6 py-4 font-medium text-main/70">Hizmet</th>
-              <th className="px-6 py-4 font-medium text-main/70">Durum</th>
-              <th className="px-6 py-4 font-medium text-main/70">İşlem</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-main/10">
-            {/* Eğer API direkt array döndürüyorsa .data?.data yerine sadece .data kullanıyoruz */}
-            {appointments?.length === 0 ? (
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-left text-sm">
+            <thead className="border-b border-main/10 bg-back/50">
               <tr>
-                <td colSpan={5} className="px-6 py-10 text-center text-main/50">
-                  Kayıt bulunamadı.
-                </td>
+                <th className="px-3 sm:px-6 py-3 sm:py-4 font-medium text-main/70">
+                  Müşteri
+                </th>
+                <th className="px-3 sm:px-6 py-3 sm:py-4 font-medium text-main/70">
+                  Tarih / Saat
+                </th>
+                <th className="px-3 sm:px-6 py-3 sm:py-4 font-medium text-main/70">
+                  Hizmet
+                </th>
+                <th className="px-3 sm:px-6 py-3 sm:py-4 font-medium text-main/70">
+                  Durum
+                </th>
+                <th className="px-3 sm:px-6 py-3 sm:py-4 font-medium text-main/70">
+                  İşlem
+                </th>
               </tr>
-            ) : (
-              appointments?.map((apt: Appointment) => (
-                <tr key={apt.id} className="hover:bg-back/30 transition">
-                  <td className="px-6 py-4 font-medium text-main">
-                    {apt.customer?.person.name} {apt.customer?.person.surname}
-                  </td>
-                  <td className="px-6 py-4 text-main/80">
-                    <div>{formatDate(apt.start_date)}</div>
-                    <div className="text-xs text-main/50">
-                      {formatTime(apt.start_date)} - {formatTime(apt.end_date)}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-main/80">{apt.service.name}</td>
-                  <td className="px-6 py-4">
-                    <span
-                      className={`rounded-full px-2.5 py-1 text-xs font-semibold ${getStatusStyle(apt.status.name)}`}
-                    >
-                      {getStatusLabel(apt.status.name)}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <Link
-                      to={`/staff/appointments/${apt.id}`}
-                      className="text-deep hover:underline text-sm font-medium"
-                    >
-                      Detay / Güncelle
-                    </Link>
+            </thead>
+            <tbody className="divide-y divide-main/10">
+              {/* Eğer API direkt array döndürüyorsa .data?.data yerine sadece .data kullanıyoruz */}
+              {appointments?.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={5}
+                    className="px-3 sm:px-6 py-8 sm:py-10 text-center text-main/50"
+                  >
+                    Kayıt bulunamadı.
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                appointments?.map((apt: Appointment) => (
+                  <tr key={apt.id} className="hover:bg-back/30 transition">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 font-medium text-main whitespace-nowrap">
+                      {apt.customer?.person.name} {apt.customer?.person.surname}
+                    </td>
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-main/80">
+                      <div>{formatDate(apt.start_date)}</div>
+                      <div className="text-xs text-main/50">
+                        {formatTime(apt.start_date)} - {formatTime(apt.end_date)}
+                      </div>
+                    </td>
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-main/80">
+                      {apt.service.name}
+                    </td>
+                    <td className="px-3 sm:px-6 py-3 sm:py-4">
+                      <span
+                        className={`rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap ${getStatusStyle(apt.status.name)}`}
+                      >
+                        {getStatusLabel(apt.status.name)}
+                      </span>
+                    </td>
+                    <td className="px-3 sm:px-6 py-3 sm:py-4">
+                      <Link
+                        to={`/staff/appointments/${apt.id}`}
+                        className="text-deep hover:underline text-sm font-medium whitespace-nowrap"
+                      >
+                        Detay / Güncelle
+                      </Link>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

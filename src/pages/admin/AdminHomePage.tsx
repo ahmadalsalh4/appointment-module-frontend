@@ -278,10 +278,10 @@ export default function AdminHomePage() {
               {pendingAppos.slice(0, 4).map((appo) => (
                 <div
                   key={appo.id}
-                  className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-100 dark:border-gray-700"
+                  className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-100 dark:border-gray-700"
                 >
-                  <div className="flex items-center gap-4">
-                    <div className="text-center">
+                  <div className="flex items-center gap-4 min-w-0">
+                    <div className="text-center shrink-0">
                       <p className="text-xs text-gray-400 dark:text-gray-500 uppercase">
                         {new Date(
                           appo.start_date.split("T")[0],
@@ -294,11 +294,11 @@ export default function AdminHomePage() {
                         {formatSafeTime(appo.start_date)}
                       </p>
                     </div>
-                    <div>
-                      <p className="font-semibold text-gray-800 dark:text-gray-100">
+                    <div className="min-w-0">
+                      <p className="font-semibold text-gray-800 dark:text-gray-100 truncate">
                         {appo.service.name}
                       </p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                      <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
                         {appo.customer?.person.name}{" "}
                         {appo.customer?.person.surname}
                         <span className="mx-1">•</span>
@@ -307,7 +307,7 @@ export default function AdminHomePage() {
                     </div>
                   </div>
                   <span
-                    className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${getStatusStyle(appo.status.name)}`}
+                    className={`self-start sm:self-auto px-3 py-1 rounded-full text-xs font-bold uppercase whitespace-nowrap ${getStatusStyle(appo.status.name)}`}
                   >
                     {getStatusText(appo.status.name)}
                   </span>

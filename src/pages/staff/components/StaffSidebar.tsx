@@ -47,8 +47,18 @@ interface SidebarContentProps {
 function SidebarContent({ onClose }: SidebarContentProps) {
   const location = useLocation();
 
-  // 3. /staff/appointments/1 gibi detay sayfalarında da aktif kalması için startsWith kullanıyoruz
-  const isActive = (path: string) => location.pathname.startsWith(path);
+  // 3. "/staff" ana sayfası her şeyin başlangıcı olduğu için özel kontrol gerekiyor:
+  // - Randevularım: sadece /staff ve /staff/appointments/* altında aktif
+  // - Diğerleri (örn. /staff/profile): kendi path'i ile başlayan sayfalarda aktif
+  const isActive = (path: string) => {
+    if (path === "/staff") {
+      return (
+        location.pathname === "/staff" ||
+        location.pathname.startsWith("/staff/appointments")
+      );
+    }
+    return location.pathname.startsWith(path);
+  };
 
   return (
     <div className="flex h-full flex-col bg-surface pt-6">

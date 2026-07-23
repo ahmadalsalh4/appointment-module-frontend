@@ -64,7 +64,7 @@ export default function AdminStaffEdit() {
           güncellenebilir.
         </div>
 
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">
           İş Bilgilerini Düzenle
         </h1>
 

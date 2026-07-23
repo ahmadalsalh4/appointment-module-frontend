@@ -14,13 +14,13 @@ export default function NotFoundPage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-back p-6 text-center">
       {/* Big 404 Text */}
-      <h1 className="text-[10rem] font-black leading-none text-waiting/20 sm:text-[14rem]">
+      <h1 className="text-7xl sm:text-8xl md:text-9xl lg:text-[10rem] xl:text-[14rem] font-black leading-none text-waiting/20">
         404
       </h1>
 
       {/* Content */}
       <div className="-mt-10 space-y-4">
-        <h2 className="text-3xl font-bold text-main">Sayfa Bulunamadı</h2>
+        <h2 className="text-2xl sm:text-3xl font-bold text-main">Sayfa Bulunamadı</h2>
         <p className="max-w-md text-main/70">
           Aradığınız sayfa taşınmış, silinmiş veya hiç var olmamış olabilir.
         </p>

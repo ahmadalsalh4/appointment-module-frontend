@@ -80,7 +80,7 @@ export default function StaffAppointmentsPage() {
 
   return (
     <div>
-      <h1 className="mb-6 text-3xl font-bold text-main">Randevularım</h1>
+      <h1 className="mb-6 text-2xl sm:text-3xl font-bold text-main">Randevularım</h1>
 
       {/* FİLTRELEME FORMU */}
       <form

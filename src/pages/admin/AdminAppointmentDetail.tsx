@@ -143,7 +143,7 @@ export default function AdminAppointmentDetail() {
               <p className="text-sm font-bold uppercase tracking-widest opacity-80">
                 Mevcut Durum
               </p>
-              <h1 className="text-3xl font-extrabold mt-1">
+              <h1 className="text-2xl sm:text-3xl font-extrabold mt-1">
                 {getStatusText(appointment.status.name)}
               </h1>
             </div>
@@ -199,7 +199,7 @@ export default function AdminAppointmentDetail() {
                     <p className="text-gray-900 dark:text-gray-100 font-semibold">
                       {formatSafeDate(appointment.start_date)}
                     </p>
-                    <p className="text-xl font-bold text-indigo-600 dark:text-indigo-400">
+                    <p className="text-lg sm:text-xl font-bold text-indigo-600 dark:text-indigo-400">
                       {formatSafeTime(appointment.start_date)}
                     </p>
                   </div>
@@ -246,15 +246,15 @@ export default function AdminAppointmentDetail() {
                     {appointment.customer.person.name.charAt(0)}
                     {appointment.customer.person.surname.charAt(0)}
                   </div>
-                  <div>
-                    <p className="text-gray-900 dark:text-gray-100 font-bold text-lg">
+                  <div className="min-w-0">
+                    <p className="text-base sm:text-lg text-gray-900 dark:text-gray-100 font-bold truncate">
                       {appointment.customer.person.name}{" "}
                       {appointment.customer.person.surname}
                     </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 break-words">
                       {appointment.customer.email}
                     </p>
-                    <p className="text-sm text-gray-400 dark:text-gray-500">
+                    <p className="text-sm text-gray-400 dark:text-gray-500 break-words">
                       {appointment.customer.person.phone_number}
                     </p>
                   </div>
@@ -276,15 +276,15 @@ export default function AdminAppointmentDetail() {
                     {appointment.staff.person.name.charAt(0)}
                     {appointment.staff.person.surname.charAt(0)}
                   </div>
-                  <div>
-                    <p className="text-gray-900 dark:text-gray-100 font-bold text-lg">
+                  <div className="min-w-0">
+                    <p className="text-base sm:text-lg text-gray-900 dark:text-gray-100 font-bold truncate">
                       {appointment.staff.person.name}{" "}
                       {appointment.staff.person.surname}
                     </p>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
                       {appointment.staff.job_title}
                     </p>
-                    <p className="text-sm text-gray-400 dark:text-gray-500">
+                    <p className="text-sm text-gray-400 dark:text-gray-500 break-words">
                       {appointment.staff.email}
                     </p>
                   </div>

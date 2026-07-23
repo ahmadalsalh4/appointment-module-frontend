@@ -52,7 +52,7 @@ export default function Register() {
     <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 bg-back">
       <div className="w-full max-w-md p-8 rounded-2xl shadow-xl bg-surface">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold tracking-tight text-main">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-main">
             Hesap Oluştur
           </h1>
           <p className="mt-2 text-sm text-main/70">

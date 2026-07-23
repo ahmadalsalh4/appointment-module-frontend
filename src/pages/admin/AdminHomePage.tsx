@@ -62,7 +62,7 @@ export default function AdminHomePage() {
     <div className="space-y-8">
       {/* Page Header */}
       <div>
-        <h1 className="text-3xl font-extrabold text-gray-900 dark:text-gray-100">Admin Paneli</h1>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-100">Admin Paneli</h1>
         <p className="mt-1 text-gray-500 dark:text-gray-400">
           Sistemin genel durumunu buradan takip edin.
         </p>
@@ -90,7 +90,7 @@ export default function AdminHomePage() {
           </div>
           <div>
             <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Toplam Personel</p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">
               {staffList?.length || 0}
             </p>
           </div>
@@ -116,7 +116,7 @@ export default function AdminHomePage() {
           </div>
           <div>
             <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Kategoriler</p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">
               {categories?.length || 0}
             </p>
           </div>
@@ -145,7 +145,7 @@ export default function AdminHomePage() {
           </div>
           <div>
             <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Onay Bekleyen</p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">
               {pendingAppos.length}
             </p>
           </div>
@@ -173,7 +173,7 @@ export default function AdminHomePage() {
             <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
               Aktif Müşteriler
             </p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">
               {totalCustomers.length}
             </p>
           </div>

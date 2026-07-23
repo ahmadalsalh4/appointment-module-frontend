@@ -49,7 +49,7 @@ export default function AdminServiceDetail() {
                 {service.category.name}
               </span>
             )}
-            <h1 className="text-3xl font-extrabold text-gray-900 dark:text-gray-100">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-100">
               {service.name}
             </h1>
           </div>
@@ -83,7 +83,7 @@ export default function AdminServiceDetail() {
             </div>
             <div>
               <p className="text-sm text-gray-500 dark:text-gray-400">Süre</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+              <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">
                 {service.duration}{" "}
                 <span className="text-base font-normal text-gray-500 dark:text-gray-400">
                   Dakika

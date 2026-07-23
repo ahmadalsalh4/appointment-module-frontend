@@ -85,7 +85,7 @@ export default function MyAppointmentsPage() {
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-extrabold text-gray-900 dark:text-gray-100">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-100">
             Randevularım
           </h1>
           <p className="mt-1 text-gray-500 dark:text-gray-400">
@@ -136,9 +136,9 @@ export default function MyAppointmentsPage() {
             >
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 {/* Left: Date & Time */}
-                <div className="flex items-center gap-4">
-                  <div className="hidden sm:flex flex-col items-center justify-center w-16 h-16 bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 rounded-xl font-bold text-center">
-                    <span className="text-2xl leading-none">
+                <div className="flex items-center gap-4 min-w-0">
+                  <div className="hidden sm:flex flex-col items-center justify-center w-16 h-16 bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 rounded-xl font-bold text-center shrink-0">
+                    <span className="text-xl sm:text-2xl leading-none">
                       {new Date(appointment.start_date).getDate()}
                     </span>
                     <span className="text-xs uppercase">
@@ -148,11 +148,11 @@ export default function MyAppointmentsPage() {
                       )}
                     </span>
                   </div>
-                  <div>
-                    <p className="font-semibold text-gray-900 dark:text-gray-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                  <div className="min-w-0">
+                    <p className="font-semibold text-gray-900 dark:text-gray-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors truncate">
                       {appointment.service.name}
                     </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 truncate">
                       {formatDateTime(appointment.start_date)} (
                       {appointment.service.duration} dk)
                     </p>
@@ -160,13 +160,13 @@ export default function MyAppointmentsPage() {
                 </div>
 
                 {/* Right: Staff & Status */}
-                <div className="flex items-center gap-4 sm:gap-6">
+                <div className="flex items-center gap-4 sm:gap-6 shrink-0">
                   {appointment.staff && (
-                    <div className="text-right hidden md:block">
+                    <div className="text-right hidden md:block max-w-[140px]">
                       <p className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wide">
                         Personel
                       </p>
-                      <p className="text-sm font-medium text-gray-700 dark:text-gray-200">
+                      <p className="text-sm font-medium text-gray-700 dark:text-gray-200 truncate">
                         {appointment.staff.person.name}{" "}
                         {appointment.staff.person.surname}
                       </p>

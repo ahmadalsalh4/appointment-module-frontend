@@ -121,7 +121,7 @@ export default function ServiceDetailPage() {
               </span>
             )}
 
-            <h1 className="text-3xl font-extrabold text-gray-900 dark:text-gray-100 mb-4">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-100 mb-4">
               {service.name}
             </h1>
 
@@ -212,7 +212,7 @@ export default function ServiceDetailPage() {
               </div>
             ) : (
               <>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">
                   Randevu Oluştur
                 </h2>
 

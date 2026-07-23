@@ -48,8 +48,8 @@ export default function AdminStaffDetail() {
                 {staff.person.name.charAt(0)}
                 {staff.person.surname.charAt(0)}
               </div>
-              <div>
-                <h1 className="text-2xl font-extrabold text-gray-900 dark:text-gray-100">
+              <div className="min-w-0">
+                <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-gray-100 break-words">
                   {staff.person.name} {staff.person.surname}
                 </h1>
                 <p className="text-indigo-700 dark:text-indigo-300 font-semibold">
@@ -88,11 +88,11 @@ export default function AdminStaffDetail() {
                   />
                 </svg>
               </div>
-              <div>
+              <div className="min-w-0">
                 <p className="text-xs text-gray-500 dark:text-gray-400 uppercase">
                   İş E-Posta (Giriş)
                 </p>
-                <p className="text-sm font-bold text-gray-900 dark:text-gray-100">{staff.email}</p>
+                <p className="text-sm font-bold text-gray-900 dark:text-gray-100 break-words">{staff.email}</p>
               </div>
             </div>
             <div className="flex items-center gap-4 bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl">
@@ -112,9 +112,9 @@ export default function AdminStaffDetail() {
                   />
                 </svg>
               </div>
-              <div>
+              <div className="min-w-0">
                 <p className="text-xs text-gray-500 dark:text-gray-400 uppercase">Telefon</p>
-                <p className="text-sm font-bold text-gray-900 dark:text-gray-100">
+                <p className="text-sm font-bold text-gray-900 dark:text-gray-100 break-words">
                   {staff.person.phone_number}
                 </p>
               </div>

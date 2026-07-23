@@ -47,7 +47,7 @@ export default function AdminStaffAdd() {
       </nav>
 
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-8">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">
           Yeni Personel Oluştur
         </h1>
 
@@ -127,7 +127,7 @@ export default function AdminStaffAdd() {
             </p>
           </div>
           <div className="border-t border-gray-100 dark:border-gray-700 pt-6 mt-6">
-            <h3 className="text-md font-bold text-gray-800 dark:text-gray-100 mb-4">
+            <h3 className="text-base sm:text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">
               İş Bilgileri
             </h3>
             <div className="space-y-6">

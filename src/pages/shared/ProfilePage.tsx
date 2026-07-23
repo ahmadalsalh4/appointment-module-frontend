@@ -20,7 +20,7 @@ export default function ProfilePage() {
   if (isError || !profileData) {
     return (
       <div className="p-6 text-center text-red-500">
-        <p className="text-2xl font-bold mb-2">Profil Yüklenemedi</p>
+        <p className="text-xl sm:text-2xl font-bold mb-2">Profil Yüklenemedi</p>
         <p>{(error as Error)?.message || "Lütfen tekrar giriş yapın."}</p>
       </div>
     );
@@ -30,7 +30,7 @@ export default function ProfilePage() {
 
   return (
     <div className="max-w-2xl mx-auto p-4 sm:p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md mt-8 transition-colors">
-      <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-8 border-b border-gray-200 dark:border-gray-700 pb-4">
+      <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100 mb-8 border-b border-gray-200 dark:border-gray-700 pb-4">
         Profil Bilgileri
       </h1>
 
@@ -53,13 +53,13 @@ export default function ProfilePage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50 dark:bg-gray-700/50 p-4 sm:p-6 rounded-lg">
           <div>
             <p className="text-sm text-gray-500 dark:text-gray-400">Telefon</p>
-            <p className="text-lg font-medium text-gray-900 dark:text-gray-100">
+            <p className="text-base sm:text-lg font-medium text-gray-900 dark:text-gray-100 break-words">
               {person.phone_number}
             </p>
           </div>
           <div>
             <p className="text-sm text-gray-500 dark:text-gray-400">E-Posta</p>
-            <p className="text-lg font-medium text-gray-900 dark:text-gray-100">
+            <p className="text-base sm:text-lg font-medium text-gray-900 dark:text-gray-100 break-words">
               {profileData.data.email}
             </p>
           </div>
@@ -68,7 +68,7 @@ export default function ProfilePage() {
             <p className="text-sm text-gray-500 dark:text-gray-400">
               Kayıt Tarihi
             </p>
-            <p className="text-lg font-medium text-gray-900 dark:text-gray-100">
+            <p className="text-base sm:text-lg font-medium text-gray-900 dark:text-gray-100">
               {new Date(person.created_at).toLocaleDateString("tr-TR")}
             </p>
           </div>
@@ -96,7 +96,7 @@ export default function ProfilePage() {
                 <p className="text-sm text-blue-600 dark:text-blue-300">
                   Pozisyon / Görev
                 </p>
-                <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                <p className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 break-words">
                   {profileData.data.job_title}
                 </p>
               </div>
@@ -104,7 +104,7 @@ export default function ProfilePage() {
                 <p className="text-sm text-blue-600 dark:text-blue-300">
                   Kategori
                 </p>
-                <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                <p className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 break-words">
                   {profileData.data.category?.name ?? "Atanmamış"}
                 </p>
               </div>
@@ -113,7 +113,7 @@ export default function ProfilePage() {
                   <p className="text-sm text-blue-600 dark:text-blue-300">
                     Yöneticisi
                   </p>
-                  <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                  <p className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 break-words">
                     {profileData.data.managing_admin.email}
                   </p>
                 </div>

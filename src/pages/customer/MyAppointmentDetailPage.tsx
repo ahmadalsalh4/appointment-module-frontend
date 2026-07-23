@@ -131,7 +131,7 @@ export default function MyAppointmentDetailPage() {
               <p className="text-sm font-bold uppercase tracking-widest opacity-80">
                 Durum
               </p>
-              <h1 className="text-3xl font-extrabold mt-1">
+              <h1 className="text-2xl sm:text-3xl font-extrabold mt-1">
                 {getStatusText(appointment.status.name)}
               </h1>
             </div>
@@ -221,11 +221,11 @@ export default function MyAppointmentDetailPage() {
                   {appointment.staff.person.name.charAt(0)}
                   {appointment.staff.person.surname.charAt(0)}
                 </div>
-                <div>
-                  <p className="text-gray-900 dark:text-gray-100 font-bold text-lg">
-                    {appointment.staff.person.name}{" "}
-                    {appointment.staff.person.surname}
-                  </p>
+              <div className="min-w-0">
+                <p className="text-base sm:text-lg text-gray-900 dark:text-gray-100 font-bold truncate">
+                  {appointment.staff.person.name}{" "}
+                  {appointment.staff.person.surname}
+                </p>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
                     {appointment.staff.job_title}
                   </p>

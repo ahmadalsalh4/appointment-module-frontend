@@ -78,7 +78,7 @@ export default function StaffAppointmentDetailPage() {
       <div className="rounded-2xl bg-surface shadow-sm border border-main/10 overflow-hidden">
         {/* ÜST BAR: Durum Güncelleme */}
         <div className="flex flex-col gap-4 border-b border-main/10 bg-back/30 p-6 sm:flex-row sm:items-center sm:justify-between">
-          <h1 className="text-2xl font-bold text-main">Randevu # {apt?.id}</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-main">Randevu # {apt?.id}</h1>
 
           <form
             onSubmit={handleUpdateStatus}
@@ -112,19 +112,19 @@ export default function StaffAppointmentDetailPage() {
             </h3>
             <div>
               <dt className="text-xs text-main/50">Ad Soyad</dt>
-              <dd className="text-lg font-semibold text-main">
+              <dd className="text-base sm:text-lg font-semibold text-main break-words">
                 {apt?.customer?.person.name} {apt?.customer?.person.surname}
               </dd>
             </div>
             <div>
               <dt className="text-xs text-main/50">Telefon</dt>
-              <dd className="text-main">
+              <dd className="text-main break-words">
                 {apt?.customer?.person.phone_number}
               </dd>
             </div>
             <div>
               <dt className="text-xs text-main/50">E-posta</dt>
-              <dd className="text-main">{apt?.customer?.email}</dd>
+              <dd className="text-main break-words">{apt?.customer?.email}</dd>
             </div>
           </div>
 
@@ -135,7 +135,7 @@ export default function StaffAppointmentDetailPage() {
             </h3>
             <div>
               <dt className="text-xs text-main/50">Hizmet</dt>
-              <dd className="text-lg font-semibold text-main">
+              <dd className="text-base sm:text-lg font-semibold text-main break-words">
                 {apt?.service.name}{" "}
                 <span className="text-sm font-normal text-main/50">
                   ({apt?.service.duration} dk)

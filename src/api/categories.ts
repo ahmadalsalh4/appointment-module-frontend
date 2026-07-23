@@ -34,4 +34,9 @@ export default {
     const res = await api.delete(`/categories/${id}`); // apiResource route
     return res.data;
   },
+  
+  getCategoryStaff: async (categoryId: number | string) => {
+    const res = await api.get(`/categories/${categoryId}/staff`);
+    return res.data;
+  },
 };

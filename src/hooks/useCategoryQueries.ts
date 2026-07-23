@@ -7,6 +7,7 @@ import type {
   DeleteCategoryResponse,
   CategoryRequestBody,
   LaravelErrorResponse,
+  StaffEntity,
 } from "../other/types";
 
 export const useGetAllCategoriesQuery = () => {
@@ -61,5 +62,14 @@ export const useDeleteCategoryMutation = () => {
     mutationFn: async (id) => {
       return await categoriesApi.delete(id);
     },
+  });
+};
+export const useGetCategoryStaffQuery = (categoryId: string | number) => {
+  return useQuery<StaffEntity[], AxiosError<LaravelErrorResponse>>({
+    queryKey: ["categories", categoryId, "staff"],
+    queryFn: async () => {
+      return await categoriesApi.getCategoryStaff(categoryId);
+    },
+    enabled: !!categoryId, // Sadece categoryId varsa istek at
   });
 };

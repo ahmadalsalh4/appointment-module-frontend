@@ -1,14 +1,13 @@
 import { useState } from "react";
 import { Link, useParams, useNavigate } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import {
-  useGetServiceByIdQuery,
-  useGetServiceStaffQuery,
-} from "../../hooks/useServiceQueries";
+import { useGetServiceByIdQuery } from "../../hooks/useServiceQueries";
 import {
   useGetAvailabilityMutation,
   useCreateAppointmentMutation,
 } from "../../hooks/useAppointmentQueries";
+import { useGetServiceStaffQuery } from "../../hooks/useServiceQueries";
+import { useGetCategoryStaffQuery } from "../../hooks/useCategoryQueries";
 
 import type { GetAvailabilityBody } from "../../other/types";
 import { useAuth } from "../../contexts/auth/useAuth";
@@ -24,15 +23,18 @@ export default function ServiceDetailPage() {
   const [slots, setSlots] = useState<string[]>([]);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
 
-  // 1. Always fetch service details (Public)
+  // 1. Hizmet Detayları
   const {
     data: service,
     isLoading,
     isError,
   } = useGetServiceByIdQuery(id || "");
 
-  // 2. ONLY fetch staff assigned to THIS service (No 401 errors!)
-  const { data: availableStaff } = useGetServiceStaffQuery(id || "");
+  // 2. SADECE HOOK'LARI BURAYA OLMALI! (Hook'lar return dışında olmalı)
+  const { data: serviceStaff } = useGetServiceStaffQuery(id || "");
+  const { data: categoryStaff } = useGetCategoryStaffQuery(
+    service?.category?.id || "",
+  );
 
   // 3. Mutations
   const checkAvailability = useGetAvailabilityMutation();
@@ -40,7 +42,7 @@ export default function ServiceDetailPage() {
 
   const handleCheckAvailability = async () => {
     if (!selectedDate || !selectedStaff) return;
-    setSlots([]); // Clear old slots while loading
+    setSlots([]);
 
     const body: GetAvailabilityBody = {
       staff_id: selectedStaff,
@@ -60,18 +62,15 @@ export default function ServiceDetailPage() {
   const handleFinalBooking = async () => {
     if (!selectedTime || !selectedStaff || !selectedDate || !id) return;
 
-    // 1. Keep the exact format Laravel wants
     const start_date = `${selectedDate}T${selectedTime}:00.000000Z`;
 
     try {
-      // 2. CONVERT IDs TO NUMBERS using Number()
       await createAppointment.mutateAsync({
         staff_id: Number(selectedStaff),
         service_id: Number(id),
-        start_date: start_date,
+        start_date,
       });
 
-      // Success! Redirect to "My Appointments" page
       queryClient.invalidateQueries({ queryKey: ["appointments", "customer"] });
       navigate("/appointments");
     } catch {
@@ -229,11 +228,32 @@ export default function ServiceDetailPage() {
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-colors bg-gray-50"
                     >
                       <option value="">Seçiniz...</option>
-                      {availableStaff?.map((s) => (
-                        <option key={s.id} value={String(s.id)}>
-                          {s.person.name} {s.person.surname} ({s.job_title})
-                        </option>
-                      ))}
+
+                      {/* Öncelikle hizmete direkt atanmış personeller */}
+                      {serviceStaff && serviceStaff.length > 0 && (
+                        <optgroup label="Hizmete Atananlar">
+                          {serviceStaff.map((s) => (
+                            <option key={s.id} value={String(s.id)}>
+                              {s.person.name} {s.person.surname}
+                            </option>
+                          ))}
+                        </optgroup>
+                      )}
+
+                      {/* Eğer hizmete atanmış yoksa, kategorideki tüm personelleri listeler */}
+                      {(!serviceStaff || serviceStaff.length === 0) &&
+                        categoryStaff &&
+                        categoryStaff.length > 0 && (
+                          <optgroup
+                            label={`${service?.category?.name || "Kategori"} Personeli`}
+                          >
+                            {categoryStaff.map((s) => (
+                              <option key={s.id} value={String(s.id)}>
+                                {s.person.name} {s.person.surname}
+                              </option>
+                            ))}
+                          </optgroup>
+                        )}
                     </select>
                   </div>
 

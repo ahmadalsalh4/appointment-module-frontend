@@ -4,67 +4,8 @@ import { useAuth } from "../../../contexts/auth/useAuth";
 
 const menuItems = [
   {
-    label: "Dashboard",
-    path: "/admin",
-    icon: (
-      <svg
-        className="h-5 w-5"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        strokeWidth={2}
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-        />
-      </svg>
-    ),
-  },
-  {
-    label: "Randevular",
-    icon: (
-      <svg
-        className="h-5 w-5"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        strokeWidth={2}
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-        />
-      </svg>
-    ),
-    children: [{ label: "Tüm Randevular", path: "/admin/appointments" }],
-  },
-  {
-    label: "Personel",
-    icon: (
-      <svg
-        className="h-5 w-5"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        strokeWidth={2}
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
-        />
-      </svg>
-    ),
-    children: [
-      { label: "Personel Listesi", path: "/admin/staff" },
-      { label: "Personel Ekle", path: "/admin/staff/add" },
-    ],
-  },
-  {
     label: "Hizmetler",
+    path: "/services", // Müşteri anasayfası hizmetler listesi
     icon: (
       <svg
         className="h-5 w-5"
@@ -80,13 +21,9 @@ const menuItems = [
         />
       </svg>
     ),
-    children: [
-      { label: "Hizmet Listesi", path: "/admin/services" },
-      { label: "Hizmet Ekle", path: "/admin/services/add" },
-    ],
   },
   {
-    label: "Kategoriler",
+    label: "Randevularım",
     icon: (
       <svg
         className="h-5 w-5"
@@ -98,18 +35,15 @@ const menuItems = [
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
-          d="M4 6h16M4 10h16M4 14h16M4 18h16"
+          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
         />
       </svg>
     ),
-    children: [
-      { label: "Kategori Listesi", path: "/admin/categories" },
-      { label: "Kategori Ekle", path: "/admin/categories/add" },
-    ],
+    children: [{ label: "Aktif Randevular", path: "/appointments" }],
   },
   {
     label: "Profilim",
-    path: "/admin/profile",
+    path: "/profile", // Shared profile sayfası
     icon: (
       <svg
         className="h-5 w-5"
@@ -148,32 +82,22 @@ function SidebarContent({ onClose }: SidebarContentProps) {
   const isActive = (path: string) => location.pathname === path;
 
   const isParentActive = (item: (typeof menuItems)[0]) => {
-    // Eğer children yoksa VE path varsa, direkt eşleştiğini kontrol et
     if (!item.children && "path" in item) {
       return location.pathname === (item as { path: string }).path;
     }
-
-    // Eğer children varsa, alt linklerden herhangi birine eşleşiyor mu diye bak
     if (item.children) {
       return item.children.some((child) =>
         location.pathname.startsWith(child.path),
       );
     }
-
     return false;
-  };
-
-  const onLogoutClick = () => {
-    // Assuming your logout mutation is handled inside handleLogout in Context
-    // If it's not, you might need to call the mutation here before handleLogout()
-    handleLogout();
   };
 
   return (
     <div className="flex h-full flex-col bg-surface pt-6">
       {/* Mobile Close Button */}
       <div className="mb-4 flex items-center justify-between px-4 lg:hidden">
-        <span className="text-lg font-bold text-deep">Yönetici</span>
+        <span className="text-lg font-bold text-deep">Menü</span>
         <button onClick={onClose} className="text-main/70 hover:text-main">
           <svg
             className="h-6 w-6"
@@ -194,9 +118,9 @@ function SidebarContent({ onClose }: SidebarContentProps) {
       {/* Desktop Logo/Title */}
       <div className="mb-8 hidden px-6 lg:block">
         <h1 className="text-xl font-extrabold tracking-tight text-deep">
-          Admin Panel
+          Randevu Sistemi
         </h1>
-        <p className="text-xs text-main/50 mt-1">Yönetim Merkezi</p>
+        <p className="text-xs text-main/50 mt-1">Müşteri Paneli</p>
       </div>
 
       <nav className="flex-1 space-y-1 px-3 overflow-y-auto pb-4">
@@ -274,10 +198,10 @@ function SidebarContent({ onClose }: SidebarContentProps) {
         ))}
       </nav>
 
-      {/* Logout Button - Fixed at the bottom */}
+      {/* Logout Button */}
       <div className="mt-auto p-3 border-t border-main/10">
         <button
-          onClick={onLogoutClick}
+          onClick={handleLogout}
           className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
         >
           <svg
@@ -300,7 +224,7 @@ function SidebarContent({ onClose }: SidebarContentProps) {
   );
 }
 
-export default function AdminSidebar() {
+export default function CustomerSidebar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
@@ -344,7 +268,7 @@ export default function AdminSidebar() {
       </div>
 
       {/* DESKTOP: Static Sidebar */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:z-30 lg:flex lg:w-64 lg:flex-col">
+      <div className="hidden lg:fixed lg:inset-y-15 lg:z-30 lg:flex lg:w-64 lg:flex-col">
         <SidebarContent />
       </div>
     </>

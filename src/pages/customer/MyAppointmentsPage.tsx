@@ -93,7 +93,7 @@ export default function MyAppointmentsPage() {
           </p>
         </div>
         <Link
-          to="/"
+          to="/services"
           className="hidden sm:inline-flex items-center px-5 py-2.5 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
         >
           + Yeni Randevu
@@ -120,7 +120,7 @@ export default function MyAppointmentsPage() {
             Henüz bir randevunuz bulunmuyor.
           </p>
           <Link
-            to="/"
+            to="/services"
             className="mt-4 inline-block text-indigo-600 font-semibold hover:underline"
           >
             İlk randevunuzu oluşturun

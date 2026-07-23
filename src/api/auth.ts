@@ -6,7 +6,7 @@ export default {
     const res = await api.post(`/${role}/login`, { email, password });
     return res.data;
   },
-
+// /
   logout: async (role: UserRole) => {
     const res = await api.post<LogoutResponse>(`/${role}/logout`);
     return res.data;

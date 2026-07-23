@@ -12,7 +12,7 @@ export interface ProfileUpdateBody {
 
 export default {
   get: async (role: UserRole): Promise<AnyProfileResponse> => {
-    let data: any;
+    let data: Record<string, unknown>;
 
     if (role === "customer") {
       const res = await api.get("/customer/profile");

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router";
 
 import { useQueryClient } from "@tanstack/react-query";
@@ -20,22 +20,11 @@ export default function AdminServiceEdit() {
   const { data: categories } = useGetAllCategoriesQuery();
   const updateMut = useUpdateServiceMutation();
 
-  const [formData, setFormData] = useState<ServiceRequestBody>({
-    catagory_id: "",
-    name: "",
-    duration: 30,
-  });
-
-  // Mevcut verileri form'a doldur
-  useEffect(() => {
-    if (service) {
-      setFormData({
-        catagory_id: service.catagory_id,
-        name: service.name,
-        duration: service.duration,
-      });
-    }
-  }, [service]);
+  const [formData, setFormData] = useState<ServiceRequestBody>(() => ({
+    catagory_id: service?.catagory_id || "",
+    name: service?.name || "",
+    duration: service?.duration || 30,
+  }));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,7 +33,7 @@ export default function AdminServiceEdit() {
       await updateMut.mutateAsync({ id, data: formData });
       queryClient.invalidateQueries({ queryKey: ["services"] });
       navigate("/admin/services");
-    } catch (err) {
+    } catch {
       alert("Hizmet güncellenirken bir hata oluştu.");
     }
   };

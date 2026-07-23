@@ -20,7 +20,7 @@ export default function AdminCategoriesList() {
     try {
       await deleteMut.mutateAsync(id);
       queryClient.invalidateQueries({ queryKey: ["categories"] });
-    } catch (err) {
+    } catch {
       alert("Kategori silinirken bir hata oluştu.");
     }
   };

@@ -25,7 +25,7 @@ export default function AdminStaffAdd() {
       await createMut.mutateAsync(formData);
       queryClient.invalidateQueries({ queryKey: ["staff"] });
       navigate("/admin/staff");
-    } catch (err) {
+    } catch {
       alert("Personel eklenirken bir hata oluştu.");
     }
   };

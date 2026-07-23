@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router";
 import {
   useGetCategoryByIdQuery,
@@ -16,15 +16,9 @@ export default function AdminCategoryEdit() {
     useGetCategoryByIdQuery(id || "");
   const updateMut = useUpdateCategoryMutation();
 
-  const [formData, setFormData] = useState<CategoryRequestBody>({
-    name: "",
-  });
-
-  useEffect(() => {
-    if (category) {
-      setFormData({ name: category.name });
-    }
-  }, [category]);
+  const [formData, setFormData] = useState<CategoryRequestBody>(() => ({
+    name: category?.name || "",
+  }));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,7 +27,7 @@ export default function AdminCategoryEdit() {
       await updateMut.mutateAsync({ id, data: formData });
       queryClient.invalidateQueries({ queryKey: ["categories"] });
       navigate("/admin/categories");
-    } catch (err) {
+    } catch {
       alert("Kategori güncellenirken bir hata oluştu.");
     }
   };

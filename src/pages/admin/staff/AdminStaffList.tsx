@@ -20,7 +20,7 @@ export default function AdminStaffList() {
     try {
       await deleteMut.mutateAsync(id);
       queryClient.invalidateQueries({ queryKey: ["staff"] });
-    } catch (err) {
+    } catch {
       alert("Personel silinirken bir hata oluştu.");
     }
   };

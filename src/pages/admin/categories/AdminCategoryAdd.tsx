@@ -19,7 +19,7 @@ export default function AdminCategoryAdd() {
       await createMut.mutateAsync(formData);
       queryClient.invalidateQueries({ queryKey: ["categories"] });
       navigate("/admin/categories");
-    } catch (err) {
+    } catch {
       alert("Kategori eklenirken bir hata oluştu.");
     }
   };

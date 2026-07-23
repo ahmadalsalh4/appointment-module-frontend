@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router";
 import {
   useGetStaffByIdQuery,
@@ -18,19 +18,10 @@ export default function AdminStaffEdit() {
   );
   const updateMut = useUpdateStaffMutation();
 
-  const [formData, setFormData] = useState<UpdateStaffRequestBody>({
-    job_title: "",
-    email: "",
-  });
-
-  useEffect(() => {
-    if (staff) {
-      setFormData({
-        job_title: staff.job_title,
-        email: staff.email,
-      });
-    }
-  }, [staff]);
+  const [formData, setFormData] = useState<UpdateStaffRequestBody>(() => ({
+    job_title: staff?.job_title || "",
+    email: staff?.email || "",
+  }));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,7 +30,7 @@ export default function AdminStaffEdit() {
       await updateMut.mutateAsync({ id, data: formData });
       queryClient.invalidateQueries({ queryKey: ["staff"] });
       navigate("/admin/staff");
-    } catch (err) {
+    } catch  {
       alert("Personel güncellenirken bir hata oluştu.");
     }
   };

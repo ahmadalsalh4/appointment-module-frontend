@@ -64,7 +64,7 @@ export default function AdminAppointmentsList() {
         data: { state_id: newStateId },
       });
       queryClient.invalidateQueries({ queryKey: ["appointments", "admin"] });
-    } catch (err) {
+    } catch {
       alert("Durum güncellenirken hata oluştu.");
     } finally {
       setChangingId(null);
@@ -77,7 +77,7 @@ export default function AdminAppointmentsList() {
     try {
       await deleteMut.mutateAsync(id);
       queryClient.invalidateQueries({ queryKey: ["appointments", "admin"] });
-    } catch (err) {
+    } catch {
       alert("Randevu silinirken hata oluştu.");
     }
   };

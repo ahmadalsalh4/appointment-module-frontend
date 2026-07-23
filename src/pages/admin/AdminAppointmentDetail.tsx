@@ -79,7 +79,7 @@ export default function AdminAppointmentDetail() {
       queryClient.invalidateQueries({
         queryKey: ["appointments", "admin", id],
       });
-    } catch (err) {
+    } catch {
       alert("Durum güncellenirken bir hata oluştu.");
     }
   };
@@ -95,7 +95,7 @@ export default function AdminAppointmentDetail() {
       await deleteMut.mutateAsync(id!);
       queryClient.invalidateQueries({ queryKey: ["appointments", "admin"] });
       navigate("/admin/appointments"); // Listeye geri dön
-    } catch (err) {
+    } catch {
       alert("Randevu silinirken bir hata oluştu.");
     }
   };

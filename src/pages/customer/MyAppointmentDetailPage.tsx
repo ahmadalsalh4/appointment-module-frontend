@@ -79,7 +79,7 @@ export default function MyAppointmentDetailPage() {
       await cancelMutation.mutateAsync(id!);
       queryClient.invalidateQueries({ queryKey: ["appointments", "customer"] });
       navigate("/appointments"); // Redirect back to list
-    } catch (err) {
+    } catch {
       alert("Randevu iptal edilirken bir hata oluştu.");
     }
   };

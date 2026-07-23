@@ -24,7 +24,7 @@ export default function AdminServiceAdd() {
       await createMut.mutateAsync(formData);
       queryClient.invalidateQueries({ queryKey: ["services"] });
       navigate("/admin/services");
-    } catch (err) {
+    } catch {
       alert("Hizmet eklenirken bir hata oluştu.");
     }
   };

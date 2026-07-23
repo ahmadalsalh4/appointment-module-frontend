@@ -24,7 +24,7 @@ export default function ProfilePage() {
     return (
       <div className="p-6 text-center text-red-500">
         <p className="text-2xl font-bold mb-2">Profil Yüklenemedi</p>
-        <p>{(error as any)?.message || "Lütfen tekrar giriş yapın."}</p>
+        <p>{(error as Error)?.message || "Lütfen tekrar giriş yapın."}</p>
       </div>
     );
   }

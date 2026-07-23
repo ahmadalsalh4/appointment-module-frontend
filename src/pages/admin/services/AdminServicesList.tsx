@@ -15,7 +15,7 @@ export default function AdminServicesList() {
     try {
       await deleteMut.mutateAsync(id);
       queryClient.invalidateQueries({ queryKey: ["services"] });
-    } catch (err) {
+    } catch {
       alert("Hizmet silinirken bir hata oluştu.");
     }
   };

@@ -52,7 +52,7 @@ export default function ServiceDetailPage() {
       const res = await checkAvailability.mutateAsync(body);
       setSlots(res.available_slots);
       setSelectedTime(null);
-    } catch (err) {
+    } catch {
       setSlots([]);
     }
   };
@@ -74,7 +74,7 @@ export default function ServiceDetailPage() {
       // Success! Redirect to "My Appointments" page
       queryClient.invalidateQueries({ queryKey: ["appointments", "customer"] });
       navigate("/appointments");
-    } catch (err) {
+    } catch {
       alert("Randevu oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.");
     }
   };

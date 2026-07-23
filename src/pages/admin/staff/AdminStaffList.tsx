@@ -35,7 +35,7 @@ export default function AdminStaffList() {
 
   if (isError) {
     return (
-      <div className="text-center py-20 text-red-500">
+      <div className="text-center py-20 text-red-500 dark:text-red-400">
         <p className="text-xl font-bold">
           Personel listesi yüklenirken hata oluştu.
         </p>
@@ -48,14 +48,14 @@ export default function AdminStaffList() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-gray-900">Personel</h1>
-          <p className="mt-1 text-gray-500 text-sm">
+          <h1 className="text-3xl font-extrabold text-gray-900 dark:text-gray-100">Personel</h1>
+          <p className="mt-1 text-gray-500 dark:text-gray-400 text-sm">
             Sistemdeki personelleri yönetin ve yeni ekleyin.
           </p>
         </div>
         <Link
           to="/admin/staff/add"
-          className="inline-flex items-center justify-center px-5 py-2.5 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          className="inline-flex items-center justify-center px-5 py-2.5 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-indigo-600 dark:bg-indigo-500 hover:bg-indigo-700 dark:hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
         >
           + Yeni Personel Ekle
         </Link>
@@ -67,19 +67,19 @@ export default function AdminStaffList() {
           staffList.map((staff) => (
             <div
               key={staff.id}
-              className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 hover:shadow-md transition-shadow flex flex-col"
+              className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-6 hover:shadow-md transition-shadow flex flex-col"
             >
               {/* Profile Header */}
               <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-lg font-bold">
+                <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 rounded-full flex items-center justify-center text-lg font-bold">
                   {staff.person.name.charAt(0)}
                   {staff.person.surname.charAt(0)}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold text-gray-900 truncate">
+                  <p className="text-sm font-bold text-gray-900 dark:text-gray-100 truncate">
                     {staff.person.name} {staff.person.surname}
                   </p>
-                  <p className="text-xs text-indigo-600 font-medium truncate">
+                  <p className="text-xs text-indigo-600 dark:text-indigo-400 font-medium truncate">
                     {staff.job_title}
                   </p>
                 </div>
@@ -87,7 +87,7 @@ export default function AdminStaffList() {
 
               {/* Info */}
               <div className="flex-1 space-y-2 mb-4 text-sm">
-                <div className="flex items-center text-gray-500 truncate">
+                <div className="flex items-center text-gray-500 dark:text-gray-400 truncate">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-4 w-4 mr-2 shrink-0"
@@ -104,7 +104,7 @@ export default function AdminStaffList() {
                   </svg>
                   {staff.email}
                 </div>
-                <div className="flex items-center text-gray-500">
+                <div className="flex items-center text-gray-500 dark:text-gray-400">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-4 w-4 mr-2 shrink-0"
@@ -124,23 +124,23 @@ export default function AdminStaffList() {
               </div>
 
               {/* Actions */}
-              <div className="pt-4 border-t border-gray-100 flex items-center justify-end gap-4 text-sm font-medium">
+              <div className="pt-4 border-t border-gray-100 dark:border-gray-700 flex items-center justify-end gap-4 text-sm font-medium">
                 <Link
                   to={`/admin/staff/${staff.id}`}
-                  className="text-indigo-600 hover:text-indigo-900"
+                  className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300"
                 >
                   Detay
                 </Link>
                 <Link
                   to={`/admin/staff/${staff.id}/edit`}
-                  className="text-yellow-600 hover:text-yellow-900"
+                  className="text-yellow-600 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-300"
                 >
                   Düzenle
                 </Link>
                 <button
                   onClick={() => handleDelete(staff.id)}
                   disabled={deleteMut.isPending}
-                  className="text-red-600 hover:text-red-900 disabled:text-gray-400"
+                  className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 disabled:text-gray-400 dark:disabled:text-gray-500"
                 >
                   Sil
                 </button>
@@ -148,7 +148,7 @@ export default function AdminStaffList() {
             </div>
           ))
         ) : (
-          <div className="col-span-3 text-center py-16 bg-white rounded-xl border border-gray-200 text-gray-500">
+          <div className="col-span-3 text-center py-16 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400">
             Sistemde henüz bir personel bulunmuyor.
           </div>
         )}

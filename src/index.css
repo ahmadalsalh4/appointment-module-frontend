@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-main: #1b2430;
   --color-back: #f5f6f7;
@@ -8,6 +10,16 @@
   --color-waiting: #d98e04;
   --color-completed: #3f7d53;
   --color-canceld: #c1443c;
+}
+
+.dark {
+  --color-main: #e5e7eb;
+  --color-back: #0f1419;
+  --color-surface: #1b2430;
+  --color-deep: #2dd4bf;
+  --color-waiting: #fbbf24;
+  --color-completed: #34d399;
+  --color-canceld: #f87171;
 }
 
 @layer base {

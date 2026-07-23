@@ -16,7 +16,7 @@ export default function ServicesPage() {
   if (isError) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-20 text-center">
-        <div className="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-lg">
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-6 py-4 rounded-lg">
           <p className="font-semibold text-lg">
             Hizmetler yüklenirken bir hata oluştu.
           </p>
@@ -32,18 +32,18 @@ export default function ServicesPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* Header Section */}
       <div className="text-center mb-12">
-        <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl">
+        <h1 className="text-4xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight sm:text-5xl">
           Hizmetlerimiz
         </h1>
-        <p className="mt-4 text-lg text-gray-500 max-w-2xl mx-auto">
+        <p className="mt-4 text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
           İhtiyacınıza uygun hizmeti seçin ve hemen randevunuzu oluşturun.
         </p>
       </div>
 
       {/* Grid Section */}
       {services && services.length === 0 ? (
-        <div className="text-center py-16 bg-white rounded-2xl border border-gray-100">
-          <p className="text-gray-400 text-lg">
+        <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700">
+          <p className="text-gray-400 dark:text-gray-500 text-lg">
             Şu anda aktif bir hizmet bulunmamaktadır.
           </p>
         </div>
@@ -53,31 +53,31 @@ export default function ServicesPage() {
             <Link
               to={`/services/${service.id}`}
               key={service.id}
-              className="group relative bg-white rounded-2xl shadow-sm border border-gray-100 p-8 hover:shadow-xl hover:border-indigo-100 transition-all duration-300 flex flex-col"
+              className="group relative bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-8 hover:shadow-xl hover:border-indigo-100 dark:hover:border-indigo-800 transition-all duration-300 flex flex-col"
             >
               {/* Decorative top gradient bar */}
               <div className="absolute inset-x-0 top-0 h-1 bg-linear-to-r from-indigo-500 to-purple-500 rounded-t-2xl transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
 
               {/* Category Tag */}
               {service.category && (
-                <span className="self-start inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 uppercase tracking-wide mb-6">
+                <span className="self-start inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 uppercase tracking-wide mb-6">
                   {service.category.name}
                 </span>
               )}
 
               {/* Content */}
-              <h3 className="text-xl font-bold text-gray-900 group-hover:text-indigo-600 transition-colors mb-3">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors mb-3">
                 {service.name}
               </h3>
 
-              <p className="text-gray-500 text-sm mb-6 grow">
+              <p className="text-gray-500 dark:text-gray-400 text-sm mb-6 grow">
                 Bu hizmet hakkında detaylı bilgi almak ve müsait saatleri görmek
                 için tıklayın.
               </p>
 
               {/* Footer Info */}
-              <div className="flex items-center justify-between pt-6 border-t border-gray-100 mt-auto">
-                <div className="flex items-center text-gray-600">
+              <div className="flex items-center justify-between pt-6 border-t border-gray-100 dark:border-gray-700 mt-auto">
+                <div className="flex items-center text-gray-600 dark:text-gray-300">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-5 w-5 mr-2 text-indigo-500"
@@ -99,7 +99,7 @@ export default function ServicesPage() {
 
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 text-gray-300 group-hover:text-indigo-500 group-hover:translate-x-1 transition-all"
+                  className="h-5 w-5 text-gray-300 dark:text-gray-600 group-hover:text-indigo-500 group-hover:translate-x-1 transition-all"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"

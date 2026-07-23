@@ -29,14 +29,14 @@ const formatSafeDate = (isoString: string) => {
 const getStatusStyle = (statusName: string) => {
   switch (statusName) {
     case "confirmed":
-      return "bg-green-100 text-green-800";
+      return "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300";
     case "completed":
-      return "bg-blue-100 text-blue-800";
+      return "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300";
     case "cancelled":
-      return "bg-red-100 text-red-800";
+      return "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300";
     case "pending":
     default:
-      return "bg-yellow-100 text-yellow-800";
+      return "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300";
   }
 };
 
@@ -92,7 +92,7 @@ export default function AdminAppointmentsList() {
 
   if (isError) {
     return (
-      <div className="text-center py-20 text-red-500">
+      <div className="text-center py-20 text-red-500 dark:text-red-400">
         <p className="text-xl font-bold">Randevular yüklenirken hata oluştu.</p>
       </div>
     );
@@ -103,66 +103,66 @@ export default function AdminAppointmentsList() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-gray-900">Randevular</h1>
-          <p className="mt-1 text-gray-500 text-sm">
+          <h1 className="text-3xl font-extrabold text-gray-900 dark:text-gray-100">Randevular</h1>
+          <p className="mt-1 text-gray-500 dark:text-gray-400 text-sm">
             Tüm personel ve müşterilerin randevularını buradan yönetin.
           </p>
         </div>
       </div>
 
       {/* Table Container */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead className="bg-gray-50 dark:bg-gray-700/50">
               <tr>
                 <th
                   scope="col"
-                  className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider"
+                  className="px-6 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider"
                 >
                   Müşteri / Personel
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider"
+                  className="px-6 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider"
                 >
                   Hizmet
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider"
+                  className="px-6 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider"
                 >
                   Tarih & Saat
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider"
+                  className="px-6 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider"
                 >
                   Durum
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider"
+                  className="px-6 py-3 text-right text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider"
                 >
                   İşlemler
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-100">
+            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700">
               {appointments && appointments.length > 0 ? (
                 appointments.map((appo: Appointment) => (
                   <tr
                     key={appo.id}
-                    className="hover:bg-gray-50 transition-colors"
+                    className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
                   >
                     {/* Customer & Staff Info */}
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex flex-col">
-                        <span className="text-sm font-semibold text-gray-900">
+                        <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                           {appo.customer?.person.name}{" "}
                           {appo.customer?.person.surname}
                         </span>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
                           → {appo.staff?.person.name}{" "}
                           {appo.staff?.person.surname}
                         </span>
@@ -171,20 +171,20 @@ export default function AdminAppointmentsList() {
 
                     {/* Service Info */}
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
+                      <div className="text-sm text-gray-900 dark:text-gray-100">
                         {appo.service.name}
                       </div>
-                      <div className="text-xs text-gray-400">
+                      <div className="text-xs text-gray-400 dark:text-gray-500">
                         {appo.service.duration} dk
                       </div>
                     </td>
 
                     {/* Date & Time */}
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
+                      <div className="text-sm text-gray-900 dark:text-gray-100">
                         {formatSafeDate(appo.start_date)}
                       </div>
-                      <div className="text-sm font-medium text-indigo-600">
+                      <div className="text-sm font-medium text-indigo-600 dark:text-indigo-400">
                         {formatSafeTime(appo.start_date)}
                       </div>
                     </td>
@@ -213,14 +213,14 @@ export default function AdminAppointmentsList() {
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <Link
                         to={`/admin/appointments/${appo.id}`}
-                        className="text-indigo-600 hover:text-indigo-900 mr-4"
+                        className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 mr-4"
                       >
                         Detay
                       </Link>
                       <button
                         onClick={() => handleDelete(appo.id)}
                         disabled={deleteMut.isPending}
-                        className="text-red-600 hover:text-red-900 disabled:text-gray-400"
+                        className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 disabled:text-gray-400 dark:disabled:text-gray-500"
                       >
                         Sil
                       </button>
@@ -231,7 +231,7 @@ export default function AdminAppointmentsList() {
                 <tr>
                   <td
                     colSpan={5}
-                    className="px-6 py-12 text-center text-gray-500"
+                    className="px-6 py-12 text-center text-gray-500 dark:text-gray-400"
                   >
                     Sistemde henüz hiçbir randevu bulunmuyor.
                   </td>

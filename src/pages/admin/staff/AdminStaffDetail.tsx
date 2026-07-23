@@ -15,11 +15,11 @@ export default function AdminStaffDetail() {
 
   if (isError || !staff) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-20 text-center text-red-500">
+      <div className="max-w-4xl mx-auto px-4 py-20 text-center text-red-500 dark:text-red-400">
         <p className="text-xl font-bold">Personel bulunamadı.</p>
         <Link
           to="/admin/staff"
-          className="mt-4 inline-block text-indigo-600 hover:underline"
+          className="mt-4 inline-block text-indigo-600 dark:text-indigo-400 hover:underline"
         >
           Personel Listesine Dön
         </Link>
@@ -29,37 +29,37 @@ export default function AdminStaffDetail() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <nav className="flex mb-8 text-sm text-gray-500">
-        <Link to="/admin/staff" className="hover:text-indigo-600">
+      <nav className="flex mb-8 text-sm text-gray-500 dark:text-gray-400">
+        <Link to="/admin/staff" className="hover:text-indigo-600 dark:hover:text-indigo-400">
           Personel
         </Link>
         <span className="mx-2">/</span>
-        <span className="text-gray-900 font-medium">
+        <span className="text-gray-900 dark:text-gray-100 font-medium">
           {staff.person.name} {staff.person.surname}
         </span>
       </nav>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
         {/* Header */}
-        <div className="p-8 bg-indigo-50 border-b border-indigo-100">
+        <div className="p-8 bg-indigo-50 dark:bg-indigo-900/40 border-b border-indigo-100 dark:border-indigo-800">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
             <div className="flex items-center gap-6">
-              <div className="w-20 h-20 bg-indigo-200 text-indigo-700 rounded-full flex items-center justify-center text-3xl font-bold">
+              <div className="w-20 h-20 bg-indigo-200 dark:bg-indigo-800 text-indigo-700 dark:text-indigo-300 rounded-full flex items-center justify-center text-3xl font-bold">
                 {staff.person.name.charAt(0)}
                 {staff.person.surname.charAt(0)}
               </div>
               <div>
-                <h1 className="text-2xl font-extrabold text-gray-900">
+                <h1 className="text-2xl font-extrabold text-gray-900 dark:text-gray-100">
                   {staff.person.name} {staff.person.surname}
                 </h1>
-                <p className="text-indigo-700 font-semibold">
+                <p className="text-indigo-700 dark:text-indigo-300 font-semibold">
                   {staff.job_title}
                 </p>
               </div>
             </div>
             <Link
               to={`/admin/staff/${staff.id}/edit`}
-              className="px-5 py-2.5 text-sm font-medium text-yellow-700 bg-white border border-yellow-200 rounded-lg hover:bg-yellow-50 shadow-sm"
+              className="px-5 py-2.5 text-sm font-medium text-yellow-700 dark:text-yellow-300 bg-white dark:bg-gray-800 border border-yellow-200 dark:border-yellow-800 rounded-lg hover:bg-yellow-50 dark:hover:bg-yellow-900/20 shadow-sm"
             >
               Bilgileri Düzenle
             </Link>
@@ -68,11 +68,11 @@ export default function AdminStaffDetail() {
 
         <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="space-y-6">
-            <h2 className="text-lg font-bold text-gray-900 border-b pb-2">
+            <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 border-b pb-2">
               İletişim Bilgileri
             </h2>
-            <div className="flex items-center gap-4 bg-gray-50 p-4 rounded-xl">
-              <div className="p-2 bg-gray-200 rounded-lg text-gray-600">
+            <div className="flex items-center gap-4 bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl">
+              <div className="p-2 bg-gray-200 dark:bg-gray-600 rounded-lg text-gray-600 dark:text-gray-300">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-5 w-5"
@@ -89,14 +89,14 @@ export default function AdminStaffDetail() {
                 </svg>
               </div>
               <div>
-                <p className="text-xs text-gray-500 uppercase">
+                <p className="text-xs text-gray-500 dark:text-gray-400 uppercase">
                   İş E-Posta (Giriş)
                 </p>
-                <p className="text-sm font-bold text-gray-900">{staff.email}</p>
+                <p className="text-sm font-bold text-gray-900 dark:text-gray-100">{staff.email}</p>
               </div>
             </div>
-            <div className="flex items-center gap-4 bg-gray-50 p-4 rounded-xl">
-              <div className="p-2 bg-gray-200 rounded-lg text-gray-600">
+            <div className="flex items-center gap-4 bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl">
+              <div className="p-2 bg-gray-200 dark:bg-gray-600 rounded-lg text-gray-600 dark:text-gray-300">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-5 w-5"
@@ -113,8 +113,8 @@ export default function AdminStaffDetail() {
                 </svg>
               </div>
               <div>
-                <p className="text-xs text-gray-500 uppercase">Telefon</p>
-                <p className="text-sm font-bold text-gray-900">
+                <p className="text-xs text-gray-500 dark:text-gray-400 uppercase">Telefon</p>
+                <p className="text-sm font-bold text-gray-900 dark:text-gray-100">
                   {staff.person.phone_number}
                 </p>
               </div>
@@ -122,19 +122,19 @@ export default function AdminStaffDetail() {
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-lg font-bold text-gray-900 border-b pb-2">
+            <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 border-b pb-2">
               Sistem Bilgileri
             </h2>
-            <div className="bg-gray-50 p-4 rounded-xl space-y-3 text-sm">
+            <div className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl space-y-3 text-sm">
               <div className="flex justify-between">
-                <span className="text-gray-500">Kategori:</span>
-                <span className="font-medium text-gray-900">
+                <span className="text-gray-500 dark:text-gray-400">Kategori:</span>
+                <span className="font-medium text-gray-900 dark:text-gray-100">
                   {staff.category?.name ?? "Atanmamış"}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">Kayıt Tarihi:</span>
-                <span className="font-medium text-gray-900">
+                <span className="text-gray-500 dark:text-gray-400">Kayıt Tarihi:</span>
+                <span className="font-medium text-gray-900 dark:text-gray-100">
                   {new Date(
                     staff.created_at.split("T")[0] + "T00:00:00",
                   ).toLocaleDateString("tr-TR")}
@@ -142,8 +142,8 @@ export default function AdminStaffDetail() {
               </div>
               {staff.managing_admin && (
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Yöneticisi:</span>
-                  <span className="font-medium text-gray-900">
+                  <span className="text-gray-500 dark:text-gray-400">Yöneticisi:</span>
+                  <span className="font-medium text-gray-900 dark:text-gray-100">
                     {staff.managing_admin.email}
                   </span>
                 </div>

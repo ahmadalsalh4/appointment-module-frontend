@@ -31,14 +31,14 @@ const formatDateTime = (isoString: string) => {
 const getStatusStyle = (statusName: string) => {
   switch (statusName) {
     case "confirmed":
-      return "bg-green-100 text-green-800";
+      return "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300";
     case "completed":
-      return "bg-blue-100 text-blue-800";
+      return "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300";
     case "cancelled":
-      return "bg-red-100 text-red-800";
+      return "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300";
     case "pending":
     default:
-      return "bg-yellow-100 text-yellow-800";
+      return "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300";
   }
 };
 
@@ -73,7 +73,7 @@ export default function MyAppointmentsPage() {
 
   if (isError) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-20 text-center text-red-500">
+      <div className="max-w-4xl mx-auto px-4 py-20 text-center text-red-500 dark:text-red-400">
         <p className="text-xl font-bold">
           Randevularınız yüklenirken bir hata oluştu.
         </p>
@@ -85,26 +85,26 @@ export default function MyAppointmentsPage() {
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-extrabold text-gray-900">
+          <h1 className="text-3xl font-extrabold text-gray-900 dark:text-gray-100">
             Randevularım
           </h1>
-          <p className="mt-1 text-gray-500">
+          <p className="mt-1 text-gray-500 dark:text-gray-400">
             Geçmiş ve yaklaşan randevularınızı burada yönetin.
           </p>
         </div>
         <Link
           to="/services"
-          className="hidden sm:inline-flex items-center px-5 py-2.5 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          className="hidden sm:inline-flex items-center px-5 py-2.5 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-indigo-600 dark:bg-indigo-500 hover:bg-indigo-700 dark:hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
         >
           + Yeni Randevu
         </Link>
       </div>
 
       {appointments && appointments.length === 0 ? (
-        <div className="text-center py-16 bg-white rounded-2xl border border-gray-100 shadow-sm">
+        <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="mx-auto h-16 w-16 text-gray-300"
+            className="mx-auto h-16 w-16 text-gray-300 dark:text-gray-600"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -116,12 +116,12 @@ export default function MyAppointmentsPage() {
               d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
             />
           </svg>
-          <p className="mt-4 text-gray-500 text-lg">
+          <p className="mt-4 text-gray-500 dark:text-gray-400 text-lg">
             Henüz bir randevunuz bulunmuyor.
           </p>
           <Link
             to="/services"
-            className="mt-4 inline-block text-indigo-600 font-semibold hover:underline"
+            className="mt-4 inline-block text-indigo-600 dark:text-indigo-400 font-semibold hover:underline"
           >
             İlk randevunuzu oluşturun
           </Link>
@@ -132,12 +132,12 @@ export default function MyAppointmentsPage() {
             <Link
               key={appointment.id}
               to={`/appointments/${appointment.id}`}
-              className="block bg-white p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200 group"
+              className="block bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-200 group"
             >
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 {/* Left: Date & Time */}
                 <div className="flex items-center gap-4">
-                  <div className="hidden sm:flex flex-col items-center justify-center w-16 h-16 bg-indigo-50 text-indigo-700 rounded-xl font-bold text-center">
+                  <div className="hidden sm:flex flex-col items-center justify-center w-16 h-16 bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 rounded-xl font-bold text-center">
                     <span className="text-2xl leading-none">
                       {new Date(appointment.start_date).getDate()}
                     </span>
@@ -149,10 +149,10 @@ export default function MyAppointmentsPage() {
                     </span>
                   </div>
                   <div>
-                    <p className="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                    <p className="font-semibold text-gray-900 dark:text-gray-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                       {appointment.service.name}
                     </p>
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                       {formatDateTime(appointment.start_date)} (
                       {appointment.service.duration} dk)
                     </p>
@@ -163,10 +163,10 @@ export default function MyAppointmentsPage() {
                 <div className="flex items-center gap-4 sm:gap-6">
                   {appointment.staff && (
                     <div className="text-right hidden md:block">
-                      <p className="text-xs text-gray-400 uppercase tracking-wide">
+                      <p className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wide">
                         Personel
                       </p>
-                      <p className="text-sm font-medium text-gray-700">
+                      <p className="text-sm font-medium text-gray-700 dark:text-gray-200">
                         {appointment.staff.person.name}{" "}
                         {appointment.staff.person.surname}
                       </p>
@@ -181,7 +181,7 @@ export default function MyAppointmentsPage() {
 
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 text-gray-300 group-hover:text-indigo-500 group-hover:translate-x-1 transition-all"
+                    className="h-5 w-5 text-gray-300 dark:text-gray-600 group-hover:text-indigo-500 group-hover:translate-x-1 transition-all"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"

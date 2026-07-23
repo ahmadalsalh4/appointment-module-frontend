@@ -16,14 +16,14 @@ const formatSafeTime = (isoString: string) => {
 const getStatusStyle = (statusName: string) => {
   switch (statusName) {
     case "confirmed":
-      return "bg-green-100 text-green-800";
+      return "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300";
     case "completed":
-      return "bg-blue-100 text-blue-800";
+      return "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300";
     case "cancelled":
-      return "bg-red-100 text-red-800";
+      return "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300";
     case "pending":
     default:
-      return "bg-yellow-100 text-yellow-800";
+      return "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300";
   }
 };
 
@@ -62,8 +62,8 @@ export default function AdminHomePage() {
     <div className="space-y-8">
       {/* Page Header */}
       <div>
-        <h1 className="text-3xl font-extrabold text-gray-900">Admin Paneli</h1>
-        <p className="mt-1 text-gray-500">
+        <h1 className="text-3xl font-extrabold text-gray-900 dark:text-gray-100">Admin Paneli</h1>
+        <p className="mt-1 text-gray-500 dark:text-gray-400">
           Sistemin genel durumunu buradan takip edin.
         </p>
       </div>
@@ -71,8 +71,8 @@ export default function AdminHomePage() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Total Staff Card */}
-        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4">
-          <div className="p-3 bg-indigo-50 rounded-lg text-indigo-600">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm flex items-center gap-4">
+          <div className="p-3 bg-indigo-50 dark:bg-indigo-900/40 rounded-lg text-indigo-600 dark:text-indigo-400">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-8 w-8"
@@ -89,16 +89,16 @@ export default function AdminHomePage() {
             </svg>
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-500">Toplam Personel</p>
-            <p className="text-2xl font-bold text-gray-900">
+            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Toplam Personel</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
               {staffList?.length || 0}
             </p>
           </div>
         </div>
 
         {/* Total Categories Card */}
-        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4">
-          <div className="p-3 bg-purple-50 rounded-lg text-purple-600">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm flex items-center gap-4">
+          <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg text-purple-600 dark:text-purple-400">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-8 w-8"
@@ -115,8 +115,8 @@ export default function AdminHomePage() {
             </svg>
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-500">Kategoriler</p>
-            <p className="text-2xl font-bold text-gray-900">
+            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Kategoriler</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
               {categories?.length || 0}
             </p>
           </div>
@@ -125,9 +125,9 @@ export default function AdminHomePage() {
         {/* Pending Appointments Card */}
         <Link
           to="/admin/appointments"
-          className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4 hover:shadow-md transition-shadow"
+          className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm flex items-center gap-4 hover:shadow-md transition-shadow"
         >
-          <div className="p-3 bg-yellow-50 rounded-lg text-yellow-600">
+          <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg text-yellow-600 dark:text-yellow-400">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-8 w-8"
@@ -144,16 +144,16 @@ export default function AdminHomePage() {
             </svg>
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-500">Onay Bekleyen</p>
-            <p className="text-2xl font-bold text-gray-900">
+            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Onay Bekleyen</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
               {pendingAppos.length}
             </p>
           </div>
         </Link>
 
         {/* Total Customers Card */}
-        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4">
-          <div className="p-3 bg-green-50 rounded-lg text-green-600">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm flex items-center gap-4">
+          <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg text-green-600 dark:text-green-400">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-8 w-8"
@@ -170,10 +170,10 @@ export default function AdminHomePage() {
             </svg>
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-500">
+            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
               Aktif Müşteriler
             </p>
-            <p className="text-2xl font-bold text-gray-900">
+            <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
               {totalCustomers.length}
             </p>
           </div>
@@ -183,14 +183,14 @@ export default function AdminHomePage() {
       {/* Quick Actions & Pending List Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Quick Actions */}
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 h-fit">
-          <h2 className="text-lg font-bold text-gray-900 mb-4">
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-6 h-fit">
+          <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">
             Hızlı İşlemler
           </h2>
           <div className="space-y-3">
             <Link
               to="/admin/staff/add"
-              className="flex items-center justify-between w-full px-4 py-3 bg-gray-50 rounded-lg text-sm font-medium text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors"
+              className="flex items-center justify-between w-full px-4 py-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors"
             >
               <span>+ Yeni Personel Ekle</span>
               <svg
@@ -210,7 +210,7 @@ export default function AdminHomePage() {
             </Link>
             <Link
               to="/admin/categories/add"
-              className="flex items-center justify-between w-full px-4 py-3 bg-gray-50 rounded-lg text-sm font-medium text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors"
+              className="flex items-center justify-between w-full px-4 py-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors"
             >
               <span>+ Yeni Kategori Ekle</span>
               <svg
@@ -230,7 +230,7 @@ export default function AdminHomePage() {
             </Link>
             <Link
               to="/admin/services/add"
-              className="flex items-center justify-between w-full px-4 py-3 bg-gray-50 rounded-lg text-sm font-medium text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors"
+              className="flex items-center justify-between w-full px-4 py-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors"
             >
               <span>+ Yeni Hizmet Ekle</span>
               <svg
@@ -252,14 +252,14 @@ export default function AdminHomePage() {
         </div>
 
         {/* Latest Pending Appointments */}
-        <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+        <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-gray-900">
+            <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">
               Son Bekleyen Randevular
             </h2>
             <Link
               to="/admin/appointments"
-              className="text-sm text-indigo-600 hover:underline font-medium"
+              className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline font-medium"
             >
               Tümünü Gör
             </Link>
@@ -270,7 +270,7 @@ export default function AdminHomePage() {
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
             </div>
           ) : pendingAppos.length === 0 ? (
-            <p className="text-gray-500 text-center py-8 bg-gray-50 rounded-lg">
+            <p className="text-gray-500 dark:text-gray-400 text-center py-8 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
               Onay bekleyen bir randevu yok.
             </p>
           ) : (
@@ -278,11 +278,11 @@ export default function AdminHomePage() {
               {pendingAppos.slice(0, 4).map((appo) => (
                 <div
                   key={appo.id}
-                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-100"
+                  className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-100 dark:border-gray-700"
                 >
                   <div className="flex items-center gap-4">
                     <div className="text-center">
-                      <p className="text-xs text-gray-400 uppercase">
+                      <p className="text-xs text-gray-400 dark:text-gray-500 uppercase">
                         {new Date(
                           appo.start_date.split("T")[0],
                         ).toLocaleDateString("tr-TR", {
@@ -290,15 +290,15 @@ export default function AdminHomePage() {
                           month: "short",
                         })}
                       </p>
-                      <p className="text-lg font-bold text-gray-900">
+                      <p className="text-lg font-bold text-gray-900 dark:text-gray-100">
                         {formatSafeTime(appo.start_date)}
                       </p>
                     </div>
                     <div>
-                      <p className="font-semibold text-gray-800">
+                      <p className="font-semibold text-gray-800 dark:text-gray-100">
                         {appo.service.name}
                       </p>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
                         {appo.customer?.person.name}{" "}
                         {appo.customer?.person.surname}
                         <span className="mx-1">•</span>

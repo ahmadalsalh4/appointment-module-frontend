@@ -1,117 +1,147 @@
-# Appointment Module — Frontend
+# Randevu Yönetim Modülü — Frontend
 
-Single-page application for the appointment booking platform. Built with **React 19**, **Vite**, **TypeScript** and **Tailwind CSS**, with role-based routing for **customers**, **staff** and **admins**.
+Randevu yönetim modülünün **frontend** tarafıdır. Kullanıcıların randevularını görüntüleyebildiği, filtreleyebildiği, arayabildiği, oluşturabildiği, düzenleyebildiği ve iptal edebildiği, mobil / tablet / masaüstü uyumlu (responsive) tek sayfa uygulamasıdır (SPA).
 
-> Pairs with the [appointment_module_backend](../appointment_module_backend) Laravel API.
+**React 19 + Vite + TypeScript + Tailwind CSS** ile geliştirilmiştir. Backend olarak [appointment_module_backend](../appointment_module_backend) (Laravel 13 API) ile haberleşir.
 
-## Tech Stack
+## Kullanılan Teknolojiler
 
-- React 19
-- Vite 8
-- TypeScript
-- Tailwind CSS 4
-- React Router 8
-- TanStack Query 5
-- Axios
-- ESLint
+- **React 19** — UI kütüphanesi
+- **Vite 8** — geliştirme ve build aracı
+- **TypeScript** — tip güvenliği
+- **Tailwind CSS 4** — utility-first CSS
+- **React Router 8** — sayfa yönlendirme
+- **TanStack Query 5** — veri çekme ve cache
+- **Axios** — HTTP istemcisi
+- **ESLint** — kod kalitesi
 
-## Features
+## Modül Kapsamı (Frontend)
 
-- Role-based authentication & routing
-  - `customer` — browse services, book & cancel appointments, manage profile
-  - `staff` — view assigned appointments, update status, manage profile
-  - `admin` — manage categories, services, staff and all appointments
-- Token-based auth stored in `localStorage`
-- Automatic 401 handling — logs the user out and redirects to `/login`
-- Data fetching & caching via React Query
-- Protected routes by role (`RoleRoutes` + `ProtectedRoute`)
+- **Randevu listeleme** — API üzerinden
+- **Filtreleme** — randevu **durumu**, **personel** ve **tarih**e göre
+- **Arama** — **müşteri adı**na göre
+- **Yeni randevu oluşturma** — hizmet, personel, tarih ve saat seçimi
+- **Randevu düzenleme** — aynı alanlar güncellenebilir
+- **Randevu iptal etme**
+- **Müsaitlik kontrolü** — daha önce rezerve edilmiş veya uygun olmayan saatler seçilemez
+- **Responsive tasarım** — mobil, tablet ve masaüstü uyumlu
+- **Role dayalı yönlendirme** — müşteri, personel, admin
 
-## Requirements
+## Gereksinimler
 
-- Node.js **18+** (Node **20+** recommended)
+- Node.js **18+** (Node **20+** önerilir)
 - npm
-- A running instance of the [backend API](../appointment_module_backend)
+- Çalışan bir [backend API](../appointment_module_backend)
 
-## Installation
+## Kurulum
 
 ```bash
 npm install
 ```
 
-## Configuration
+## Yapılandırma
 
-The API base URL is defined in [`src/api/index.ts`](src/api/index.ts):
+API taban URL'si [`src/api/index.ts`](src/api/index.ts) içinde tanımlıdır:
 
 ```ts
-const api = axios.create({
-  baseURL: "http://appointment_module_backend.test/api",
-});
+const api = axios.create({ baseURL: "http://appointment_module_backend.test/api" });
 ```
 
-Update it to match your local backend (e.g. `http://localhost:8000/api`) if you're not using Laravel Valet / Herd's `*.test` domain.
+Laravel Valet / Herd gibi `*.test` alan adı kullanmıyorsanız bu adresi kendi local adresinizle değiştirin (ör. `http://localhost:8000/api`).
 
-The auth token is read from `localStorage` under the key `token`, and the user's role under `role`.
+Kimlik doğrulama bilgileri `localStorage` üzerinde şu anahtarlarla tutulur:
 
-## Running the app
+| Anahtar   | Açıklama                  |
+| --------- | ------------------------- |
+| `token`   | API Bearer token          |
+| `role`    | Kullanıcı rolü            |
+
+401 yanıtı alındığında token otomatik temizlenir ve kullanıcı `/login` sayfasına yönlendirilir.
+
+## Çalıştırma
 
 ```bash
-# Start dev server (Vite, hot reload)
+# Geliştirme sunucusu (hot reload)
 npm run dev
 
-# Build for production
+# Üretim build'i
 npm run build
 
-# Preview the production build
+# Üretim build'ini önizle
 npm run preview
 
 # Lint
 npm run lint
 ```
 
-Default Vite URL: <http://localhost:5173>
+Varsayılan geliştirme adresi: <http://localhost:5173>
 
-## Project Structure
+## Proje Yapısı
 
 ```
 src/
-├── api/                # Axios instance + endpoint wrappers
-│   ├── index.ts
-│   ├── auth.ts
-│   ├── appointments.ts
+├── api/                    # Axios instance ve uç nokta fonksiyonları
+│   ├── index.ts            #   - Axios ayarı, interceptor'lar
+│   ├── auth.ts             #   - login / register
+│   ├── appointments.ts     #   - randevu CRUD
 │   ├── categories.ts
 │   ├── services.ts
 │   ├── staff.ts
 │   └── profiles.ts
 ├── contexts/
-│   └── auth/           # AuthContext, AuthProvider, useAuth
-├── hooks/
+│   └── auth/               # AuthContext, AuthProvider, useAuth
+├── hooks/                  # Ortak hook'lar
 ├── pages/
-│   ├── admin/          # Admin pages
-│   ├── customer/       # Customer pages
-│   ├── staff/          # Staff pages
-│   ├── shared/         # Shared pages (login, etc.)
+│   ├── admin/              # Admin sayfaları
+│   │   ├── categories/
+│   │   ├── services/
+│   │   ├── staff/
+│   │   ├── components/
+│   │   ├── AdminHomePage.tsx
+│   │   ├── AdminAppointmentsList.tsx
+│   │   ├── AdminAppointmentDetail.tsx
+│   │   └── AdminProfilePage.tsx
+│   ├── customer/           # Müşteri sayfaları
+│   │   ├── components/
+│   │   ├── ServicesPage.tsx
+│   │   ├── ServiceDetailPage.tsx
+│   │   ├── MyAppointmentsPage.tsx
+│   │   └── MyAppointmentDetailPage.tsx
+│   ├── staff/              # Personel sayfaları
+│   │   ├── components/
+│   │   ├── StaffAppointmentsPage.tsx
+│   │   └── StaffAppointmentDetailPage.tsx
+│   ├── shared/             # Login gibi ortak sayfalar
 │   ├── components/
 │   └── layouts/
 ├── routes/
 │   ├── adminRoutes.tsx
 │   ├── customerRoutes.tsx
 │   ├── staffRoutes.tsx
-│   └── RoleRoutes.tsx
-├── other/              # ProtectedRoute, types, helpers
+│   └── RoleRoutes.tsx      # Role göre korumalı route yapısı
+├── other/                  # ProtectedRoute, tipler, yardımcılar
 ├── App.tsx
 ├── main.tsx
 └── index.css
 ```
 
-## Available Scripts
+## Scripts
 
-| Script            | Description                   |
-| ----------------- | ----------------------------- |
-| `npm run dev`     | Start Vite dev server         |
-| `npm run build`   | Type-check (`tsc -b`) + build |
-| `npm run preview` | Preview the production build  |
-| `npm run lint`    | Run ESLint                    |
+| Script           | Açıklama                                |
+| ---------------- | --------------------------------------- |
+| `npm run dev`    | Vite geliştirme sunucusunu başlatır     |
+| `npm run build`  | Type-check (`tsc -b`) + üretim build    |
+| `npm run preview`| Üretim build'ini önizler                |
+| `npm run lint`   | ESLint çalıştırır                       |
 
-## License
+## Responsive Tasarım
+
+Uygulama aşağıdaki kırılma noktalarına göre tasarlanmıştır (Tailwind utility sınıfları ile):
+
+- **Mobil** — varsayılan (< 640px)
+- **Tablet** — `sm:` / `md:` (≥ 640px / ≥ 768px)
+- **Masaüstü** — `lg:` / `xl:` (≥ 1024px / ≥ 1280px)
+
+## Lisans
 
 MIT

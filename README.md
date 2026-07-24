@@ -37,17 +37,25 @@ Randevu yönetim modülünün **frontend** tarafıdır. Kullanıcıların randev
 
 ```bash
 npm install
+cp .env.example .env   # (opsiyonel) API adresini değiştirmek için
 ```
 
 ## Yapılandırma
 
-API taban URL'si [`src/api/index.ts`](src/api/index.ts) içinde tanımlıdır:
+API taban URL'si [`src/api/index.ts`](src/api/index.ts) içinde tanımlıdır ve ortam değişkeni ile geçersiz kılınabilir:
 
 ```ts
-const api = axios.create({ baseURL: "http://appointment_module_backend.test/api" });
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000/api",
+});
 ```
 
-Laravel Valet / Herd gibi `*.test` alan adı kullanmıyorsanız bu adresi kendi local adresinizle değiştirin (ör. `http://localhost:8000/api`).
+`.env` dosyası:
+
+```bash
+# Boş bırakırsanız http://localhost:8000/api kullanılır
+VITE_API_BASE_URL=
+```
 
 Kimlik doğrulama bilgileri `localStorage` üzerinde şu anahtarlarla tutulur:
 
@@ -64,7 +72,7 @@ Kimlik doğrulama bilgileri `localStorage` üzerinde şu anahtarlarla tutulur:
 # Geliştirme sunucusu (hot reload)
 npm run dev
 
-# Üretim build'i
+# Üretim build'i (type-check + bundle)
 npm run build
 
 # Üretim build'ini önizle
@@ -76,52 +84,69 @@ npm run lint
 
 Varsayılan geliştirme adresi: <http://localhost:5173>
 
+## Test Hesapları
+
+Backend seed edildikten sonra aşağıdaki hesaplarla giriş yapılabilir:
+
+| Rol | E-posta | Şifre |
+| --- | --- | --- |
+| Admin | `admin@test.com` | `admin123` |
+| Personel | `selin@test.com`, `murat@test.com`, `ahmet@test.com`, `burcu@test.com`, `huseyin@test.com`, `sevgi@test.com` | `staff123` |
+| Müşteri | `ahmad@test.com`, `elif@test.com`, `burak@test.com` | `customer123` |
+
 ## Proje Yapısı
 
 ```
 src/
-├── api/                    # Axios instance ve uç nokta fonksiyonları
-│   ├── index.ts            #   - Axios ayarı, interceptor'lar
-│   ├── auth.ts             #   - login / register
-│   ├── appointments.ts     #   - randevu CRUD
+├── api/                        # Axios instance ve uç nokta fonksiyonları
+│   ├── index.ts                #   - baseURL + auth interceptor + 401 handler
+│   ├── auth.ts                 #   - login / logout / register
+│   ├── appointments.ts         #   - randevu CRUD + filtreler
 │   ├── categories.ts
 │   ├── services.ts
 │   ├── staff.ts
 │   └── profiles.ts
 ├── contexts/
-│   └── auth/               # AuthContext, AuthProvider, useAuth
-├── hooks/                  # Ortak hook'lar
+│   └── auth/                   # AuthContext, AuthProvider, useAuth
+├── hooks/                      # TanStack Query sarmalayıcıları + yardımcı hook'lar
+│   ├── useAppointmentQueries.ts
+│   ├── useAuthQueries.ts
+│   ├── useCategoryQueries.ts
+│   ├── useProfileQueries.ts
+│   ├── useServiceQueries.ts
+│   ├── useStaffQueries.ts
+│   └── useDarkMode.ts
 ├── pages/
-│   ├── admin/              # Admin sayfaları
-│   │   ├── categories/
-│   │   ├── services/
-│   │   ├── staff/
-│   │   ├── components/
+│   ├── admin/                  # Admin sayfaları (sidebar'lı)
 │   │   ├── AdminHomePage.tsx
-│   │   ├── AdminAppointmentsList.tsx
+│   │   ├── AdminAppointmentsList.tsx       # Durum/personel/tarih filtresi + arama
 │   │   ├── AdminAppointmentDetail.tsx
-│   │   └── AdminProfilePage.tsx
-│   ├── customer/           # Müşteri sayfaları
-│   │   ├── components/
-│   │   ├── ServicesPage.tsx
-│   │   ├── ServiceDetailPage.tsx
-│   │   ├── MyAppointmentsPage.tsx
-│   │   └── MyAppointmentDetailPage.tsx
-│   ├── staff/              # Personel sayfaları
-│   │   ├── components/
-│   │   ├── StaffAppointmentsPage.tsx
-│   │   └── StaffAppointmentDetailPage.tsx
-│   ├── shared/             # Login gibi ortak sayfalar
-│   ├── components/
-│   └── layouts/
+│   │   ├── AdminProfilePage.tsx
+│   │   ├── categories/                      # Kategori CRUD
+│   │   ├── services/                       # Hizmet CRUD
+│   │   ├── staff/                          # Personel CRUD
+│   │   └── components/AdminSidebar.tsx
+│   ├── customer/               # Müşteri sayfaları (sidebar'lı)
+│   │   ├── ServicesPage.tsx                # Hizmet listesi
+│   │   ├── ServiceDetailPage.tsx           # Hizmet detayı + randevu oluşturma
+│   │   ├── MyAppointmentsPage.tsx          # Randevularım + durum/tarih filtresi
+│   │   ├── MyAppointmentDetailPage.tsx     # Randevu detayı + iptal
+│   │   └── components/CustomerSidebar.tsx
+│   ├── staff/                  # Personel sayfaları (sidebar'lı)
+│   │   ├── StaffAppointmentsPage.tsx       # Tarih/müşteri/durum filtresi
+│   │   ├── StaffAppointmentDetailPage.tsx
+│   │   └── components/StaffSidebar.tsx
+│   ├── shared/                 # Login, Register, Profil, 404, 401
+│   ├── components/             # Header, Footer, Loading, Error, ThemeToggle
+│   └── layouts/                # GeneralLayout, AdminLayout, CustomerLayout, StaffLayout
 ├── routes/
 │   ├── adminRoutes.tsx
 │   ├── customerRoutes.tsx
 │   ├── staffRoutes.tsx
-│   └── RoleRoutes.tsx      # Role göre korumalı route yapısı
-├── other/                  # ProtectedRoute, tipler, yardımcılar
-├── App.tsx
-├── main.tsx
+│   └── RoleRoutes.tsx          # Role-based korumalı route yapısı
+├── other/                      # ProtectedRoute, tipler, yardımcılar
+├── App.tsx                     # Routes
+├── main.tsx                    # QueryClient + BrowserRouter + AuthProvider
 └── index.css
 ```
 
@@ -134,13 +159,21 @@ src/
 | `npm run preview`| Üretim build'ini önizler                |
 | `npm run lint`   | ESLint çalıştırır                       |
 
+## Filtreler Özeti
+
+| Sayfa | Filtreler |
+| --- | --- |
+| Admin → Randevular | durum, personel, tarih + müşteri adı arama |
+| Personel → Randevularım | tarih, müşteri adı, durum |
+| Müşteri → Randevularım | durum, tarih |
+
 ## Responsive Tasarım
 
 Uygulama aşağıdaki kırılma noktalarına göre tasarlanmıştır (Tailwind utility sınıfları ile):
 
-- **Mobil** — varsayılan (< 640px)
+- **Mobil** — varsayılan (< 640px) → sidebar drawer + hamburger menü
 - **Tablet** — `sm:` / `md:` (≥ 640px / ≥ 768px)
-- **Masaüstü** — `lg:` / `xl:` (≥ 1024px / ≥ 1280px)
+- **Masaüstü** — `lg:` / `xl:` (≥ 1024px / ≥ 1280px) → sabit sidebar (256px)
 
 ## Lisans
 

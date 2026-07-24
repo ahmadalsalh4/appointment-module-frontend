@@ -1,5 +1,5 @@
 import { Route, Routes } from "react-router";
-import GeneralLayout from "./pages/layouts/GeneralLayout";
+import PublicLayout from "./pages/layouts/PublicLayout";
 import CustomerLayout from "./pages/layouts/CustomerLayout";
 import StaffLayout from "./pages/layouts/StaffLayout";
 import AdminLayout from "./pages/layouts/AdminLayout";
@@ -17,28 +17,30 @@ import NotFoundPage from "./pages/shared/NotFoundPage";
 export default function App() {
   return (
     <Routes>
-      <Route element={<GeneralLayout />}>
+      {/* Public routes (Header + Footer) */}
+      <Route element={<PublicLayout />}>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
-
-        {RoleRoutes({
-          allowedRole: "customer",
-          layout: CustomerLayout,
-          routes: customerRoutes,
-        })}
-        {RoleRoutes({
-          allowedRole: "staff",
-          layout: StaffLayout,
-          routes: staffRoutes,
-        })}
-        {RoleRoutes({
-          allowedRole: "admin",
-          layout: AdminLayout,
-          routes: adminRoutes,
-        })}
         <Route path="*" element={<NotFoundPage />} />
       </Route>
+
+      {/* Role-based dashboards (sidebar only) */}
+      {RoleRoutes({
+        allowedRole: "customer",
+        layout: CustomerLayout,
+        routes: customerRoutes,
+      })}
+      {RoleRoutes({
+        allowedRole: "staff",
+        layout: StaffLayout,
+        routes: staffRoutes,
+      })}
+      {RoleRoutes({
+        allowedRole: "admin",
+        layout: AdminLayout,
+        routes: adminRoutes,
+      })}
     </Routes>
   );
 }

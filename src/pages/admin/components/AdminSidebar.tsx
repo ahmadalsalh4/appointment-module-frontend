@@ -319,7 +319,7 @@ export default function AdminSidebar() {
       </div>
 
       {/* DESKTOP: Static Sidebar */}
-      <div className="hidden lg:fixed lg:inset-y-15 lg:z-30 lg:flex lg:w-64 lg:flex-col">
+      <div className="hidden lg:fixed lg:inset-y-0 lg:z-30 lg:flex lg:w-64 lg:flex-col">
         <SidebarContent />
       </div>
     </>

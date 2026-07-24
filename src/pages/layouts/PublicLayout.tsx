@@ -3,14 +3,14 @@ import { Outlet } from "react-router";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
-export default function GlobalLayout() {
+export default function PublicLayout() {
   return (
-    <div className="flex flex-col min-h-screen  bg-back">
-      <Header></Header>
+    <div className="flex flex-col min-h-screen bg-back">
+      <Header />
       <main className="flex-1">
         <Outlet />
       </main>
-      <Footer></Footer>
+      <Footer />
     </div>
   );
 }

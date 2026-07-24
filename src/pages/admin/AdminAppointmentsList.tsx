@@ -30,14 +30,14 @@ const formatSafeDate = (isoString: string) => {
 const getStatusStyle = (statusName: string) => {
   switch (statusName) {
     case "confirmed":
-      return "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300";
+      return "bg-green-100 dark:bg-green-900/70 text-green-800 dark:text-green-300";
     case "completed":
-      return "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300";
+      return "bg-blue-100 dark:bg-blue-900/70 text-blue-800 dark:text-blue-300";
     case "cancelled":
-      return "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300";
+      return "bg-red-100 dark:bg-red-900/70 text-red-800 dark:text-red-300";
     case "pending":
     default:
-      return "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300";
+      return "bg-yellow-100 dark:bg-yellow-900/70 text-yellow-800 dark:text-yellow-300";
   }
 };
 

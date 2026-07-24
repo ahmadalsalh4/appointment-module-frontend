@@ -20,9 +20,6 @@
   --color-waiting: #fbbf24;
   --color-completed: #34d399;
   --color-canceld: #f87171;
-}
 
-@layer base {
+  color-scheme: dark;
 }
-
-@layer components {}

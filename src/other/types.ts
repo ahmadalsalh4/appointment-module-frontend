@@ -256,6 +256,7 @@ export interface CreateStaffRequestBody {
 export interface UpdateStaffRequestBody {
   job_title?: string;
   email?: string;
+  catagory_id?: string | number | null;
 }
 
 /** Put Staff Response (Note: Does not include 'person' object) */

@@ -4,44 +4,42 @@ import {
   useGetStaffByIdQuery,
   useUpdateStaffMutation,
 } from "../../../hooks/useStaffQueries";
+import { useGetAllCategoriesQuery } from "../../../hooks/useCategoryQueries";
 import { useQueryClient } from "@tanstack/react-query";
-import type { UpdateStaffRequestBody } from "../../../other/types";
+import type { UpdateStaffRequestBody, StaffEntityDetailed } from "../../../other/types";
 
-export default function AdminStaffEdit() {
+function StaffEditForm({ staff }: { staff: StaffEntityDetailed }) {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-
-  // Detaylı sorgu (isimleri göstermek için)
-  const { data: staff, isLoading: isLoadingStaff } = useGetStaffByIdQuery(
-    id || "",
-  );
+  const { data: categories } = useGetAllCategoriesQuery();
   const updateMut = useUpdateStaffMutation();
 
-  const [formData, setFormData] = useState<UpdateStaffRequestBody>(() => ({
-    job_title: staff?.job_title || "",
-    email: staff?.email || "",
-  }));
+  const [formData, setFormData] = useState<UpdateStaffRequestBody>({
+    job_title: staff.job_title || "",
+    email: staff.email || "",
+    catagory_id: staff.catagory_id ?? "",
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!id) return;
     try {
-      await updateMut.mutateAsync({ id, data: formData });
+      const payload: UpdateStaffRequestBody = {
+        job_title: formData.job_title,
+        email: formData.email,
+        catagory_id:
+          formData.catagory_id === "" || formData.catagory_id === null
+            ? null
+            : formData.catagory_id,
+      };
+      await updateMut.mutateAsync({ id, data: payload });
       queryClient.invalidateQueries({ queryKey: ["staff"] });
       navigate("/admin/staff");
-    } catch  {
+    } catch {
       alert("Personel güncellenirken bir hata oluştu.");
     }
   };
-
-  if (isLoadingStaff) {
-    return (
-      <div className="flex justify-center items-center min-h-[60vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-      </div>
-    );
-  }
 
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -51,7 +49,7 @@ export default function AdminStaffEdit() {
         </Link>
         <span className="mx-2">/</span>
         <Link to={`/admin/staff/${id}`} className="hover:text-indigo-600 dark:hover:text-indigo-400">
-          {staff?.person.name} {staff?.person.surname}
+          {staff.person.name} {staff.person.surname}
         </Link>
         <span className="mx-2">/</span>
         <span className="text-gray-900 dark:text-gray-100 font-medium">Düzenle</span>
@@ -61,7 +59,7 @@ export default function AdminStaffEdit() {
         <div className="mb-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg text-sm text-yellow-800 dark:text-yellow-300">
           <strong>Not:</strong> Ad, soyad ve telefon numarası gibi kişisel
           bilgiler buradan değiştirilemez. Sadece iş ile ilgili bilgiler
-          güncellenebilir.
+          (kategori, pozisyon, e-posta) güncellenebilir.
         </div>
 
         <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">
@@ -69,6 +67,29 @@ export default function AdminStaffEdit() {
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">
+              İlgili Olduğu Kategori
+            </label>
+            <select
+              value={formData.catagory_id === null ? "" : formData.catagory_id}
+              onChange={(e) =>
+                setFormData({ ...formData, catagory_id: e.target.value })
+              }
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+            >
+              <option value="">Kategori Seçin (Opsiyonel)</option>
+              {categories?.map((cat) => (
+                <option key={cat.id} value={String(cat.id)}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              Personelin hangi kategoride hizmet vereceğini seçin.
+            </p>
+          </div>
+
           <div>
             <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">
               Pozisyon / Görev
@@ -118,4 +139,29 @@ export default function AdminStaffEdit() {
       </div>
     </div>
   );
+}
+
+export default function AdminStaffEdit() {
+  const { id } = useParams<{ id: string }>();
+  const { data: staff, isLoading: isLoadingStaff } = useGetStaffByIdQuery(
+    id || "",
+  );
+
+  if (isLoadingStaff) {
+    return (
+      <div className="flex justify-center items-center min-h-[60vh]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      </div>
+    );
+  }
+
+  if (!staff) {
+    return (
+      <div className="text-center py-20 text-gray-500 dark:text-gray-400">
+        Personel bulunamadı.
+      </div>
+    );
+  }
+
+  return <StaffEditForm key={staff.id} staff={staff} />;
 }

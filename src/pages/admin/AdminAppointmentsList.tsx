@@ -5,6 +5,7 @@ import {
   useAdminUpdateStateMutation,
   useAdminDeleteAppointmentMutation,
 } from "../../hooks/useAppointmentQueries";
+import { useGetAllStaffQuery } from "../../hooks/useStaffQueries";
 import { useQueryClient } from "@tanstack/react-query";
 import type { Appointment } from "../../other/types";
 
@@ -42,15 +43,30 @@ const getStatusStyle = (statusName: string) => {
 
 export default function AdminAppointmentsList() {
   const queryClient = useQueryClient();
+
+  // Filtre state'leri
+  const [statusId, setStatusId] = useState<string>("");
+  const [staffId, setStaffId] = useState<string>("");
+  const [date, setDate] = useState<string>("");
+  const [customerName, setCustomerName] = useState<string>("");
+
+  const filters = {
+    ...(statusId && { status_id: statusId }),
+    ...(staffId && { staff_id: staffId }),
+    ...(date && { date }),
+    ...(customerName.trim() && { customer_name: customerName.trim() }),
+  };
+
+  const { data: staffList } = useGetAllStaffQuery();
+
   const {
     data: appointments,
     isLoading,
     isError,
-  } = useAdminGetAppointmentsQuery();
+  } = useAdminGetAppointmentsQuery(filters);
   const updateStateMut = useAdminUpdateStateMutation();
   const deleteMut = useAdminDeleteAppointmentMutation();
 
-  // Table state for sorting/filtering later if needed
   const [changingId, setChangingId] = useState<number | null>(null);
 
   const handleStatusChange = async (
@@ -82,6 +98,13 @@ export default function AdminAppointmentsList() {
     }
   };
 
+  const clearFilters = () => {
+    setStatusId("");
+    setStaffId("");
+    setDate("");
+    setCustomerName("");
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
@@ -108,6 +131,86 @@ export default function AdminAppointmentsList() {
             Tüm personel ve müşterilerin randevularını buradan yönetin.
           </p>
         </div>
+      </div>
+
+      {/* Filtreler */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+          {/* Müşteri adı arama */}
+          <div className="lg:col-span-2">
+            <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">
+              Müşteri Ara
+            </label>
+            <input
+              type="text"
+              value={customerName}
+              onChange={(e) => setCustomerName(e.target.value)}
+              placeholder="Ad veya soyad..."
+              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            />
+          </div>
+
+          {/* Durum filtresi */}
+          <div>
+            <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">
+              Durum
+            </label>
+            <select
+              value={statusId}
+              onChange={(e) => setStatusId(e.target.value)}
+              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            >
+              <option value="">Tümü</option>
+              <option value="1">Beklemede</option>
+              <option value="2">Onaylandı</option>
+              <option value="3">Tamamlandı</option>
+              <option value="4">İptal Edildi</option>
+            </select>
+          </div>
+
+          {/* Personel filtresi */}
+          <div>
+            <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">
+              Personel
+            </label>
+            <select
+              value={staffId}
+              onChange={(e) => setStaffId(e.target.value)}
+              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            >
+              <option value="">Tümü</option>
+              {staffList?.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.person?.name} {s.person?.surname}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Tarih filtresi */}
+          <div>
+            <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">
+              Tarih
+            </label>
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            />
+          </div>
+        </div>
+
+        {(statusId || staffId || date || customerName) && (
+          <div className="mt-3 flex justify-end">
+            <button
+              onClick={clearFilters}
+              className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline"
+            >
+              Filtreleri Temizle
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Table Container */}
@@ -233,7 +336,7 @@ export default function AdminAppointmentsList() {
                     colSpan={5}
                     className="px-6 py-12 text-center text-gray-500 dark:text-gray-400"
                   >
-                    Sistemde henüz hiçbir randevu bulunmuyor.
+                    Seçili filtrelerle eşleşen randevu bulunamadı.
                   </td>
                 </tr>
               )}

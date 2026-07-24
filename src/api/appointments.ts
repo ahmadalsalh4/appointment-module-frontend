@@ -8,6 +8,7 @@ import type {
 export interface AppointmentFilters {
   date?: string;
   status_id?: string | number;
+  staff_id?: string | number;
   customer_name?: string;
 }
 

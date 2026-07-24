@@ -1,21 +1,21 @@
+import { useState } from "react";
 import { Link } from "react-router";
-import { useCustomerGetAppointmentsQuery } from "../../hooks/useAppointmentQueries";
+import {
+  useCustomerGetAppointmentsQuery,
+} from "../../hooks/useAppointmentQueries";
+import type { AppointmentFilters } from "../../api/appointments";
 
 // REPLACE your old formatDateTime function with this one:
 
 const formatDateTime = (isoString: string) => {
-  // 1. Split date and time
   const [datePart, timePart] = isoString.split("T");
 
-  // 2. Remove milliseconds/Z, THEN split by ':' to get hours and minutes
-  // "15:45:00" -> ["15", "45", "00"] -> "15:45"
   const timeWithoutSeconds = timePart
     .split(".")[0]
     .split(":")
     .slice(0, 2)
     .join(":");
 
-  // 3. Format the date safely
   const dateObj = new Date(datePart + "T00:00:00");
   const formattedDate = dateObj.toLocaleDateString("tr-TR", {
     day: "numeric",
@@ -23,11 +23,9 @@ const formatDateTime = (isoString: string) => {
     year: "numeric",
   });
 
-  // 4. Combine
   return `${formattedDate} - ${timeWithoutSeconds}`;
 };
 
-// Badge colors based on appointment state
 const getStatusStyle = (statusName: string) => {
   switch (statusName) {
     case "confirmed":
@@ -57,11 +55,24 @@ const getStatusText = (statusName: string) => {
 };
 
 export default function MyAppointmentsPage() {
+  const [statusId, setStatusId] = useState<string>("");
+  const [date, setDate] = useState<string>("");
+
+  const filters: AppointmentFilters = {
+    ...(statusId && { status_id: statusId }),
+    ...(date && { date }),
+  };
+
   const {
     data: appointments,
     isLoading,
     isError,
-  } = useCustomerGetAppointmentsQuery();
+  } = useCustomerGetAppointmentsQuery(filters);
+
+  const clearFilters = () => {
+    setStatusId("");
+    setDate("");
+  };
 
   if (isLoading) {
     return (
@@ -100,6 +111,49 @@ export default function MyAppointmentsPage() {
         </Link>
       </div>
 
+      {/* Filtreler */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">
+              Durum
+            </label>
+            <select
+              value={statusId}
+              onChange={(e) => setStatusId(e.target.value)}
+              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            >
+              <option value="">Tümü</option>
+              <option value="1">Beklemede</option>
+              <option value="2">Onaylandı</option>
+              <option value="3">Tamamlandı</option>
+              <option value="4">İptal Edildi</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">
+              Tarih
+            </label>
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            />
+          </div>
+          <div className="flex items-end">
+            {(statusId || date) && (
+              <button
+                onClick={clearFilters}
+                className="w-full text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline py-2"
+              >
+                Filtreleri Temizle
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
       {appointments && appointments.length === 0 ? (
         <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
           <svg
@@ -117,14 +171,18 @@ export default function MyAppointmentsPage() {
             />
           </svg>
           <p className="mt-4 text-gray-500 dark:text-gray-400 text-lg">
-            Henüz bir randevunuz bulunmuyor.
+            {statusId || date
+              ? "Seçili filtrelerle eşleşen randevu bulunamadı."
+              : "Henüz bir randevunuz bulunmuyor."}
           </p>
-          <Link
-            to="/services"
-            className="mt-4 inline-block text-indigo-600 dark:text-indigo-400 font-semibold hover:underline"
-          >
-            İlk randevunuzu oluşturun
-          </Link>
+          {!statusId && !date && (
+            <Link
+              to="/services"
+              className="mt-4 inline-block text-indigo-600 dark:text-indigo-400 font-semibold hover:underline"
+            >
+              İlk randevunuzu oluşturun
+            </Link>
+          )}
         </div>
       ) : (
         <div className="space-y-4">
@@ -135,7 +193,6 @@ export default function MyAppointmentsPage() {
               className="block bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-200 group"
             >
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                {/* Left: Date & Time */}
                 <div className="flex items-center gap-4 min-w-0">
                   <div className="hidden sm:flex flex-col items-center justify-center w-16 h-16 bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 rounded-xl font-bold text-center shrink-0">
                     <span className="text-xl sm:text-2xl leading-none">
@@ -159,7 +216,6 @@ export default function MyAppointmentsPage() {
                   </div>
                 </div>
 
-                {/* Right: Staff & Status */}
                 <div className="flex items-center gap-4 sm:gap-6 shrink-0">
                   {appointment.staff && (
                     <div className="text-right hidden md:block max-w-[140px]">

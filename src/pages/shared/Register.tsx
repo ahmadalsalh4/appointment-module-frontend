@@ -32,11 +32,7 @@ export default function Register() {
 
   const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    register(form, {
-      onSuccess: (data) => {
-        console.log("Registration Success:", data);
-      },
-    });
+    register(form);
   };
   useEffect(() => {
     if (data) {

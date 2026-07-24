@@ -417,7 +417,7 @@ export default function ProfilePage() {
                 )}
               </div>
               <Link
-                to="/staff/appointments"
+                to="/staff"
                 className="mt-4 flex items-center justify-between w-full px-4 py-2.5 bg-sky-50 dark:bg-sky-900/20 hover:bg-sky-100 dark:hover:bg-sky-900/30 text-sky-800 dark:text-sky-300 rounded-lg text-sm font-medium transition-colors"
               >
                 Randevularım

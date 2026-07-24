@@ -25,6 +25,7 @@ const menuItems = [
   },
   {
     label: "Randevularım",
+    path: "/appointments",
     icon: (
       <svg
         className="h-5 w-5"
@@ -40,7 +41,6 @@ const menuItems = [
         />
       </svg>
     ),
-    children: [{ label: "Aktif Randevular", path: "/appointments" }],
   },
   {
     label: "Profilim",
@@ -71,29 +71,9 @@ function SidebarContent({ onClose }: SidebarContentProps) {
   const location = useLocation();
   const { role } = useAuth();
   const { mutate: logout } = useLogoutMutation();
-  const [openMenus, setOpenMenus] = useState<string[]>([]);
 
-  const toggleMenu = (label: string) => {
-    setOpenMenus((prev) =>
-      prev.includes(label)
-        ? prev.filter((item) => item !== label)
-        : [...prev, label],
-    );
-  };
-
-  const isActive = (path: string) => location.pathname === path;
-
-  const isParentActive = (item: (typeof menuItems)[0]) => {
-    if (!item.children && "path" in item) {
-      return location.pathname === (item as { path: string }).path;
-    }
-    if (item.children) {
-      return item.children.some((child) =>
-        location.pathname.startsWith(child.path),
-      );
-    }
-    return false;
-  };
+  const isActive = (path: string) =>
+    location.pathname === path || location.pathname.startsWith(`${path}/`);
 
   return (
     <div className="flex h-full flex-col bg-surface pt-6">
@@ -127,76 +107,19 @@ function SidebarContent({ onClose }: SidebarContentProps) {
 
       <nav className="flex-1 space-y-1 px-3 overflow-y-auto pb-4">
         {menuItems.map((item) => (
-          <div key={item.label}>
-            {item.children ? (
-              <button
-                onClick={() => toggleMenu(item.label)}
-                className={`flex w-full items-center justify-between rounded-lg px-4 py-3 text-sm font-medium transition-all ${
-                  isParentActive(item)
-                    ? "text-deep bg-deep/5"
-                    : "text-main/70 hover:bg-main/5 hover:text-main"
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  {item.icon}
-                  {item.label}
-                </div>
-                <svg
-                  className={`h-4 w-4 transform transition-transform ${openMenus.includes(item.label) ? "rotate-180" : ""}`}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </button>
-            ) : (
-              <Link
-                to={item.path!}
-                onClick={onClose}
-                className={`flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all ${
-                  isActive(item.path!)
-                    ? "bg-deep text-surface shadow-sm"
-                    : "text-main/70 hover:bg-main/5 hover:text-main"
-                }`}
-              >
-                {item.icon}
-                {item.label}
-              </Link>
-            )}
-
-            {item.children && (
-              <div
-                className={`overflow-hidden transition-all duration-200 ease-in-out ${
-                  openMenus.includes(item.label) || isParentActive(item)
-                    ? "max-h-96 mt-1 opacity-100"
-                    : "max-h-0 opacity-0"
-                }`}
-              >
-                <div className="ml-8 flex flex-col space-y-1 border-l-2 border-main/10 pl-4">
-                  {item.children.map((child) => (
-                    <Link
-                      key={child.path}
-                      to={child.path}
-                      onClick={onClose}
-                      className={`rounded-lg px-3 py-2 text-sm transition-all ${
-                        isActive(child.path)
-                          ? "font-semibold text-deep bg-deep/5"
-                          : "text-main/60 hover:text-main hover:bg-main/5"
-                      }`}
-                    >
-                      {child.label}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
+          <Link
+            key={item.label}
+            to={item.path!}
+            onClick={onClose}
+            className={`flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all ${
+              isActive(item.path!)
+                ? "bg-deep text-surface shadow-sm"
+                : "text-main/70 hover:bg-main/5 hover:text-main"
+            }`}
+          >
+            {item.icon}
+            {item.label}
+          </Link>
         ))}
       </nav>
 
@@ -204,7 +127,7 @@ function SidebarContent({ onClose }: SidebarContentProps) {
       <div className="mt-auto p-3 border-t border-main/10">
         <button
           onClick={() => role && logout(role)}
-          className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+          className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
         >
           <svg
             className="h-5 w-5"

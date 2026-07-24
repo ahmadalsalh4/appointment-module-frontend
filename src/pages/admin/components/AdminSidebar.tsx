@@ -1,5 +1,7 @@
 import { Link, useLocation } from "react-router";
 import { useState } from "react";
+import { useAuth } from "../../../contexts/auth/useAuth";
+import { useLogoutMutation } from "../../../hooks/useAuthQueries";
 
 const menuItems = [
   {
@@ -136,6 +138,8 @@ interface SidebarContentProps {
 
 function SidebarContent({ onClose }: SidebarContentProps) {
   const location = useLocation();
+  const { role } = useAuth();
+  const { mutate: logout } = useLogoutMutation();
   const [openMenus, setOpenMenus] = useState<string[]>([]);
 
   const toggleMenu = (label: string) => {
@@ -271,6 +275,29 @@ function SidebarContent({ onClose }: SidebarContentProps) {
           </div>
         ))}
       </nav>
+
+      {/* Logout Button */}
+      <div className="mt-auto p-3 border-t border-main/10">
+        <button
+          onClick={() => role && logout(role)}
+          className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+        >
+          <svg
+            className="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+            />
+          </svg>
+          Çıkış Yap
+        </button>
+      </div>
     </div>
   );
 }

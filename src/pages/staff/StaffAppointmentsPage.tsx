@@ -1,24 +1,21 @@
 import { useState } from "react";
 import { Link } from "react-router";
-import Loading from "../components/Loading";
-import Error from "../components/Error";
 import { useStaffGetAppointmentsQuery } from "../../hooks/useAppointmentQueries";
 import type { AppointmentFilters } from "../../api/appointments";
 import type { Appointment } from "../../other/types";
 
-// Durum isimlerini Türkçeye çeviren ve renk veren fonksiyon
 const getStatusStyle = (statusName: string) => {
   switch (statusName) {
     case "pending":
-      return "bg-waiting/10 text-waiting";
+      return "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300";
     case "confirmed":
-      return "bg-deep/10 text-deep";
+      return "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300";
     case "completed":
-      return "bg-completed/10 text-completed";
+      return "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300";
     case "cancelled":
-      return "bg-canceld/10 text-canceld";
+      return "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300";
     default:
-      return "bg-main/10 text-main";
+      return "bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-300";
   }
 };
 
@@ -37,18 +34,14 @@ const getStatusLabel = (statusName: string) => {
   }
 };
 
-// Zaman formatlayıcı (15:45:00.000000Z -> 15:45)
 const formatTime = (isoDate: string) => {
-  const timePart = isoDate.split("T")[1]; // "15:45:00.000000Z" alır
+  const timePart = isoDate.split("T")[1];
   if (!timePart) return "";
-  // Milisaniyeleri at, saat:dakikaayı al
   return timePart.split(".")[0].split(":").slice(0, 2).join(":");
 };
 
-// Tarih formatlayıcı (2026-07-23T15:00:00.000000Z -> 23 Temmuz 2026)
 const formatDate = (isoDate: string) => {
-  const datePart = isoDate.split("T")[0]; // "2026-07-23" alır
-  // Saat kısmını "T00:00:00" yaparak JavaScript'in saat kayması yapmasını engelleriz
+  const datePart = isoDate.split("T")[0];
   return new Date(datePart + "T00:00:00").toLocaleDateString("tr-TR", {
     day: "numeric",
     month: "long",
@@ -57,148 +50,180 @@ const formatDate = (isoDate: string) => {
 };
 
 export default function StaffAppointmentsPage() {
-  const [filters, setFilters] = useState<AppointmentFilters>({});
-  const {
-    data: appointments,
-    isPending,
-    isError,
-    error,
-  } = useStaffGetAppointmentsQuery(filters);
+  const [statusId, setStatusId] = useState<string>("");
+  const [date, setDate] = useState<string>("");
+  const [customerName, setCustomerName] = useState<string>("");
 
-  const handleFilter = (e: React.SubmitEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    setFilters({
-      date: (formData.get("date") as string) || undefined,
-      customer_name: (formData.get("customer_name") as string) || undefined,
-      status_id: (formData.get("status_id") as string) || undefined,
-    });
+  const filters: AppointmentFilters = {
+    ...(statusId && { status_id: statusId }),
+    ...(date && { date }),
+    ...(customerName.trim() && { customer_name: customerName.trim() }),
   };
 
-  if (isPending) return <Loading message="Randevular yükleniyor..." />;
-  if (isError) return <Error message={error?.response?.data?.message} />;
+  const { data: appointments, isLoading, isError } =
+    useStaffGetAppointmentsQuery(filters);
+
+  const clearFilters = () => {
+    setStatusId("");
+    setDate("");
+    setCustomerName("");
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-[60vh]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-20 text-center text-red-500 dark:text-red-400">
+        <p className="text-xl font-bold">
+          Randevular yüklenirken bir hata oluştu.
+        </p>
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <h1 className="mb-6 text-2xl sm:text-3xl font-bold text-main">Randevularım</h1>
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="mb-8">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-100">
+          Randevularım
+        </h1>
+        <p className="mt-1 text-gray-500 dark:text-gray-400 text-sm">
+          Size atanmış randevuları buradan yönetin.
+        </p>
+      </div>
 
-      {/* FİLTRELEME FORMU */}
-      <form
-        onSubmit={handleFilter}
-        className="mb-8 grid grid-cols-1 gap-4 rounded-xl bg-surface p-4 sm:p-6 shadow-sm border border-main/10 sm:grid-cols-2 lg:grid-cols-4"
-      >
-        <div>
-          <label className="mb-1 block text-xs font-medium text-main/70">
-            Tarih
-          </label>
-          <input
-            name="date"
-            type="date"
-            className="w-full rounded-lg border border-main/20 bg-back px-3 py-2 text-sm text-main outline-none focus:border-deep"
-          />
+      {/* Filtreler */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="lg:col-span-2">
+            <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">
+              Müşteri Ara
+            </label>
+            <input
+              type="text"
+              value={customerName}
+              onChange={(e) => setCustomerName(e.target.value)}
+              placeholder="Ad veya soyad..."
+              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">
+              Durum
+            </label>
+            <select
+              value={statusId}
+              onChange={(e) => setStatusId(e.target.value)}
+              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            >
+              <option value="">Tümü</option>
+              <option value="1">Beklemede</option>
+              <option value="2">Onaylandı</option>
+              <option value="3">Tamamlandı</option>
+              <option value="4">İptal Edildi</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">
+              Tarih
+            </label>
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            />
+          </div>
         </div>
-        <div>
-          <label className="mb-1 block text-xs font-medium text-main/70">
-            Müşteri Adı
-          </label>
-          <input
-            name="customer_name"
-            type="text"
-            placeholder="ahmad..."
-            className="w-full rounded-lg border border-main/20 bg-back px-3 py-2 text-sm text-main outline-none focus:border-deep"
-          />
-        </div>
-        <div>
-          <label className="mb-1 block text-xs font-medium text-main/70">
-            Durum
-          </label>
-          <select
-            name="status_id"
-            className="w-full rounded-lg border border-main/20 bg-back px-3 py-2 text-sm text-main outline-none focus:border-deep"
-          >
-            <option value="">Tümü</option>
-            <option value="1">Beklemede</option>
-            <option value="2">Onaylandı</option>
-            <option value="3">Tamamlandı</option>
-            <option value="4">İptal Edildi</option>
-          </select>
-        </div>
-        <div className="flex items-end">
-          <button
-            type="submit"
-            className="w-full rounded-lg bg-deep py-2 text-sm font-semibold text-surface hover:bg-deep/90"
-          >
-            Filtrele
-          </button>
-        </div>
-      </form>
+
+        {(statusId || date || customerName) && (
+          <div className="mt-3 flex justify-end">
+            <button
+              onClick={clearFilters}
+              className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline"
+            >
+              Filtreleri Temizle
+            </button>
+          </div>
+        )}
+      </div>
 
       {/* TABLO */}
-      <div className="overflow-hidden rounded-xl bg-surface shadow-sm border border-main/10">
+      <div className="overflow-hidden rounded-xl bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700">
         <div className="overflow-x-auto">
-          <table className="min-w-full text-left text-sm">
-            <thead className="border-b border-main/10 bg-back/50">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-left text-sm">
+            <thead className="bg-gray-50 dark:bg-gray-700/50">
               <tr>
-                <th className="px-3 sm:px-6 py-3 sm:py-4 font-medium text-main/70">
+                <th className="px-3 sm:px-6 py-3 sm:py-4 font-semibold text-gray-600 dark:text-gray-300 uppercase text-xs tracking-wider">
                   Müşteri
                 </th>
-                <th className="px-3 sm:px-6 py-3 sm:py-4 font-medium text-main/70">
+                <th className="px-3 sm:px-6 py-3 sm:py-4 font-semibold text-gray-600 dark:text-gray-300 uppercase text-xs tracking-wider">
                   Tarih / Saat
                 </th>
-                <th className="px-3 sm:px-6 py-3 sm:py-4 font-medium text-main/70">
+                <th className="px-3 sm:px-6 py-3 sm:py-4 font-semibold text-gray-600 dark:text-gray-300 uppercase text-xs tracking-wider">
                   Hizmet
                 </th>
-                <th className="px-3 sm:px-6 py-3 sm:py-4 font-medium text-main/70">
+                <th className="px-3 sm:px-6 py-3 sm:py-4 font-semibold text-gray-600 dark:text-gray-300 uppercase text-xs tracking-wider">
                   Durum
                 </th>
-                <th className="px-3 sm:px-6 py-3 sm:py-4 font-medium text-main/70">
+                <th className="px-3 sm:px-6 py-3 sm:py-4 font-semibold text-gray-600 dark:text-gray-300 uppercase text-xs tracking-wider text-right">
                   İşlem
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-main/10">
-              {/* Eğer API direkt array döndürüyorsa .data?.data yerine sadece .data kullanıyoruz */}
-              {appointments?.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={5}
-                    className="px-3 sm:px-6 py-8 sm:py-10 text-center text-main/50"
+            <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+              {appointments && appointments.length > 0 ? (
+                appointments.map((apt: Appointment) => (
+                  <tr
+                    key={apt.id}
+                    className="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors"
                   >
-                    Kayıt bulunamadı.
-                  </td>
-                </tr>
-              ) : (
-                appointments?.map((apt: Appointment) => (
-                  <tr key={apt.id} className="hover:bg-back/30 transition">
-                    <td className="px-3 sm:px-6 py-3 sm:py-4 font-medium text-main whitespace-nowrap">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 font-medium text-gray-900 dark:text-gray-100 whitespace-nowrap">
                       {apt.customer?.person.name} {apt.customer?.person.surname}
                     </td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-main/80">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-700 dark:text-gray-300">
                       <div>{formatDate(apt.start_date)}</div>
-                      <div className="text-xs text-main/50">
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
                         {formatTime(apt.start_date)} - {formatTime(apt.end_date)}
                       </div>
                     </td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-main/80">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-700 dark:text-gray-300">
                       {apt.service.name}
                     </td>
                     <td className="px-3 sm:px-6 py-3 sm:py-4">
                       <span
-                        className={`rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap ${getStatusStyle(apt.status.name)}`}
+                        className={`rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide ${getStatusStyle(apt.status.name)}`}
                       >
                         {getStatusLabel(apt.status.name)}
                       </span>
                     </td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-4">
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-right">
                       <Link
                         to={`/staff/appointments/${apt.id}`}
-                        className="text-deep hover:underline text-sm font-medium whitespace-nowrap"
+                        className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 text-sm font-medium whitespace-nowrap"
                       >
                         Detay / Güncelle
                       </Link>
                     </td>
                   </tr>
                 ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan={5}
+                    className="px-3 sm:px-6 py-8 sm:py-10 text-center text-gray-500 dark:text-gray-400"
+                  >
+                    {statusId || date || customerName
+                      ? "Seçili filtrelerle eşleşen randevu bulunamadı."
+                      : "Size atanmış henüz bir randevu bulunmuyor."}
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>

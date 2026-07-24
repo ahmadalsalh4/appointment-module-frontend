@@ -1,11 +1,9 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router";
 import {
   useCustomerGetAppointmentsQuery,
 } from "../../hooks/useAppointmentQueries";
 import type { AppointmentFilters } from "../../api/appointments";
-
-// REPLACE your old formatDateTime function with this one:
 
 const formatDateTime = (isoString: string) => {
   const [datePart, timePart] = isoString.split("T");
@@ -56,12 +54,22 @@ const getStatusText = (statusName: string) => {
 
 export default function MyAppointmentsPage() {
   const [statusId, setStatusId] = useState<string>("");
+  const [staffId, setStaffId] = useState<string>("");
   const [date, setDate] = useState<string>("");
 
   const filters: AppointmentFilters = {
     ...(statusId && { status_id: statusId }),
+    ...(staffId && { staff_id: staffId }),
     ...(date && { date }),
   };
+
+  // Herhangi bir filtre uygulanmamışken personelleri türet — böylece dropdown tüm
+  // personeli gösterir. Filtre uygulandığında sadece kalan personeller görünür.
+  const allParams = useMemo(() => ({} as AppointmentFilters), []);
+
+  const {
+    data: allAppointments,
+  } = useCustomerGetAppointmentsQuery(allParams);
 
   const {
     data: appointments,
@@ -69,8 +77,29 @@ export default function MyAppointmentsPage() {
     isError,
   } = useCustomerGetAppointmentsQuery(filters);
 
+  // Müşterinin randevu geçmişindeki benzersiz personeller
+  const staffOptions = useMemo(() => {
+    const map = new Map<
+      number,
+      { id: number; name: string; surname: string }
+    >();
+    for (const apt of allAppointments ?? []) {
+      if (apt.staff) {
+        map.set(apt.staff.id, {
+          id: apt.staff.id,
+          name: apt.staff.person?.name ?? "",
+          surname: apt.staff.person?.surname ?? "",
+        });
+      }
+    }
+    return Array.from(map.values()).sort((a, b) =>
+      `${a.name} ${a.surname}`.localeCompare(`${b.name} ${b.surname}`, "tr")
+    );
+  }, [allAppointments]);
+
   const clearFilters = () => {
     setStatusId("");
+    setStaffId("");
     setDate("");
   };
 
@@ -113,7 +142,7 @@ export default function MyAppointmentsPage() {
 
       {/* Filtreler */}
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-4 mb-6">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <div>
             <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">
               Durum
@@ -132,6 +161,23 @@ export default function MyAppointmentsPage() {
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">
+              Personel
+            </label>
+            <select
+              value={staffId}
+              onChange={(e) => setStaffId(e.target.value)}
+              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            >
+              <option value="">Tümü</option>
+              {staffOptions.map((s) => (
+                <option key={s.id} value={String(s.id)}>
+                  {s.name} {s.surname}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">
               Tarih
             </label>
             <input
@@ -142,7 +188,7 @@ export default function MyAppointmentsPage() {
             />
           </div>
           <div className="flex items-end">
-            {(statusId || date) && (
+            {(statusId || staffId || date) && (
               <button
                 onClick={clearFilters}
                 className="w-full text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline py-2"
@@ -171,11 +217,11 @@ export default function MyAppointmentsPage() {
             />
           </svg>
           <p className="mt-4 text-gray-500 dark:text-gray-400 text-lg">
-            {statusId || date
+            {statusId || staffId || date
               ? "Seçili filtrelerle eşleşen randevu bulunamadı."
               : "Henüz bir randevunuz bulunmuyor."}
           </p>
-          {!statusId && !date && (
+          {!statusId && !staffId && !date && (
             <Link
               to="/services"
               className="mt-4 inline-block text-indigo-600 dark:text-indigo-400 font-semibold hover:underline"

@@ -244,7 +244,7 @@ export default function ProfilePage() {
         {/* Name + role badge — on the white card area, not on the gradient */}
         <div className="px-4 sm:px-6 pt-4 pb-6">
           <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-gray-100 break-words">
+            <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-gray-100 break-words text-wrap-balance">
               {person.name} {person.surname}
             </h1>
             <span className="text-xs text-gray-500 dark:text-gray-400">

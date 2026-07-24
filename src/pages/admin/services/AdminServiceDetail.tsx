@@ -49,7 +49,7 @@ export default function AdminServiceDetail() {
                 {service.category.name}
               </span>
             )}
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-100">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-100 text-wrap-balance">
               {service.name}
             </h1>
           </div>

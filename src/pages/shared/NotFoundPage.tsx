@@ -20,7 +20,7 @@ export default function NotFoundPage() {
 
       {/* Content */}
       <div className="-mt-10 space-y-4">
-        <h2 className="text-2xl sm:text-3xl font-bold text-main">Sayfa Bulunamadı</h2>
+        <h2 className="text-2xl sm:text-3xl font-bold text-main text-wrap-balance">Sayfa Bulunamadı</h2>
         <p className="max-w-md text-main/70">
           Aradığınız sayfa taşınmış, silinmiş veya hiç var olmamış olabilir.
         </p>

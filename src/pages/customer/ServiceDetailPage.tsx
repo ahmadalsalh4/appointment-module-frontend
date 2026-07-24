@@ -121,7 +121,7 @@ export default function ServiceDetailPage() {
               </span>
             )}
 
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-100 mb-4">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-100 mb-4 text-wrap-balance">
               {service.name}
             </h1>
 

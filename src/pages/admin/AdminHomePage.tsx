@@ -62,7 +62,7 @@ export default function AdminHomePage() {
     <div className="space-y-8">
       {/* Page Header */}
       <div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-100">Admin Paneli</h1>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-100 text-wrap-balance">Admin Paneli</h1>
         <p className="mt-1 text-gray-500 dark:text-gray-400">
           Sistemin genel durumunu buradan takip edin.
         </p>

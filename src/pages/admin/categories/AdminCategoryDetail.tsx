@@ -60,7 +60,7 @@ export default function AdminCategoryDetail() {
                 />
               </svg>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-100">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-100 text-wrap-balance">
               {category.name}
             </h1>
           </div>

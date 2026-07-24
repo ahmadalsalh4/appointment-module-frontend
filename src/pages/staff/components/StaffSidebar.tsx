@@ -87,6 +87,14 @@ function SidebarContent({ onClose }: SidebarContentProps) {
         </button>
       </div>
 
+      {/* Desktop Logo/Title */}
+      <div className="mb-8 hidden px-6 lg:block">
+        <h1 className="text-xl font-extrabold tracking-tight text-deep">
+          Randevu Sistemi
+        </h1>
+        <p className="text-xs text-main/50 mt-1">Personel Paneli</p>
+      </div>
+
       {/* Navigation Links */}
       <nav className="flex-1 space-y-1 px-3">
         {navLinks.map(({ label, path, Icon }) => (

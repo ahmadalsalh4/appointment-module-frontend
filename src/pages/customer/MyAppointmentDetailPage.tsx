@@ -131,7 +131,7 @@ export default function MyAppointmentDetailPage() {
               <p className="text-sm font-bold uppercase tracking-widest opacity-80">
                 Durum
               </p>
-              <h1 className="text-2xl sm:text-3xl font-extrabold mt-1">
+              <h1 className="text-2xl sm:text-3xl font-extrabold mt-1 text-wrap-balance">
                 {getStatusText(appointment.status.name)}
               </h1>
             </div>

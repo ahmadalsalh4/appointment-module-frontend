@@ -62,7 +62,7 @@ function StaffEditForm({ staff }: { staff: StaffEntityDetailed }) {
           (kategori, pozisyon, e-posta) güncellenebilir.
         </div>
 
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6 text-wrap-balance">
           İş Bilgilerini Düzenle
         </h1>
 

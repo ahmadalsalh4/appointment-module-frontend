@@ -90,7 +90,7 @@ export default function StaffAppointmentsPage() {
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="mb-8">
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-100">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-100 text-wrap-balance">
           Randevularım
         </h1>
         <p className="mt-1 text-gray-500 dark:text-gray-400 text-sm">

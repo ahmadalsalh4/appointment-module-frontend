@@ -78,7 +78,7 @@ export default function StaffAppointmentDetailPage() {
       <div className="rounded-2xl bg-surface shadow-sm border border-main/10 overflow-hidden">
         {/* ÜST BAR: Durum Güncelleme */}
         <div className="flex flex-col gap-4 border-b border-main/10 bg-back/30 p-6 sm:flex-row sm:items-center sm:justify-between">
-          <h1 className="text-xl sm:text-2xl font-bold text-main">Randevu # {apt?.id}</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-main text-wrap-balance">Randevu # {apt?.id}</h1>
 
           <form
             onSubmit={handleUpdateStatus}

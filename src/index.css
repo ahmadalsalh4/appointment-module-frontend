@@ -25,17 +25,4 @@
 @layer base {
 }
 
-@layer components {
-  .myContainer {
-    @apply flex justify-center items-center h-screen;
-  }
-  .myFormCard {
-    @apply w-2/3 rounded-3xl p-3 bg-surface shadow-2xl;
-  }
-  .myHead {
-    @apply text-2xl text-center text-deep;
-  }
-  .myButton {
-    @apply bg-deep text-main p-2 rounded-2xl;
-  }
-}
+@layer components {}

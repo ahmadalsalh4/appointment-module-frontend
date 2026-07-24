@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router";
 import { useState } from "react";
 import { useAuth } from "../../../contexts/auth/useAuth";
 import { useLogoutMutation } from "../../../hooks/useAuthQueries";
+import ThemeToggle from "../../components/ThemeToggle";
 
 const menuItems = [
   {
@@ -277,7 +278,13 @@ function SidebarContent({ onClose }: SidebarContentProps) {
       </nav>
 
       {/* Logout Button */}
-      <div className="mt-auto p-3 border-t border-main/10">
+      <div className="mt-auto p-3 border-t border-main/10 space-y-1">
+        <div className="flex items-center gap-3 px-4 py-2">
+          <span className="text-xs font-semibold text-main/60 uppercase tracking-wider">
+            Tema
+          </span>
+          <ThemeToggle />
+        </div>
         <button
           onClick={() => role && logout(role)}
           className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"

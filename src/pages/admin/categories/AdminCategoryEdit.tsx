@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import { useParams, useNavigate } from "react-router";
 import {
   useGetCategoryByIdQuery,
@@ -18,8 +18,14 @@ export default function AdminCategoryEdit() {
   const updateMut = useUpdateCategoryMutation();
 
   const [formData, setFormData] = useState<CategoryRequestBody>(() => ({
-    name: category?.name || "",
+    name: category?.name ?? "",
   }));
+
+  useEffect(() => {
+    if (category) {
+      setFormData({ name: category.name ?? "" });
+    }
+  }, [category]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();

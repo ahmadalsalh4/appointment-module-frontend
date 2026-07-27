@@ -12,9 +12,9 @@ import { formatTime, formatMonthDay } from "../../utils/dates";
 export default function AdminHomePage() {
   // Fetch real data for the dashboard cards
   const { data: appointments, isLoading: loadingAppos } =
-    useAdminGetAppointmentsQuery();
-  const { data: staffList } = useGetAllStaffQuery();
-  const { data: categories } = useGetAllCategoriesQuery();
+    useAdminGetAppointmentsQuery({ per_page: 9999 });
+  const { data: staffList } = useGetAllStaffQuery({ per_page: 9999 });
+  const { data: categories } = useGetAllCategoriesQuery({ per_page: 9999 });
 
   // Calculate metrics safely (Fixed .length error)
   const pendingAppos =

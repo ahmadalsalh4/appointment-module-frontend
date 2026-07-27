@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router";
 import { useCreateStaffMutation } from "../../../hooks/useStaffQueries";
 import { useQueryClient } from "@tanstack/react-query";
-import type { CreateStaffRequestBody } from "../../../other/types";
+import type { Category, CreateStaffRequestBody } from "../../../other/types";
 import { useGetAllCategoriesQuery } from "../../../hooks/useCategoryQueries";
 import Breadcrumb from "../../../components/Breadcrumb";
 import FormActions from "../../../components/FormActions";
@@ -115,7 +115,7 @@ export default function AdminStaffAdd() {
               className="input focus:border-deep focus:ring-2 focus:ring-deep/20"
             >
               <option value="">Kategori Seçin (Opsiyonel)</option>
-              {categories?.data?.map((cat: any) => (
+              {categories?.data?.map((cat: Category) => (
                 <option key={cat.id} value={String(cat.id)}>
                   {cat.name}
                 </option>

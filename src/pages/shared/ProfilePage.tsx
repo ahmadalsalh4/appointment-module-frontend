@@ -29,7 +29,7 @@ export default function ProfilePage() {
 
   const { data: profileData, isLoading, isError, error } = useGetProfileQuery(role);
 
-  if (isError || !profileData) {
+  if ((isError || !profileData) && !isLoading) {
     return (
       <div className="page-wide flex flex-col items-center justify-center min-h-[50vh] text-center">
         <div className="w-16 h-16 rounded-full bg-canceld/10 flex items-center justify-center mb-4">
@@ -37,7 +37,7 @@ export default function ProfilePage() {
         </div>
         <h1 className="page-header">Profil Yüklenemedi</h1>
         <p className="mt-2 text-main/60">
-          {(error as Error)?.message || "Lütfen tekrar giriş yapın."}
+          {(error as any)?.response?.data?.message || "Lütfen tekrar giriş yapın."}
         </p>
         <Link to="/login" className="btn-primary mt-6">
           Giriş Yap

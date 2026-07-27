@@ -1,7 +1,7 @@
-import { useState, type FormEvent } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import { useParams, useNavigate } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import type { ServiceRequestBody } from "../../../other/types";
+import type { Category, ServiceRequestBody } from "../../../other/types";
 import {
   useGetServiceByIdQuery,
   useUpdateServiceMutation,
@@ -21,10 +21,20 @@ export default function AdminServiceEdit() {
   const updateMut = useUpdateServiceMutation();
 
   const [formData, setFormData] = useState<ServiceRequestBody>(() => ({
-    catagory_id: service?.catagory_id || "",
-    name: service?.name || "",
-    duration: service?.duration || 30,
+    catagory_id: service?.catagory_id ?? "",
+    name: service?.name ?? "",
+    duration: service?.duration ?? 30,
   }));
+
+  useEffect(() => {
+    if (service) {
+      setFormData({
+        catagory_id: service.catagory_id ?? "",
+        name: service.name ?? "",
+        duration: service.duration ?? 30,
+      });
+    }
+  }, [service]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -80,7 +90,7 @@ export default function AdminServiceEdit() {
           className="input focus:border-deep focus:ring-2 focus:ring-deep/20"
         >
           <option value="">Kategori Seçin...</option>
-          {categories?.data?.map((cat: any) => (
+          {categories?.data?.map((cat: Category) => (
             <option key={cat.id} value={String(cat.id)}>
               {cat.name}
             </option>

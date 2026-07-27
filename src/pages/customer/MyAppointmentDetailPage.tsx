@@ -30,7 +30,7 @@ export default function MyAppointmentDetailPage() {
   const [editTime, setEditTime] = useState("");
 
   const { data: serviceStaff } = useGetServiceStaffQuery(String(appointment?.service_id ?? ""));
-  const { data: categoryStaff } = useGetCategoryStaffQuery(String((appointment?.service as any)?.category?.id ?? ""));
+  const { data: categoryStaff } = useGetCategoryStaffQuery(String((appointment?.service as any)?.catagory_id ?? (appointment?.service as any)?.category?.id ?? ""));
 
   const handleCancel = async () => {
     if (!window.confirm("Randevunuzu iptal etmek istediğinize emin misiniz?")) return;
@@ -57,6 +57,7 @@ export default function MyAppointmentDetailPage() {
     try {
       await updateMutation.mutateAsync({ id: id!, data: body as any });
       queryClient.invalidateQueries({ queryKey: ["appointments", "customer"] });
+      queryClient.invalidateQueries({ queryKey: ["appointments", "customer", id] });
       setIsEditing(false);
     } catch {
       alert("Randevu güncellenirken bir hata oluştu.");
@@ -115,10 +116,10 @@ export default function MyAppointmentDetailPage() {
                 <label className="label-sm">Personel</label>
                 <select value={editStaff} onChange={(e) => setEditStaff(e.target.value)} className="input text-sm">
                   <option value="">Değiştirme</option>
-                  {(serviceStaff as any)?.map((s: any) => (
+                  {serviceStaff?.map((s: any) => (
                     <option key={s.id} value={s.id}>{s.person.name} {s.person.surname}</option>
                   ))}
-                  {(categoryStaff as any)?.map((s: any) => (
+                  {categoryStaff?.map((s: any) => (
                     <option key={s.id} value={s.id}>{s.person.name} {s.person.surname}</option>
                   ))}
                 </select>

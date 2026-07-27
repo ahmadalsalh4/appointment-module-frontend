@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router";
 import { Mail, Phone } from "lucide-react";
 import {
@@ -8,10 +9,14 @@ import { useQueryClient } from "@tanstack/react-query";
 import PageHeader from "../../../components/PageHeader";
 import QueryGate from "../../../components/QueryGate";
 import Avatar from "../../../components/Avatar";
+import Pagination from "../../../components/Pagination";
 
 export default function AdminStaffList() {
   const queryClient = useQueryClient();
-  const { data: staffList, isLoading, isError } = useGetAllStaffQuery();
+  const [perPage, setPerPage] = useState(15);
+  const [page, setPage] = useState(1);
+  const { data: staffData, isLoading, isError } = useGetAllStaffQuery({ per_page: perPage, page });
+  const staffList = staffData?.data ?? [];
   const deleteMut = useDeleteStaffMutation();
 
   const handleDelete = async (id: number) => {
@@ -44,8 +49,8 @@ export default function AdminStaffList() {
       <QueryGate isLoading={isLoading} isError={isError} errorMessage="Personel listesi yüklenirken hata oluştu.">
       {/* Cards Grid instead of table for better profile view */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {staffList?.data && staffList.data.length > 0 ? (
-          staffList?.data?.map((staff) => (
+        {staffList.length > 0 ? (
+          staffList.map((staff) => (
             <div
               key={staff.id}
               className="card p-6 hover:shadow-md transition-shadow flex flex-col"
@@ -109,6 +114,18 @@ export default function AdminStaffList() {
           </div>
         )}
       </div>
+      {staffData && (
+        <Pagination
+          currentPage={staffData.current_page}
+          lastPage={staffData.last_page}
+          perPage={staffData.per_page}
+          total={staffData.total}
+          from={staffData.from}
+          to={staffData.to}
+          onPageChange={setPage}
+          onPerPageChange={(pp) => { setPerPage(pp); setPage(1); }}
+        />
+      )}
       </QueryGate>
     </div>
   );

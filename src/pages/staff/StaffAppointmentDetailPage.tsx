@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useParams, useNavigate } from "react-router";
 import { ArrowLeft } from "lucide-react";
 import {
@@ -22,15 +23,22 @@ export default function StaffAppointmentDetailPage() {
   } = useStaffGetAppointmentByIdQuery(Number(id));
   const updateStatus = useStaffUpdateStateMutation();
 
+  const queryClient = useQueryClient();
+
   const [selectedStatus, setSelectedStatus] = useState<string>("");
 
-  const handleUpdateStatus = (e: React.SubmitEvent) => {
+  const handleUpdateStatus = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!selectedStatus || !id) return;
 
     updateStatus.mutate(
       { id: Number(id), data: { state_id: Number(selectedStatus) } },
-      { onSuccess: () => navigate("/staff") },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ["appointments", "staff"] });
+          navigate("/staff");
+        },
+      },
     );
   };
 

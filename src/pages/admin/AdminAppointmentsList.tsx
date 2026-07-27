@@ -107,7 +107,7 @@ export default function AdminAppointmentsList() {
           <select value={staffId} onChange={(e) => setStaffId(e.target.value)} className="input-filter focus:border-deep focus:ring-2 focus:ring-deep/20">
             <option value="">Tümü</option>
             {staffList?.data?.map((s) => (
-              <option key={s.id} value={s.id}>{s.person?.name} {s.person?.surname}</option>
+              <option key={s.id} value={String(s.id)}>{s.person?.name} {s.person?.surname}</option>
             ))}
           </select>
         </div>

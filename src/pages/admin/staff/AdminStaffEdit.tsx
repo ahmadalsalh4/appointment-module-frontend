@@ -6,7 +6,7 @@ import {
 } from "../../../hooks/useStaffQueries";
 import { useGetAllCategoriesQuery } from "../../../hooks/useCategoryQueries";
 import { useQueryClient } from "@tanstack/react-query";
-import type { UpdateStaffRequestBody, StaffEntityDetailed } from "../../../other/types";
+import type { Category, UpdateStaffRequestBody, StaffEntityDetailed } from "../../../other/types";
 import Breadcrumb from "../../../components/Breadcrumb";
 import FormActions from "../../../components/FormActions";
 import QueryGate from "../../../components/QueryGate";
@@ -69,14 +69,14 @@ function StaffEditForm({ staff }: { staff: StaffEntityDetailed }) {
               İlgili Olduğu Kategori
             </label>
             <select
-              value={formData.catagory_id === null ? "" : formData.catagory_id}
+              value={formData.catagory_id ?? ""}
               onChange={(e) =>
                 setFormData({ ...formData, catagory_id: e.target.value })
               }
               className="input focus:border-deep focus:ring-2 focus:ring-deep/20"
             >
               <option value="">Kategori Seçin (Opsiyonel)</option>
-              {categories?.data?.map((cat: any) => (
+              {categories?.data?.map((cat: Category) => (
                 <option key={cat.id} value={String(cat.id)}>
                   {cat.name}
                 </option>

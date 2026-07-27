@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router";
 import { Clock } from "lucide-react";
 import {
@@ -6,6 +7,7 @@ import {
 } from "../../../hooks/useServiceQueries";
 import { useQueryClient } from "@tanstack/react-query";
 import AdminListPage from "../components/AdminListPage";
+import Pagination from "../../../components/Pagination";
 import type { ServiceWithCategory } from "../../../other/types";
 import type { AdminListColumn } from "../components/AdminListPage";
 
@@ -22,7 +24,10 @@ const columns: AdminListColumn[] = [
 
 export default function AdminServicesList() {
   const queryClient = useQueryClient();
-  const { data: services, isLoading, isError } = useGetAllServicesQuery();
+  const [perPage, setPerPage] = useState(15);
+  const [page, setPage] = useState(1);
+  const { data: servicesData, isLoading, isError } = useGetAllServicesQuery({ per_page: perPage, page });
+  const services = servicesData?.data ?? [];
   const deleteMut = useDeleteServiceMutation();
 
   const handleDelete = async (id: number) => {
@@ -42,13 +47,13 @@ export default function AdminServicesList() {
       addPath="/admin/services/add"
       addLabel="+ Yeni Hizmet Ekle"
       columns={columns}
-      itemsCount={services?.data?.length ?? 0}
+      itemsCount={servicesData?.total ?? 0}
       emptyMessage="Sistemde henüz bir hizmet eklenmemiş."
       isLoading={isLoading}
       isError={isError}
       errorMessage="Hizmetler yüklenirken hata oluştu."
     >
-      {services?.data?.map((service: ServiceWithCategory) => (
+      {services.map((service: ServiceWithCategory) => (
         <tr key={service.id} className="hover:bg-back transition-colors">
           <td className="table-cell whitespace-nowrap">
             <div className="text-sm font-semibold text-main">
@@ -93,6 +98,18 @@ export default function AdminServicesList() {
           </td>
         </tr>
       ))}
+      {servicesData && (
+        <Pagination
+          currentPage={servicesData.current_page}
+          lastPage={servicesData.last_page}
+          perPage={servicesData.per_page}
+          total={servicesData.total}
+          from={servicesData.from}
+          to={servicesData.to}
+          onPageChange={setPage}
+          onPerPageChange={(pp) => { setPerPage(pp); setPage(1); }}
+        />
+      )}
     </AdminListPage>
   );
 }

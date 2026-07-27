@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import type { ServiceRequestBody } from "../../../other/types";
+import type { Category, ServiceRequestBody } from "../../../other/types";
 import { useCreateServiceMutation } from "../../../hooks/useServiceQueries";
 import { useGetAllCategoriesQuery } from "../../../hooks/useCategoryQueries";
 import AdminFormPage from "../components/AdminFormPage";
@@ -70,7 +70,7 @@ export default function AdminServiceAdd() {
           className="input focus:border-deep focus:ring-2 focus:ring-deep/20"
         >
           <option value="">Kategori Seçin...</option>
-          {categories?.data?.map((cat: any) => (
+          {categories?.data?.map((cat: Category) => (
             <option key={cat.id} value={String(cat.id)}>
               {cat.name}
             </option>

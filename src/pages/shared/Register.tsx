@@ -30,13 +30,13 @@ export default function Register() {
     setForm({ ...form, [e.target.id]: e.target.value });
   };
 
-  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     register(form);
   };
   useEffect(() => {
     if (data) {
-      handleLoginSuccess(data as any);
+      handleLoginSuccess({ token: data.token, role: data.role, user: data.customer, other_roles: [] });
 
       if (data.role === "customer") {
         navigate("/");

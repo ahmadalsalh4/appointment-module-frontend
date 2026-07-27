@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router";
 import { List } from "lucide-react";
 import {
@@ -7,6 +8,7 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import { formatDate } from "../../../utils/dates";
 import AdminListPage from "../components/AdminListPage";
+import Pagination from "../../../components/Pagination";
 import type { Category } from "../../../other/types";
 import type { AdminListColumn } from "../components/AdminListPage";
 
@@ -22,7 +24,10 @@ const columns: AdminListColumn[] = [
 
 export default function AdminCategoriesList() {
   const queryClient = useQueryClient();
-  const { data: categories, isLoading, isError } = useGetAllCategoriesQuery();
+  const [perPage, setPerPage] = useState(15);
+  const [page, setPage] = useState(1);
+  const { data: categoriesData, isLoading, isError } = useGetAllCategoriesQuery({ per_page: perPage, page });
+  const categories = categoriesData?.data ?? [];
   const deleteMut = useDeleteCategoryMutation();
 
   const handleDelete = async (id: number) => {
@@ -47,13 +52,13 @@ export default function AdminCategoriesList() {
       addPath="/admin/categories/add"
       addLabel="+ Yeni Kategori Ekle"
       columns={columns}
-      itemsCount={categories?.data?.length ?? 0}
+      itemsCount={categoriesData?.total ?? 0}
       emptyMessage="Sistemde henüz bir kategori eklenmemiş."
       isLoading={isLoading}
       isError={isError}
       errorMessage="Kategoriler yüklenirken hata oluştu."
     >
-      {categories?.data?.map((category: Category) => (
+      {categories.map((category: Category) => (
         <tr key={category.id} className="hover:bg-back transition-colors">
           <td className="table-cell whitespace-nowrap">
             <div className="flex items-center gap-3">
@@ -91,6 +96,18 @@ export default function AdminCategoriesList() {
           </td>
         </tr>
       ))}
+      {categoriesData && (
+        <Pagination
+          currentPage={categoriesData.current_page}
+          lastPage={categoriesData.last_page}
+          perPage={categoriesData.per_page}
+          total={categoriesData.total}
+          from={categoriesData.from}
+          to={categoriesData.to}
+          onPageChange={setPage}
+          onPerPageChange={(pp) => { setPerPage(pp); setPage(1); }}
+        />
+      )}
     </AdminListPage>
   );
 }

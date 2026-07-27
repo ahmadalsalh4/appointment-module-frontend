@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { useParams, Link, useNavigate } from "react-router";
-import { Calendar, Clock } from "lucide-react";
+import { Calendar, Clock, Edit3 } from "lucide-react";
 import {
   useAdminGetAppointmentByIdQuery,
   useAdminUpdateAppointmentMutation,
@@ -12,6 +12,8 @@ import Breadcrumb from "../../components/Breadcrumb";
 import QueryGate from "../../components/QueryGate";
 import Avatar from "../../components/Avatar";
 import { formatDate, formatTime } from "../../utils/dates";
+import { useGetAllServicesQuery } from "../../hooks/useServiceQueries";
+import { useGetAllStaffQuery } from "../../hooks/useStaffQueries";
 
 export default function AdminAppointmentDetail() {
   const { id } = useParams<{ id: string }>();
@@ -25,6 +27,15 @@ export default function AdminAppointmentDetail() {
   } = useAdminGetAppointmentByIdQuery(id || "");
   const updateAppointmentMut = useAdminUpdateAppointmentMutation();
   const deleteMut = useAdminDeleteAppointmentMutation();
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [editStaff, setEditStaff] = useState("");
+  const [editService, setEditService] = useState("");
+  const [editDate, setEditDate] = useState("");
+  const [editTime, setEditTime] = useState("");
+
+  const { data: allServices } = useGetAllServicesQuery({ per_page: 9999 });
+  const { data: allStaff } = useGetAllStaffQuery({ per_page: 9999 });
 
   const handleStatusUpdate = async (
     e: React.ChangeEvent<HTMLSelectElement>,
@@ -56,6 +67,27 @@ export default function AdminAppointmentDetail() {
       navigate("/admin/appointments"); // Listeye geri dön
     } catch {
       alert("Randevu silinirken bir hata oluştu.");
+    }
+  };
+
+  const handleEditSubmit = async () => {
+    const body: Record<string, unknown> = {};
+    if (editStaff) body.staff_id = Number(editStaff);
+    if (editService) body.service_id = Number(editService);
+    if (editDate && editTime) {
+      body.start_date = `${editDate}T${editTime}:00.000000Z`;
+    } else if (editDate) {
+      const oldTime = appointment?.start_date?.slice(11, 16) ?? "09:00";
+      body.start_date = `${editDate}T${oldTime}:00.000000Z`;
+    }
+
+    try {
+      await updateAppointmentMut.mutateAsync({ id: id!, data: body as any });
+      queryClient.invalidateQueries({ queryKey: ["appointments", "admin", id] });
+      queryClient.invalidateQueries({ queryKey: ["appointments", "admin"] });
+      setIsEditing(false);
+    } catch {
+      alert("Randevu güncellenirken hata oluştu.");
     }
   };
 
@@ -97,6 +129,60 @@ export default function AdminAppointmentDetail() {
                 />
               </h1>
             </div>
+
+            {isEditing ? (
+              <div className="flex flex-wrap items-end gap-3">
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-bold uppercase opacity-80">Personel</label>
+                  <select value={editStaff} onChange={(e) => setEditStaff(e.target.value)} className="bg-surface text-main rounded-lg shadow-sm border border-main/20 px-3 py-1.5 text-sm">
+                    <option value="">Değiştirme</option>
+                    {allStaff?.data?.map((s) => (
+                      <option key={s.id} value={s.id}>{s.person?.name} {s.person?.surname}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-bold uppercase opacity-80">Hizmet</label>
+                  <select value={editService} onChange={(e) => setEditService(e.target.value)} className="bg-surface text-main rounded-lg shadow-sm border border-main/20 px-3 py-1.5 text-sm">
+                    <option value="">Değiştirme</option>
+                    {allServices?.data?.map((svc) => (
+                      <option key={svc.id} value={svc.id}>{svc.name} ({svc.duration}dk)</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-bold uppercase opacity-80">Tarih</label>
+                  <input type="date" value={editDate} onChange={(e) => setEditDate(e.target.value)} className="bg-surface text-main rounded-lg shadow-sm border border-main/20 px-3 py-1.5 text-sm" />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-bold uppercase opacity-80">Saat</label>
+                  <input type="time" value={editTime} onChange={(e) => setEditTime(e.target.value)} step="900" className="bg-surface text-main rounded-lg shadow-sm border border-main/20 px-3 py-1.5 text-sm" />
+                </div>
+                <button
+                  onClick={handleEditSubmit}
+                  disabled={updateAppointmentMut.isPending}
+                  className="bg-deep text-white font-bold rounded-lg px-4 py-2 text-sm hover:bg-deep/80 disabled:opacity-50"
+                >
+                  {updateAppointmentMut.isPending ? "..." : "Güncelle"}
+                </button>
+                <button onClick={() => setIsEditing(false)} className="text-main/60 hover:text-main text-sm px-2 py-1">
+                  İptal
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => {
+                  setIsEditing(true);
+                  setEditStaff(String(appointment.staff_id || ""));
+                  setEditService(String(appointment.service_id || ""));
+                  setEditDate(appointment.start_date?.slice(0, 10) || "");
+                  setEditTime(appointment.start_date?.slice(11, 16) || "");
+                }}
+                className="flex items-center gap-1.5 bg-surface text-main font-bold rounded-lg shadow-sm border border-main/20 px-3 py-2 text-sm hover:bg-deep/5"
+              >
+                <Edit3 className="h-4 w-4" /> Randevuyu Düzenle
+              </button>
+            )}
 
             {/* Admin Action: Status Change Dropdown */}
             <div className="flex flex-col gap-2">

@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { useState } from "react";
 import { ChevronDown, LogOut, Menu, X } from "lucide-react";
 import { useAuth } from "../contexts/auth/useAuth";
@@ -6,6 +6,7 @@ import { useLogoutMutation } from "../hooks/useAuthQueries";
 import ThemeToggle from "../pages/components/ThemeToggle";
 import authApi from "../api/auth";
 import type { ReactNode } from "react";
+import type { UserRole } from "../other/types";
 
 export interface SidebarItem {
   label: string;
@@ -28,6 +29,7 @@ function SidebarContent({
   onClose,
 }: SidebarProps & { onClose?: () => void }) {
   const location = useLocation();
+  const navigate = useNavigate();
   const { role, otherRoles, handleSwitchRole } = useAuth();
   const { mutate: logout } = useLogoutMutation();
   const [openMenus, setOpenMenus] = useState<string[]>([]);
@@ -37,9 +39,9 @@ function SidebarContent({
     if (!password) return;
 
     try {
-      const result = await authApi.switchRole({ role: targetRole as any, password });
-      handleSwitchRole(result as any);
-      window.location.href = targetRole === "customer" ? "/" : `/${targetRole}`;
+      const result = await authApi.switchRole({ role: targetRole as UserRole, password });
+      handleSwitchRole(result as unknown as Parameters<typeof handleSwitchRole>[0]);
+      navigate(targetRole === "customer" ? "/" : `/${targetRole}`);
     } catch (err) {
       alert("Rol değiştirme başarısız oldu. Şifrenizi kontrol edin.");
     }

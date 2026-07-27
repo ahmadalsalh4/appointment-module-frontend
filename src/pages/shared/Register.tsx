@@ -36,7 +36,7 @@ export default function Register() {
   };
   useEffect(() => {
     if (data) {
-      handleLoginSuccess(data);
+      handleLoginSuccess(data as any);
 
       if (data.role === "customer") {
         navigate("/");

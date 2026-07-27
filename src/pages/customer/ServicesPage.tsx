@@ -20,11 +20,11 @@ export default function ServicesPage() {
 
       <QueryGate isLoading={isLoading} isError={isError} errorMessage="Hizmetler yüklenirken bir hata oluştu.">
       {/* Grid Section */}
-      {services && services.length === 0 ? (
+      {services?.data && services.data.length === 0 ? (
         <EmptyState message="Şu anda aktif bir hizmet bulunmamaktadır." />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {services?.map((service: ServiceWithCategory) => (
+          {services?.data?.map((service: ServiceWithCategory) => (
             <Link
               to={`/services/${service.id}`}
               key={service.id}

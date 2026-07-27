@@ -76,7 +76,7 @@ function StaffEditForm({ staff }: { staff: StaffEntityDetailed }) {
               className="input focus:border-deep focus:ring-2 focus:ring-deep/20"
             >
               <option value="">Kategori Seçin (Opsiyonel)</option>
-              {categories?.map((cat) => (
+              {categories?.data?.map((cat: any) => (
                 <option key={cat.id} value={String(cat.id)}>
                   {cat.name}
                 </option>

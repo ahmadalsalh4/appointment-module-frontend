@@ -28,7 +28,7 @@ function SidebarContent({
   onClose,
 }: SidebarProps & { onClose?: () => void }) {
   const location = useLocation();
-  const { role, otherRoles, handleLogout, handleSwitchRole } = useAuth();
+  const { role, otherRoles, handleSwitchRole } = useAuth();
   const { mutate: logout } = useLogoutMutation();
   const [openMenus, setOpenMenus] = useState<string[]>([]);
 
@@ -37,8 +37,8 @@ function SidebarContent({
     if (!password) return;
 
     try {
-      const result = await authApi.switchRole({ role: targetRole, password });
-      handleSwitchRole(result);
+      const result = await authApi.switchRole({ role: targetRole as any, password });
+      handleSwitchRole(result as any);
       window.location.href = targetRole === "customer" ? "/" : `/${targetRole}`;
     } catch (err) {
       alert("Rol değiştirme başarısız oldu. Şifrenizi kontrol edin.");

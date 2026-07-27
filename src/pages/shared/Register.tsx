@@ -46,9 +46,9 @@ export default function Register() {
 
   return (
     <div className="flex items-center justify-center p-4 sm:p-6 py-12 sm:py-16 bg-back">
-      <div className="w-full max-w-md p-8 rounded-2xl shadow-xl bg-surface">
+      <div className="card-auth">
         <div className="text-center mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-main text-wrap-balance">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-main text-balance">
             Hesap Oluştur
           </h1>
           <p className="mt-2 text-sm text-main/70">
@@ -65,7 +65,7 @@ export default function Register() {
           <div>
             <label
               htmlFor="name"
-              className="block text-sm font-medium mb-2 text-main"
+              className="label"
             >
               Ad
             </label>
@@ -74,7 +74,7 @@ export default function Register() {
               type="text"
               value={form.name}
               onChange={handleChange}
-              className="w-full px-4 py-3 rounded-lg border border-main/20 bg-back text-main outline-none transition-all focus:border-deep focus:ring-2 focus:ring-deep/20"
+              className="input focus:border-deep focus:ring-2 focus:ring-deep/20"
               placeholder="Adınız"
               required
             />
@@ -84,7 +84,7 @@ export default function Register() {
           <div>
             <label
               htmlFor="surname"
-              className="block text-sm font-medium mb-2 text-main"
+              className="label"
             >
               Soyad
             </label>
@@ -93,7 +93,7 @@ export default function Register() {
               type="text"
               value={form.surname}
               onChange={handleChange}
-              className="w-full px-4 py-3 rounded-lg border border-main/20 bg-back text-main outline-none transition-all focus:border-deep focus:ring-2 focus:ring-deep/20"
+              className="input focus:border-deep focus:ring-2 focus:ring-deep/20"
               placeholder="Soyadınız"
               required
             />
@@ -103,7 +103,7 @@ export default function Register() {
           <div>
             <label
               htmlFor="email"
-              className="block text-sm font-medium mb-2 text-main"
+              className="label"
             >
               E-posta Adresi
             </label>
@@ -112,7 +112,7 @@ export default function Register() {
               type="email"
               value={form.email}
               onChange={handleChange}
-              className="w-full px-4 py-3 rounded-lg border border-main/20 bg-back text-main outline-none transition-all focus:border-deep focus:ring-2 focus:ring-deep/20"
+              className="input focus:border-deep focus:ring-2 focus:ring-deep/20"
               placeholder="ornek@sirket.com"
               required
             />
@@ -122,7 +122,7 @@ export default function Register() {
           <div>
             <label
               htmlFor="phone_number"
-              className="block text-sm font-medium mb-2 text-main"
+              className="label"
             >
               Telefon Numarası
             </label>
@@ -131,7 +131,7 @@ export default function Register() {
               type="tel"
               value={form.phone_number}
               onChange={handleChange}
-              className="w-full px-4 py-3 rounded-lg border border-main/20 bg-back text-main outline-none transition-all focus:border-deep focus:ring-2 focus:ring-deep/20"
+              className="input focus:border-deep focus:ring-2 focus:ring-deep/20"
               placeholder="0512 345 67 89"
               required
             />
@@ -141,7 +141,7 @@ export default function Register() {
           <div>
             <label
               htmlFor="password"
-              className="block text-sm font-medium mb-2 text-main"
+              className="label"
             >
               Şifre
             </label>
@@ -150,7 +150,7 @@ export default function Register() {
               type="password"
               value={form.password}
               onChange={handleChange}
-              className="w-full px-4 py-3 rounded-lg border border-main/20 bg-back text-main outline-none transition-all focus:border-deep focus:ring-2 focus:ring-deep/20"
+              className="input focus:border-deep focus:ring-2 focus:ring-deep/20"
               placeholder="••••••••"
               required
             />
@@ -160,7 +160,7 @@ export default function Register() {
           <div>
             <label
               htmlFor="password_confirmation"
-              className="block text-sm font-medium mb-2 text-main"
+              className="label"
             >
               Şifre Tekrar
             </label>
@@ -169,7 +169,7 @@ export default function Register() {
               type="password"
               value={form.password_confirmation}
               onChange={handleChange}
-              className="w-full px-4 py-3 rounded-lg border border-main/20 bg-back text-main outline-none transition-all focus:border-deep focus:ring-2 focus:ring-deep/20"
+              className="input focus:border-deep focus:ring-2 focus:ring-deep/20"
               placeholder="••••••••"
               required
             />
@@ -179,7 +179,7 @@ export default function Register() {
           <button
             type="submit"
             disabled={isPending}
-            className="w-full py-3 px-4 rounded-lg font-semibold text-white bg-deep hover:opacity-90 transition-all focus:outline-none focus:ring-2 focus:ring-deep/50 focus:ring-offset-2 mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="btn-auth mt-2"
           >
             {isPending ? "Kayıt Yapılıyor..." : "Kayıt Ol"}
           </button>

@@ -33,7 +33,7 @@ export default function UnauthorizedPage() {
 
       {/* Content */}
       <div className="mt-6 space-y-3">
-        <h2 className="text-2xl sm:text-3xl font-bold text-main text-wrap-balance">Erişim Engellendi</h2>
+        <h2 className="page-header">Erişim Engellendi</h2>
         <p className="max-w-md text-main/70">
           Bu sayfayı görüntülemek için gerekli yetkilere sahip değilsiniz. Eğer
           bunun bir hata olduğunu düşünüyorsanız yöneticinizle iletişime geçin.

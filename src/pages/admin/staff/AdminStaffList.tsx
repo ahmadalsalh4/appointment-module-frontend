@@ -4,6 +4,8 @@ import {
   useDeleteStaffMutation,
 } from "../../../hooks/useStaffQueries";
 import { useQueryClient } from "@tanstack/react-query";
+import PageHeader from "../../../components/PageHeader";
+import Avatar from "../../../components/Avatar";
 
 export default function AdminStaffList() {
   const queryClient = useQueryClient();
@@ -27,15 +29,15 @@ export default function AdminStaffList() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center min-h-[60vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      <div className="loader">
+        <div className="spinner"></div>
       </div>
     );
   }
 
   if (isError) {
     return (
-      <div className="text-center py-20 text-red-500 dark:text-red-400">
+      <div className="text-center py-20 text-canceld">
         <p className="text-xl font-bold">
           Personel listesi yüklenirken hata oluştu.
         </p>
@@ -44,22 +46,16 @@ export default function AdminStaffList() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-100 text-wrap-balance">Personel</h1>
-          <p className="mt-1 text-gray-500 dark:text-gray-400 text-sm">
-            Sistemdeki personelleri yönetin ve yeni ekleyin.
-          </p>
-        </div>
-        <Link
-          to="/admin/staff/add"
-          className="inline-flex items-center justify-center px-5 py-2.5 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-indigo-600 dark:bg-indigo-500 hover:bg-indigo-700 dark:hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-        >
-          + Yeni Personel Ekle
-        </Link>
-      </div>
+    <div className="page-xl space-y-6">
+      <PageHeader
+        title="Personel"
+        subtitle="Sistemdeki personelleri yönetin ve yeni ekleyin."
+        action={
+          <Link to="/admin/staff/add" className="btn-primary">
+            + Yeni Personel Ekle
+          </Link>
+        }
+      />
 
       {/* Cards Grid instead of table for better profile view */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -67,19 +63,20 @@ export default function AdminStaffList() {
           staffList.map((staff) => (
             <div
               key={staff.id}
-              className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-6 hover:shadow-md transition-shadow flex flex-col"
+              className="card p-6 hover:shadow-md transition-shadow flex flex-col"
             >
               {/* Profile Header */}
               <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 rounded-full flex items-center justify-center text-lg font-bold">
-                  {staff.person.name.charAt(0)}
-                  {staff.person.surname.charAt(0)}
-                </div>
+                <Avatar
+                  name={staff.person.name}
+                  surname={staff.person.surname}
+                  size="sm"
+                />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold text-gray-900 dark:text-gray-100 truncate">
+                  <p className="text-sm font-bold text-main truncate">
                     {staff.person.name} {staff.person.surname}
                   </p>
-                  <p className="text-xs text-indigo-600 dark:text-indigo-400 font-medium truncate">
+                  <p className="text-xs text-deep font-medium truncate">
                     {staff.job_title}
                   </p>
                 </div>
@@ -87,7 +84,7 @@ export default function AdminStaffList() {
 
               {/* Info */}
               <div className="flex-1 space-y-2 mb-4 text-sm">
-                <div className="flex items-center text-gray-500 dark:text-gray-400 truncate">
+                <div className="flex items-center text-main/60 truncate">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-4 w-4 mr-2 shrink-0"
@@ -104,7 +101,7 @@ export default function AdminStaffList() {
                   </svg>
                   {staff.email}
                 </div>
-                <div className="flex items-center text-gray-500 dark:text-gray-400">
+                <div className="flex items-center text-main/60">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-4 w-4 mr-2 shrink-0"
@@ -124,23 +121,23 @@ export default function AdminStaffList() {
               </div>
 
               {/* Actions */}
-              <div className="pt-4 border-t border-gray-100 dark:border-gray-700 flex items-center justify-end gap-4 text-sm font-medium">
+              <div className="pt-4 border-t border-main/5 flex items-center justify-end gap-4 text-sm font-medium">
                 <Link
                   to={`/admin/staff/${staff.id}`}
-                  className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300"
+                  className="text-deep hover:text-deep/80"
                 >
                   Detay
                 </Link>
                 <Link
                   to={`/admin/staff/${staff.id}/edit`}
-                  className="text-yellow-600 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-300"
+                  className="text-waiting hover:text-waiting/80"
                 >
                   Düzenle
                 </Link>
                 <button
                   onClick={() => handleDelete(staff.id)}
                   disabled={deleteMut.isPending}
-                  className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 disabled:text-gray-400 dark:disabled:text-gray-500"
+                  className="text-canceld hover:text-canceld/80 disabled:text-main/40"
                 >
                   Sil
                 </button>
@@ -148,7 +145,7 @@ export default function AdminStaffList() {
             </div>
           ))
         ) : (
-          <div className="col-span-3 text-center py-16 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400">
+          <div className="col-span-3 text-center py-16 bg-surface rounded-xl border border-main/10 text-main/60">
             Sistemde henüz bir personel bulunmuyor.
           </div>
         )}

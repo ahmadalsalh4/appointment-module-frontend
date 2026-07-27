@@ -287,7 +287,7 @@ function SidebarContent({ onClose }: SidebarContentProps) {
         </div>
         <button
           onClick={() => role && logout(role)}
-          className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+          className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-canceld hover:bg-canceld/10 transition-colors"
         >
           <svg
             className="h-5 w-5"

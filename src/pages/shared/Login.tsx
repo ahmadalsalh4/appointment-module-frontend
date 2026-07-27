@@ -38,9 +38,9 @@ export default function Login() {
 
   return (
     <div className="flex items-center justify-center p-4 py-12 sm:py-16 bg-back">
-      <div className="w-full max-w-md p-8 rounded-2xl shadow-xl bg-surface">
+      <div className="card-auth">
         <div className="text-center mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-main text-wrap-balance">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-main text-balance">
             Hoş Geldiniz
           </h1>
           <p className="mt-2 text-sm text-main/70">
@@ -59,7 +59,7 @@ export default function Login() {
           <div>
             <label
               htmlFor="role"
-              className="block text-sm font-medium mb-2 text-main"
+              className="label"
             >
               Giriş Türü
             </label>
@@ -70,7 +70,7 @@ export default function Login() {
               onChange={(e) =>
                 setForm({ ...form, role: e.target.value as LoginShape["role"] })
               }
-              className="w-full px-4 py-3 rounded-lg border border-main/20 bg-back text-main outline-none transition-all focus:border-deep focus:ring-2 focus:ring-deep/20"
+              className="input focus:border-deep focus:ring-2 focus:ring-deep/20"
             >
               <option value="customer">Müşteri</option>
               <option value="staff">Personel</option>
@@ -81,7 +81,7 @@ export default function Login() {
           <div>
             <label
               htmlFor="email"
-              className="block text-sm font-medium mb-2 text-main"
+              className="label"
             >
               E-posta Adresi
             </label>
@@ -90,7 +90,7 @@ export default function Login() {
               type="email"
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
-              className="w-full px-4 py-3 rounded-lg border border-main/20 bg-back text-main outline-none transition-all focus:border-deep focus:ring-2 focus:ring-deep/20"
+              className="input focus:border-deep focus:ring-2 focus:ring-deep/20"
               placeholder="ornek@sirket.com"
               required
             />
@@ -99,7 +99,7 @@ export default function Login() {
           <div>
             <label
               htmlFor="password"
-              className="block text-sm font-medium mb-2 text-main"
+              className="label"
             >
               Şifre
             </label>
@@ -108,7 +108,7 @@ export default function Login() {
               type="password"
               value={form.password}
               onChange={(e) => setForm({ ...form, password: e.target.value })}
-              className="w-full px-4 py-3 rounded-lg border border-main/20 bg-back text-main outline-none transition-all focus:border-deep focus:ring-2 focus:ring-deep/20"
+              className="input focus:border-deep focus:ring-2 focus:ring-deep/20"
               placeholder="••••••••"
               required
             />
@@ -117,7 +117,7 @@ export default function Login() {
           <button
             type="submit"
             disabled={isPending}
-            className="w-full py-3 px-4 rounded-lg font-semibold text-white bg-deep hover:opacity-90 transition-all focus:outline-none focus:ring-2 focus:ring-deep/50 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="btn-auth"
           >
             {isPending ? "Giriş yapılıyor..." : "Giriş Yap"}
           </button>

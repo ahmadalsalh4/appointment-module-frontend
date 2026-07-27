@@ -1,5 +1,7 @@
 import { useParams, Link } from "react-router";
 import { useGetStaffByIdQuery } from "../../../hooks/useStaffQueries";
+import Breadcrumb from "../../../components/Breadcrumb";
+import Avatar from "../../../components/Avatar";
 
 export default function AdminStaffDetail() {
   const { id } = useParams<{ id: string }>();
@@ -7,19 +9,19 @@ export default function AdminStaffDetail() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center min-h-[60vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      <div className="loader">
+        <div className="spinner"></div>
       </div>
     );
   }
 
   if (isError || !staff) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-20 text-center text-red-500 dark:text-red-400">
+      <div className="max-w-4xl mx-auto px-4 py-20 text-center text-canceld">
         <p className="text-xl font-bold">Personel bulunamadı.</p>
         <Link
           to="/admin/staff"
-          className="mt-4 inline-block text-indigo-600 dark:text-indigo-400 hover:underline"
+          className="mt-4 inline-block text-deep hover:underline"
         >
           Personel Listesine Dön
         </Link>
@@ -28,38 +30,34 @@ export default function AdminStaffDetail() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <nav className="flex mb-8 text-sm text-gray-500 dark:text-gray-400">
-        <Link to="/admin/staff" className="hover:text-indigo-600 dark:hover:text-indigo-400">
-          Personel
-        </Link>
-        <span className="mx-2">/</span>
-        <span className="text-gray-900 dark:text-gray-100 font-medium">
-          {staff.person.name} {staff.person.surname}
-        </span>
-      </nav>
+    <div className="page-wide">
+      <Breadcrumb items={[
+        { label: "Personel", to: "/admin/staff" },
+        { label: `${staff.person.name} ${staff.person.surname}` },
+      ]} />
 
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+      <div className="card-lg overflow-hidden">
         {/* Header */}
-        <div className="p-4 sm:p-6 lg:p-8 bg-indigo-50 dark:bg-indigo-900/40 border-b border-indigo-100 dark:border-indigo-800">
+        <div className="p-4 sm:p-6 lg:p-8 bg-deep/10 border-b border-deep/20">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
             <div className="flex items-center gap-6">
-              <div className="w-20 h-20 bg-indigo-200 dark:bg-indigo-800 text-indigo-700 dark:text-indigo-300 rounded-full flex items-center justify-center text-3xl font-bold">
-                {staff.person.name.charAt(0)}
-                {staff.person.surname.charAt(0)}
-              </div>
+              <Avatar
+                name={staff.person.name}
+                surname={staff.person.surname}
+                size="lg"
+              />
               <div className="min-w-0">
-                <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-gray-100 break-words text-wrap-balance">
+                <h1 className="text-xl sm:text-2xl font-extrabold text-main break-words text-balance">
                   {staff.person.name} {staff.person.surname}
                 </h1>
-                <p className="text-indigo-700 dark:text-indigo-300 font-semibold">
+                <p className="text-deep font-semibold">
                   {staff.job_title}
                 </p>
               </div>
             </div>
             <Link
               to={`/admin/staff/${staff.id}/edit`}
-              className="px-5 py-2.5 text-sm font-medium text-yellow-700 dark:text-yellow-300 bg-white dark:bg-gray-800 border border-yellow-200 dark:border-yellow-800 rounded-lg hover:bg-yellow-50 dark:hover:bg-yellow-900/20 shadow-sm"
+              className="px-5 py-2.5 text-sm font-medium text-waiting bg-surface border border-waiting/20 rounded-lg hover:bg-waiting/10 shadow-sm"
             >
               Bilgileri Düzenle
             </Link>
@@ -68,11 +66,11 @@ export default function AdminStaffDetail() {
 
         <div className="p-4 sm:p-6 lg:p-8 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
           <div className="space-y-6">
-            <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 border-b pb-2">
+            <h2 className="section-header">
               İletişim Bilgileri
             </h2>
-            <div className="flex items-center gap-4 bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl">
-              <div className="p-2 bg-gray-200 dark:bg-gray-600 rounded-lg text-gray-600 dark:text-gray-300">
+            <div className="flex items-center gap-4 bg-back p-4 rounded-xl">
+              <div className="icon-box">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-5 w-5"
@@ -89,14 +87,14 @@ export default function AdminStaffDetail() {
                 </svg>
               </div>
               <div className="min-w-0">
-                <p className="text-xs text-gray-500 dark:text-gray-400 uppercase">
+                <p className="detail-label">
                   İş E-Posta (Giriş)
                 </p>
-                <p className="text-sm font-bold text-gray-900 dark:text-gray-100 break-words">{staff.email}</p>
+                <p className="detail-value break-words">{staff.email}</p>
               </div>
             </div>
-            <div className="flex items-center gap-4 bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl">
-              <div className="p-2 bg-gray-200 dark:bg-gray-600 rounded-lg text-gray-600 dark:text-gray-300">
+            <div className="flex items-center gap-4 bg-back p-4 rounded-xl">
+              <div className="icon-box">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-5 w-5"
@@ -113,8 +111,8 @@ export default function AdminStaffDetail() {
                 </svg>
               </div>
               <div className="min-w-0">
-                <p className="text-xs text-gray-500 dark:text-gray-400 uppercase">Telefon</p>
-                <p className="text-sm font-bold text-gray-900 dark:text-gray-100 break-words">
+                <p className="detail-label">Telefon</p>
+                <p className="detail-value break-words">
                   {staff.person.phone_number}
                 </p>
               </div>
@@ -122,19 +120,19 @@ export default function AdminStaffDetail() {
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 border-b pb-2">
+            <h2 className="section-header">
               Sistem Bilgileri
             </h2>
-            <div className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl space-y-3 text-sm">
+            <div className="bg-back p-4 rounded-xl space-y-3 text-sm">
               <div className="flex justify-between">
-                <span className="text-gray-500 dark:text-gray-400">Kategori:</span>
-                <span className="font-medium text-gray-900 dark:text-gray-100">
+                <span className="text-main/60">Kategori:</span>
+                <span className="font-medium text-main">
                   {staff.category?.name ?? "Atanmamış"}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500 dark:text-gray-400">Kayıt Tarihi:</span>
-                <span className="font-medium text-gray-900 dark:text-gray-100">
+                <span className="text-main/60">Kayıt Tarihi:</span>
+                <span className="font-medium text-main">
                   {new Date(
                     staff.created_at.split("T")[0] + "T00:00:00",
                   ).toLocaleDateString("tr-TR")}
@@ -142,8 +140,8 @@ export default function AdminStaffDetail() {
               </div>
               {staff.managing_admin && (
                 <div className="flex justify-between">
-                  <span className="text-gray-500 dark:text-gray-400">Yöneticisi:</span>
-                  <span className="font-medium text-gray-900 dark:text-gray-100">
+                  <span className="text-main/60">Yöneticisi:</span>
+                  <span className="font-medium text-main">
                     {staff.managing_admin.email}
                   </span>
                 </div>

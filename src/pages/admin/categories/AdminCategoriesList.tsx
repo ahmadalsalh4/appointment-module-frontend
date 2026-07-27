@@ -4,6 +4,8 @@ import {
   useDeleteCategoryMutation,
 } from "../../../hooks/useCategoryQueries";
 import { useQueryClient } from "@tanstack/react-query";
+import PageHeader from "../../../components/PageHeader";
+import { formatDate } from "../../../utils/dates";
 
 export default function AdminCategoriesList() {
   const queryClient = useQueryClient();
@@ -27,15 +29,15 @@ export default function AdminCategoriesList() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center min-h-[60vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      <div className="loader">
+        <div className="spinner"></div>
       </div>
     );
   }
 
   if (isError) {
     return (
-      <div className="text-center py-20 text-red-500 dark:text-red-400">
+      <div className="text-center py-20 text-canceld">
         <p className="text-xl font-bold">
           Kategoriler yüklenirken hata oluştu.
         </p>
@@ -44,38 +46,32 @@ export default function AdminCategoriesList() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-100 text-wrap-balance">Kategoriler</h1>
-          <p className="mt-1 text-gray-500 dark:text-gray-400 text-sm">
-            Hizmetleri gruplandırmak için kategorileri yönetin.
-          </p>
-        </div>
-        <Link
-          to="/admin/categories/add"
-          className="inline-flex items-center justify-center px-5 py-2.5 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-indigo-600 dark:bg-indigo-500 hover:bg-indigo-700 dark:hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-        >
-          + Yeni Kategori Ekle
-        </Link>
-      </div>
+    <div className="page-xl space-y-6">
+      <PageHeader
+        title="Kategoriler"
+        subtitle="Hizmetleri gruplandırmak için kategorileri yönetin."
+        action={
+          <Link to="/admin/categories/add" className="btn-primary">
+            + Yeni Kategori Ekle
+          </Link>
+        }
+      />
 
       {/* Table */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+      <div className="table-container">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-50 dark:bg-gray-700/50">
+          <table className="min-w-full divide-y divide-main/10">
+            <thead className="bg-back">
               <tr>
                 <th
                   scope="col"
-                  className="px-3 sm:px-6 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                  className="px-3 sm:px-6 py-3 text-left text-xs font-bold text-main/60 uppercase tracking-wider"
                 >
                   Kategori Adı
                 </th>
                 <th
                   scope="col"
-                  className="px-3 sm:px-6 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                  className="px-3 sm:px-6 py-3 text-left text-xs font-bold text-main/60 uppercase tracking-wider"
                 >
                   Oluşturulma Tarihi
                 </th>
@@ -87,16 +83,16 @@ export default function AdminCategoriesList() {
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700">
+            <tbody className="bg-surface divide-y divide-main/5">
               {categories && categories.length > 0 ? (
                 categories.map((category) => (
                   <tr
                     key={category.id}
-                    className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                    className="hover:bg-back transition-colors"
                   >
-                    <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+                    <td className="table-cell whitespace-nowrap">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-purple-50 dark:bg-purple-900/20 rounded-lg text-purple-600 dark:text-purple-400 shrink-0">
+                        <div className="icon-box shrink-0">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="h-5 w-5"
@@ -112,37 +108,31 @@ export default function AdminCategoriesList() {
                             />
                           </svg>
                         </div>
-                        <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                        <span className="text-sm font-semibold text-main">
                           {category.name}
                         </span>
                       </div>
                     </td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                      {new Date(
-                        category.created_at.split("T")[0] + "T00:00:00",
-                      ).toLocaleDateString("tr-TR", {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                      })}
+                    <td className="table-cell whitespace-nowrap text-sm text-main/60">
+                      {formatDate(category.created_at)}
                     </td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <td className="table-cell whitespace-nowrap text-right text-sm font-medium">
                       <Link
                         to={`/admin/categories/${category.id}`}
-                        className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 sm:mr-4"
+                        className="text-deep hover:text-deep/80 sm:mr-4"
                       >
                         Detay
                       </Link>
                       <Link
                         to={`/admin/categories/${category.id}/edit`}
-                        className="text-yellow-600 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-300 sm:mr-4"
+                        className="text-waiting hover:text-waiting/80 sm:mr-4"
                       >
                         Düzenle
                       </Link>
                       <button
                         onClick={() => handleDelete(category.id)}
                         disabled={deleteMut.isPending}
-                        className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 disabled:text-gray-400 dark:disabled:text-gray-500"
+                        className="text-canceld hover:text-canceld/80 disabled:text-main/40"
                       >
                         Sil
                       </button>
@@ -153,7 +143,7 @@ export default function AdminCategoriesList() {
                 <tr>
                   <td
                     colSpan={3}
-                    className="px-6 py-12 text-center text-gray-500 dark:text-gray-400"
+                    className="px-6 py-12 text-center text-main/60"
                   >
                     Sistemde henüz bir kategori eklenmemiş.
                   </td>

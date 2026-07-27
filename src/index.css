@@ -23,3 +23,189 @@
 
   color-scheme: dark;
 }
+
+/* ── Card surfaces ── */
+@utility card {
+  @apply bg-surface rounded-xl border border-main/10 shadow-sm;
+}
+@utility card-lg {
+  @apply bg-surface rounded-2xl shadow-sm border border-main/5;
+}
+@utility card-auth {
+  @apply w-full max-w-md p-8 rounded-2xl shadow-xl bg-surface;
+}
+
+/* ── Form inputs ── */
+@utility input {
+  @apply w-full px-4 py-3 rounded-lg border border-main/20 bg-back text-main outline-none transition-all;
+}
+@utility input-surface {
+  @apply w-full px-4 py-3 rounded-lg border border-main/20 bg-surface text-main outline-none transition-all;
+}
+@utility input-filter {
+  @apply w-full rounded-lg border border-main/20 bg-back text-main text-sm px-3 py-2 outline-none transition-all;
+}
+
+/* ── Labels ── */
+@utility label {
+  @apply block text-sm font-medium mb-2 text-main;
+}
+@utility label-sm {
+  @apply block text-xs font-semibold text-main/60 mb-1;
+}
+
+/* ── Buttons ── */
+@utility btn-primary {
+  @apply px-5 py-2.5 text-sm font-medium text-white bg-deep rounded-lg shadow-sm hover:bg-deep/90 disabled:bg-deep/50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2 transition-colors;
+}
+@utility btn-secondary {
+  @apply px-5 py-2.5 text-sm font-medium text-main/80 bg-surface border border-main/20 rounded-lg hover:bg-back transition-colors;
+}
+@utility btn-destructive {
+  @apply px-5 py-2.5 text-sm font-medium text-canceld bg-canceld/10 border border-canceld/20 rounded-lg hover:bg-canceld/20 transition-colors;
+}
+@utility btn-auth {
+  @apply w-full py-3 px-4 rounded-lg font-semibold text-white bg-deep hover:opacity-90 transition-all focus:outline-none focus:ring-2 focus:ring-deep/50 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+/* ── Page containers ── */
+@utility page {
+  @apply max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12;
+}
+@utility page-wide {
+  @apply max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12;
+}
+@utility page-xl {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12;
+}
+
+/* ── Page header ── */
+@utility page-header {
+  @apply text-3xl sm:text-4xl font-extrabold text-main text-balance;
+}
+
+/* ── Section header ── */
+@utility section-header {
+  @apply text-lg font-bold text-main border-b border-main/10 pb-2 mb-4;
+}
+
+/* ── Spacing helpers ── */
+@utility section-gap {
+  @apply space-y-8;
+}
+@utility section-gap-sm {
+  @apply space-y-6;
+}
+
+/* ── Sidebar skeleton ── */
+@utility sidebar-desktop {
+  @apply hidden lg:fixed lg:inset-y-0 lg:z-30 lg:flex lg:w-64 lg:flex-col;
+}
+@utility sidebar-drawer {
+  @apply fixed inset-y-0 left-0 z-50 w-64 transform bg-surface transition-transform duration-300 ease-in-out lg:hidden;
+}
+@utility sidebar-backdrop {
+  @apply fixed inset-0 z-40 bg-black/50 lg:hidden;
+}
+@utility sidebar-fab {
+  @apply fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-deep text-surface shadow-lg transition hover:bg-deep/90 lg:hidden;
+}
+@utility sidebar-nav-item {
+  @apply flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all;
+}
+@utility sidebar-nav-active {
+  @apply bg-deep text-surface shadow-sm;
+}
+@utility sidebar-nav-inactive {
+  @apply text-main/70 hover:bg-main/5 hover:text-main;
+}
+
+/* ── Table ── */
+@utility table-container {
+  @apply bg-surface rounded-xl border border-main/10 shadow-sm overflow-hidden;
+}
+@utility table-cell {
+  @apply px-3 sm:px-6 py-3 sm:py-4;
+}
+
+/* ── Status badge ── */
+@utility badge {
+  @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase;
+}
+@utility badge-pending {
+  @apply bg-waiting/15 text-waiting;
+}
+@utility badge-confirmed {
+  @apply bg-completed/15 text-completed;
+}
+@utility badge-completed {
+  @apply bg-deep/15 text-deep;
+}
+@utility badge-cancelled {
+  @apply bg-canceld/15 text-canceld;
+}
+
+/* ── Breadcrumb ── */
+@utility breadcrumb {
+  @apply flex mb-8 text-sm text-main/60;
+}
+@utility breadcrumb-link {
+  @apply hover:text-deep transition-colors;
+}
+@utility breadcrumb-current {
+  @apply text-main font-medium;
+}
+
+/* ── Empty state ── */
+@utility empty-state {
+  @apply text-center py-16 bg-surface rounded-2xl border border-main/5 shadow-sm;
+}
+@utility empty-state-icon {
+  @apply mx-auto h-16 w-16 text-main/15;
+}
+
+/* ── Layout ── */
+@utility layout-dashboard {
+  @apply min-h-screen bg-back;
+}
+@utility layout-main {
+  @apply lg:pl-64;
+}
+@utility layout-content {
+  @apply min-h-screen p-4 sm:p-6 lg:p-8;
+}
+
+/* ── Loading ── */
+@utility loader {
+  @apply flex justify-center items-center min-h-[60vh];
+}
+@utility spinner {
+  @apply animate-spin rounded-full h-12 w-12 border-4 border-surface border-t-deep;
+}
+@utility spinner-sm {
+  @apply animate-spin rounded-full h-5 w-5 border-2 border-surface border-t-deep;
+}
+
+/* ── Avatar ── */
+@utility avatar-sm {
+  @apply w-12 h-12 bg-deep/10 text-deep rounded-xl flex items-center justify-center text-lg font-bold shrink-0;
+}
+@utility avatar-md {
+  @apply w-14 h-14 bg-deep/10 text-deep rounded-full flex items-center justify-center text-xl font-bold shrink-0;
+}
+@utility avatar-lg {
+  @apply w-20 h-20 bg-deep/15 text-deep rounded-full flex items-center justify-center text-2xl font-bold shrink-0;
+}
+
+/* ── Icon box ── */
+@utility icon-box {
+  @apply p-2 bg-deep/10 rounded-lg text-deep;
+}
+
+/* ── Detail label / value ── */
+@utility detail-label {
+  @apply text-sm text-main/60;
+}
+@utility detail-value {
+  @apply text-main font-semibold;
+}

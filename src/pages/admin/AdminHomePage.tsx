@@ -3,43 +3,9 @@ import { useAdminGetAppointmentsQuery } from "../../hooks/useAppointmentQueries"
 import { useGetAllStaffQuery } from "../../hooks/useStaffQueries";
 import { useGetAllCategoriesQuery } from "../../hooks/useCategoryQueries";
 import type { CustomerProfile } from "../../other/types";
-
-// Helper to format time without timezone shift
-const formatSafeTime = (isoString: string) => {
-  return (
-    isoString.split("T")[1]?.split(".")[0].split(":").slice(0, 2).join(":") ||
-    ""
-  );
-};
-
-// Status Badge Styles
-const getStatusStyle = (statusName: string) => {
-  switch (statusName) {
-    case "confirmed":
-      return "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300";
-    case "completed":
-      return "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300";
-    case "cancelled":
-      return "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300";
-    case "pending":
-    default:
-      return "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300";
-  }
-};
-
-const getStatusText = (statusName: string) => {
-  switch (statusName) {
-    case "confirmed":
-      return "Onaylandı";
-    case "completed":
-      return "Tamamlandı";
-    case "cancelled":
-      return "İptal Edildi";
-    case "pending":
-    default:
-      return "Beklemede";
-  }
-};
+import StatusBadge from "../../components/StatusBadge";
+import PageHeader from "../../components/PageHeader";
+import { formatTime, formatMonthDay } from "../../utils/dates";
 
 export default function AdminHomePage() {
   // Fetch real data for the dashboard cards
@@ -59,20 +25,17 @@ export default function AdminHomePage() {
   const totalCustomers = Array.from(uniqueCustomersMap.values());
 
   return (
-    <div className="space-y-8">
-      {/* Page Header */}
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-100 text-wrap-balance">Admin Paneli</h1>
-        <p className="mt-1 text-gray-500 dark:text-gray-400">
-          Sistemin genel durumunu buradan takip edin.
-        </p>
-      </div>
+    <div className="page-xl space-y-8">
+      <PageHeader
+        title="Admin Paneli"
+        subtitle="Sistemin genel durumunu buradan takip edin."
+      />
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Total Staff Card */}
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm flex items-center gap-4">
-          <div className="p-3 bg-indigo-50 dark:bg-indigo-900/40 rounded-lg text-indigo-600 dark:text-indigo-400">
+        <div className="card p-6 flex items-center gap-4">
+          <div className="icon-box">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-8 w-8"
@@ -89,16 +52,16 @@ export default function AdminHomePage() {
             </svg>
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Toplam Personel</p>
-            <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">
+            <p className="text-sm font-medium text-main/60">Toplam Personel</p>
+            <p className="text-2xl sm:text-3xl font-bold text-main">
               {staffList?.length || 0}
             </p>
           </div>
         </div>
 
         {/* Total Categories Card */}
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm flex items-center gap-4">
-          <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg text-purple-600 dark:text-purple-400">
+        <div className="card p-6 flex items-center gap-4">
+          <div className="icon-box">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-8 w-8"
@@ -115,8 +78,8 @@ export default function AdminHomePage() {
             </svg>
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Kategoriler</p>
-            <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">
+            <p className="text-sm font-medium text-main/60">Kategoriler</p>
+            <p className="text-2xl sm:text-3xl font-bold text-main">
               {categories?.length || 0}
             </p>
           </div>
@@ -125,9 +88,9 @@ export default function AdminHomePage() {
         {/* Pending Appointments Card */}
         <Link
           to="/admin/appointments"
-          className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm flex items-center gap-4 hover:shadow-md transition-shadow"
+          className="card p-6 flex items-center gap-4 hover:shadow-md transition-shadow"
         >
-          <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg text-yellow-600 dark:text-yellow-400">
+          <div className="p-3 bg-waiting/10 rounded-lg text-waiting">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-8 w-8"
@@ -144,16 +107,16 @@ export default function AdminHomePage() {
             </svg>
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Onay Bekleyen</p>
-            <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">
+            <p className="text-sm font-medium text-main/60">Onay Bekleyen</p>
+            <p className="text-2xl sm:text-3xl font-bold text-main">
               {pendingAppos.length}
             </p>
           </div>
         </Link>
 
         {/* Total Customers Card */}
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm flex items-center gap-4">
-          <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg text-green-600 dark:text-green-400">
+        <div className="card p-6 flex items-center gap-4">
+          <div className="p-3 bg-completed/10 rounded-lg text-completed">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-8 w-8"
@@ -170,10 +133,10 @@ export default function AdminHomePage() {
             </svg>
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+            <p className="text-sm font-medium text-main/60">
               Aktif Müşteriler
             </p>
-            <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">
+            <p className="text-2xl sm:text-3xl font-bold text-main">
               {totalCustomers.length}
             </p>
           </div>
@@ -181,16 +144,16 @@ export default function AdminHomePage() {
       </div>
 
       {/* Quick Actions & Pending List Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 section-gap">
         {/* Quick Actions */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-6 h-fit">
-          <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">
+        <div className="card p-6 h-fit">
+          <h2 className="text-lg font-bold text-main mb-4">
             Hızlı İşlemler
           </h2>
           <div className="space-y-3">
             <Link
               to="/admin/staff/add"
-              className="flex items-center justify-between w-full px-4 py-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors"
+              className="flex items-center justify-between w-full px-4 py-3 bg-back rounded-lg text-sm font-medium text-main/80 hover:bg-deep/5 hover:text-deep transition-colors"
             >
               <span>+ Yeni Personel Ekle</span>
               <svg
@@ -210,7 +173,7 @@ export default function AdminHomePage() {
             </Link>
             <Link
               to="/admin/categories/add"
-              className="flex items-center justify-between w-full px-4 py-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors"
+              className="flex items-center justify-between w-full px-4 py-3 bg-back rounded-lg text-sm font-medium text-main/80 hover:bg-deep/5 hover:text-deep transition-colors"
             >
               <span>+ Yeni Kategori Ekle</span>
               <svg
@@ -230,7 +193,7 @@ export default function AdminHomePage() {
             </Link>
             <Link
               to="/admin/services/add"
-              className="flex items-center justify-between w-full px-4 py-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors"
+              className="flex items-center justify-between w-full px-4 py-3 bg-back rounded-lg text-sm font-medium text-main/80 hover:bg-deep/5 hover:text-deep transition-colors"
             >
               <span>+ Yeni Hizmet Ekle</span>
               <svg
@@ -252,25 +215,25 @@ export default function AdminHomePage() {
         </div>
 
         {/* Latest Pending Appointments */}
-        <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-6">
+        <div className="lg:col-span-2 card p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+            <h2 className="text-lg font-bold text-main">
               Son Bekleyen Randevular
             </h2>
             <Link
               to="/admin/appointments"
-              className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline font-medium"
+              className="text-sm text-deep hover:underline font-medium"
             >
               Tümünü Gör
             </Link>
           </div>
 
           {loadingAppos ? (
-            <div className="flex justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+            <div className="loader">
+              <div className="spinner"></div>
             </div>
           ) : pendingAppos.length === 0 ? (
-            <p className="text-gray-500 dark:text-gray-400 text-center py-8 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+            <p className="text-main/60 text-center py-8 bg-back rounded-lg">
               Onay bekleyen bir randevu yok.
             </p>
           ) : (
@@ -278,27 +241,23 @@ export default function AdminHomePage() {
               {pendingAppos.slice(0, 4).map((appo) => (
                 <div
                   key={appo.id}
-                  className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-100 dark:border-gray-700"
+                  className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 bg-back rounded-lg border border-main/5"
                 >
                   <div className="flex items-center gap-4 min-w-0">
                     <div className="text-center shrink-0">
-                      <p className="text-xs text-gray-400 dark:text-gray-500 uppercase">
-                        {new Date(
-                          appo.start_date.split("T")[0],
-                        ).toLocaleDateString("tr-TR", {
-                          day: "numeric",
-                          month: "short",
-                        })}
+                      <p className="text-xs text-main/40 uppercase">
+                        {formatMonthDay(appo.start_date).day}{" "}
+                        {formatMonthDay(appo.start_date).month}
                       </p>
-                      <p className="text-lg font-bold text-gray-900 dark:text-gray-100">
-                        {formatSafeTime(appo.start_date)}
+                      <p className="text-lg font-bold text-main">
+                        {formatTime(appo.start_date)}
                       </p>
                     </div>
                     <div className="min-w-0">
-                      <p className="font-semibold text-gray-800 dark:text-gray-100 truncate">
+                      <p className="font-semibold text-main truncate">
                         {appo.service.name}
                       </p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                      <p className="text-sm text-main/60 truncate">
                         {appo.customer?.person.name}{" "}
                         {appo.customer?.person.surname}
                         <span className="mx-1">•</span>
@@ -306,11 +265,7 @@ export default function AdminHomePage() {
                       </p>
                     </div>
                   </div>
-                  <span
-                    className={`self-start sm:self-auto px-3 py-1 rounded-full text-xs font-bold uppercase whitespace-nowrap ${getStatusStyle(appo.status.name)}`}
-                  >
-                    {getStatusText(appo.status.name)}
-                  </span>
+                  <StatusBadge status={appo.status.name} />
                 </div>
               ))}
             </div>

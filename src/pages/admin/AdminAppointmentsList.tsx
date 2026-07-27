@@ -8,38 +8,8 @@ import {
 import { useGetAllStaffQuery } from "../../hooks/useStaffQueries";
 import { useQueryClient } from "@tanstack/react-query";
 import type { Appointment } from "../../other/types";
-
-// Zaman formatlayıcı (Saat dilimi kaymasını önler)
-const formatSafeTime = (isoString: string) => {
-  return (
-    isoString.split("T")[1]?.split(".")[0].split(":").slice(0, 2).join(":") ||
-    ""
-  );
-};
-
-const formatSafeDate = (isoString: string) => {
-  const datePart = isoString.split("T")[0];
-  return new Date(datePart + "T00:00:00").toLocaleDateString("tr-TR", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-};
-
-// Durum etiketleri
-const getStatusStyle = (statusName: string) => {
-  switch (statusName) {
-    case "confirmed":
-      return "bg-green-100 dark:bg-green-900/70 text-green-800 dark:text-green-300";
-    case "completed":
-      return "bg-blue-100 dark:bg-blue-900/70 text-blue-800 dark:text-blue-300";
-    case "cancelled":
-      return "bg-red-100 dark:bg-red-900/70 text-red-800 dark:text-red-300";
-    case "pending":
-    default:
-      return "bg-yellow-100 dark:bg-yellow-900/70 text-yellow-800 dark:text-yellow-300";
-  }
-};
+import PageHeader from "../../components/PageHeader";
+import { formatDate, formatTime } from "../../utils/dates";
 
 export default function AdminAppointmentsList() {
   const queryClient = useQueryClient();
@@ -107,38 +77,33 @@ export default function AdminAppointmentsList() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center min-h-[60vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      <div className="loader">
+        <div className="spinner"></div>
       </div>
     );
   }
 
   if (isError) {
     return (
-      <div className="text-center py-20 text-red-500 dark:text-red-400">
+      <div className="text-center py-20 text-canceld">
         <p className="text-xl font-bold">Randevular yüklenirken hata oluştu.</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-gray-100 text-wrap-balance">Randevular</h1>
-          <p className="mt-1 text-gray-500 dark:text-gray-400 text-sm">
-            Tüm personel ve müşterilerin randevularını buradan yönetin.
-          </p>
-        </div>
-      </div>
+    <div className="page-xl space-y-6">
+      <PageHeader
+        title="Randevular"
+        subtitle="Tüm personel ve müşterilerin randevularını buradan yönetin."
+      />
 
       {/* Filtreler */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-4">
+      <div className="card p-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
           {/* Müşteri adı arama */}
           <div className="lg:col-span-2">
-            <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">
+              <label className="label-sm">
               Müşteri Ara
             </label>
             <input
@@ -146,19 +111,19 @@ export default function AdminAppointmentsList() {
               value={customerName}
               onChange={(e) => setCustomerName(e.target.value)}
               placeholder="Ad veya soyad..."
-              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="input-filter focus:border-deep focus:ring-2 focus:ring-deep/20"
             />
           </div>
 
           {/* Durum filtresi */}
           <div>
-            <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">
+              <label className="label-sm">
               Durum
             </label>
             <select
               value={statusId}
               onChange={(e) => setStatusId(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="input-filter focus:border-deep focus:ring-2 focus:ring-deep/20"
             >
               <option value="">Tümü</option>
               <option value="1">Beklemede</option>
@@ -170,13 +135,13 @@ export default function AdminAppointmentsList() {
 
           {/* Personel filtresi */}
           <div>
-            <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">
+              <label className="label-sm">
               Personel
             </label>
             <select
               value={staffId}
               onChange={(e) => setStaffId(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="input-filter focus:border-deep focus:ring-2 focus:ring-deep/20"
             >
               <option value="">Tümü</option>
               {staffList?.map((s) => (
@@ -189,14 +154,14 @@ export default function AdminAppointmentsList() {
 
           {/* Tarih filtresi */}
           <div>
-            <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">
+              <label className="label-sm">
               Tarih
             </label>
             <input
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="input-filter focus:border-deep focus:ring-2 focus:ring-deep/20"
             />
           </div>
         </div>
@@ -205,7 +170,7 @@ export default function AdminAppointmentsList() {
           <div className="mt-3 flex justify-end">
             <button
               onClick={clearFilters}
-              className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline"
+              className="text-xs font-semibold text-deep hover:underline"
             >
               Filtreleri Temizle
             </button>
@@ -214,58 +179,58 @@ export default function AdminAppointmentsList() {
       </div>
 
       {/* Table Container */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+      <div className="table-container">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-50 dark:bg-gray-700/50">
+          <table className="min-w-full divide-y divide-main/10">
+            <thead className="bg-back">
               <tr>
                 <th
                   scope="col"
-                  className="px-6 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                  className="px-6 py-3 text-left text-xs font-bold text-main/60 uppercase tracking-wider"
                 >
                   Müşteri / Personel
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                  className="px-6 py-3 text-left text-xs font-bold text-main/60 uppercase tracking-wider"
                 >
                   Hizmet
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                  className="px-6 py-3 text-left text-xs font-bold text-main/60 uppercase tracking-wider"
                 >
                   Tarih & Saat
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                  className="px-6 py-3 text-left text-xs font-bold text-main/60 uppercase tracking-wider"
                 >
                   Durum
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-3 text-right text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                  className="px-6 py-3 text-right text-xs font-bold text-main/60 uppercase tracking-wider"
                 >
                   İşlemler
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700">
+            <tbody className="bg-surface divide-y divide-main/5">
               {appointments && appointments.length > 0 ? (
                 appointments.map((appo: Appointment) => (
                   <tr
                     key={appo.id}
-                    className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                    className="hover:bg-back transition-colors"
                   >
                     {/* Customer & Staff Info */}
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="table-cell whitespace-nowrap">
                       <div className="flex flex-col">
-                        <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                        <span className="text-sm font-semibold text-main">
                           {appo.customer?.person.name}{" "}
                           {appo.customer?.person.surname}
                         </span>
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                        <span className="text-xs text-main/60">
                           → {appo.staff?.person.name}{" "}
                           {appo.staff?.person.surname}
                         </span>
@@ -273,36 +238,36 @@ export default function AdminAppointmentsList() {
                     </td>
 
                     {/* Service Info */}
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900 dark:text-gray-100">
+                    <td className="table-cell whitespace-nowrap">
+                      <div className="text-sm text-main">
                         {appo.service.name}
                       </div>
-                      <div className="text-xs text-gray-400 dark:text-gray-500">
+                      <div className="text-xs text-main/40">
                         {appo.service.duration} dk
                       </div>
                     </td>
 
                     {/* Date & Time */}
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900 dark:text-gray-100">
-                        {formatSafeDate(appo.start_date)}
+                    <td className="table-cell whitespace-nowrap">
+                      <div className="text-sm text-main">
+                        {formatDate(appo.start_date)}
                       </div>
-                      <div className="text-sm font-medium text-indigo-600 dark:text-indigo-400">
-                        {formatSafeTime(appo.start_date)}
+                      <div className="text-sm font-medium text-deep">
+                        {formatTime(appo.start_date)}
                       </div>
                     </td>
 
                     {/* Status Dropdown */}
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="table-cell whitespace-nowrap">
                       {changingId === appo.id ? (
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-indigo-600"></div>
+                        <div className="spinner-sm"></div>
                       ) : (
                         <select
                           value={appo.state_id}
                           onChange={(e) =>
                             handleStatusChange(appo.id, Number(e.target.value))
                           }
-                          className={`text-xs font-bold uppercase rounded-full px-3 py-1.5 border-0 cursor-pointer focus:ring-2 focus:ring-offset-1 ${getStatusStyle(appo.status.name)}`}
+                          className={`badge badge-${appo.status.name} cursor-pointer focus:ring-2 focus:ring-offset-1`}
                         >
                           <option value="1">Beklemede</option>
                           <option value="2">Onaylandı</option>
@@ -313,17 +278,17 @@ export default function AdminAppointmentsList() {
                     </td>
 
                     {/* Actions */}
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <td className="table-cell whitespace-nowrap text-right text-sm font-medium">
                       <Link
                         to={`/admin/appointments/${appo.id}`}
-                        className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 mr-4"
+                        className="text-deep hover:text-deep/80 mr-4"
                       >
                         Detay
                       </Link>
                       <button
                         onClick={() => handleDelete(appo.id)}
                         disabled={deleteMut.isPending}
-                        className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 disabled:text-gray-400 dark:disabled:text-gray-500"
+                        className="text-canceld hover:text-canceld/80 disabled:text-main/40"
                       >
                         Sil
                       </button>
@@ -334,7 +299,7 @@ export default function AdminAppointmentsList() {
                 <tr>
                   <td
                     colSpan={5}
-                    className="px-6 py-12 text-center text-gray-500 dark:text-gray-400"
+                    className="px-6 py-12 text-center text-main/60"
                   >
                     Seçili filtrelerle eşleşen randevu bulunamadı.
                   </td>

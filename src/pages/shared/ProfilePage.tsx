@@ -1,58 +1,49 @@
 import { Link } from "react-router";
-import { Calendar, ChevronRight, LogOut, Mail, Monitor, Pencil, Phone, Plus, Tag } from "lucide-react";
+import { Calendar, ChevronRight, LogOut, Mail, Monitor, Phone, Tag } from "lucide-react";
 import { useAuth } from "../../contexts/auth/useAuth";
 import { useGetProfileQuery } from "../../hooks/useProfileQueries";
 import { useLogoutMutation } from "../../hooks/useAuthQueries";
 import Loading from "../components/Loading";
 import Avatar from "../../components/Avatar";
 import type { UserRole } from "../../other/types";
+import { formatDate } from "../../utils/dates";
 
-const roleBadgeStyle: Record<UserRole, string> = {
-  customer:
-    "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300 ring-emerald-600/20",
-  staff:
-    "bg-sky-100 text-sky-800 dark:bg-sky-900/40 dark:text-sky-300 ring-sky-600/20",
-  admin:
-    "bg-violet-100 text-violet-800 dark:bg-violet-900/40 dark:text-violet-300 ring-violet-600/20",
-};
-
-// --- HELPERS ---
 const roleLabel: Record<UserRole, string> = {
   customer: "Müşteri",
   staff: "Personel",
   admin: "Yönetici",
 };
 
-const roleGradient: Record<UserRole, string> = {
-  customer: "from-emerald-500 via-emerald-600 to-teal-600",
-  staff: "from-sky-500 via-blue-600 to-deep",
-  admin: "from-violet-500 via-purple-600 to-fuchsia-600",
+const roleBadgeStyle: Record<UserRole, string> = {
+  customer: "bg-main/5 text-main/70",
+  staff: "bg-deep/10 text-deep",
+  admin: "bg-deep/15 text-deep font-semibold",
 };
 
 export default function ProfilePage() {
   const { role } = useAuth();
   const { mutate: logout } = useLogoutMutation();
-
   const handleLogout = () => {
     if (role) logout(role);
   };
 
-  const {
-    data: profileData,
-    isLoading,
-    isError,
-    error,
-  } = useGetProfileQuery(role);
+  const { data: profileData, isLoading, isError, error } = useGetProfileQuery(role);
 
-  if (isLoading) {
-    return <Loading></Loading>;
-  }
+  if (isLoading) return <Loading />;
 
   if (isError || !profileData) {
     return (
-      <div className="p-6 text-center text-canceld">
-        <p className="text-xl sm:text-2xl font-bold mb-2">Profil Yüklenemedi</p>
-        <p>{(error as Error)?.message || "Lütfen tekrar giriş yapın."}</p>
+      <div className="page-wide flex flex-col items-center justify-center min-h-[50vh] text-center">
+        <div className="w-16 h-16 rounded-full bg-canceld/10 flex items-center justify-center mb-4">
+          <LogOut className="h-8 w-8 text-canceld" />
+        </div>
+        <h1 className="page-header">Profil Yüklenemedi</h1>
+        <p className="mt-2 text-main/60">
+          {(error as Error)?.message || "Lütfen tekrar giriş yapın."}
+        </p>
+        <Link to="/login" className="btn-primary mt-6">
+          Giriş Yap
+        </Link>
       </div>
     );
   }
@@ -61,226 +52,179 @@ export default function ProfilePage() {
   const currentRole = profileData.role;
 
   return (
-    <div className="page-wide space-y-6">
-      <div className="card-lg relative">
-        <div
-          className={`relative h-28 sm:h-32 bg-gradient-to-br ${roleGradient[currentRole]} rounded-t-2xl`}
-        >
-          <div className="absolute top-3 right-3 sm:top-4 sm:right-4">
-            <button
-              onClick={() => alert("Profil düzenleme yakında aktif olacak.")}
-              className="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold text-white bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-lg shadow-sm transition"
-            >
-              <Pencil className="h-4 w-4" />
-              <span className="hidden sm:inline">Profili Düzenle</span>
-              <span className="sm:hidden">Düzenle</span>
-            </button>
-          </div>
-        </div>
+    <div className="page-wide">
+      {/* ── Identity section ── */}
+      <section className="relative pt-8 pb-6">
+        <div className="flex flex-col items-center text-center">
+          <Avatar name={person.name} surname={person.surname} size="lg" />
 
-        <div className="px-4 sm:px-6">
-          <div className="-mt-12 sm:-mt-14">
-            <Avatar
-              name={person.name}
-              surname={person.surname}
-              size="lg"
-            />
-          </div>
-        </div>
+          <h1 className="mt-5 text-2xl sm:text-3xl font-extrabold text-main break-words text-balance leading-tight">
+            {person.name} {person.surname}
+          </h1>
 
-        <div className="px-4 sm:px-6 pt-4 pb-6">
-          <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-xl sm:text-2xl font-extrabold text-main break-words text-balance">
-              {person.name} {person.surname}
-            </h1>
-            <span className="text-xs text-main/40">
-              #{profileData.data.id}
-            </span>
-          </div>
-          <div className="mt-2">
-            <span
-              className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-full ring-1 ring-inset ${roleBadgeStyle[currentRole]}`}
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-current opacity-70" />
+          <div className="mt-2 flex items-center gap-2.5">
+            <span className="text-sm text-main/40 tabular-nums">#{profileData.data.id}</span>
+            <span className="w-1 h-1 rounded-full bg-main/20" />
+            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs ${roleBadgeStyle[currentRole]}`}>
               {roleLabel[currentRole]}
             </span>
           </div>
-        </div>
-      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
-          <div className="card-lg p-4 sm:p-6">
-            <h3 className="section-header">İletişim Bilgileri</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="flex items-start gap-3 p-3 rounded-lg bg-surface ring-1 ring-main/10 min-w-0">
-                <span className="icon-box shrink-0 mt-0.5">
-                  <Phone className="h-4 w-4" />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="detail-label">Telefon</p>
-                  <p className="detail-value">{person.phone_number || "—"}</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3 p-3 rounded-lg bg-surface ring-1 ring-main/10 min-w-0">
-                <span className="icon-box shrink-0 mt-0.5">
-                  <Mail className="h-4 w-4" />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="detail-label">E-posta</p>
-                  <p className="detail-value">{profileData.data.email}</p>
-                </div>
-              </div>
+          <p className="mt-2 text-sm text-main/50">
+            {formatDate(person.created_at)} tarihinden beri üye
+          </p>
+
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-x-8 gap-y-2 px-4 py-3 rounded-xl bg-back border border-main/5">
+            <div className="flex items-center gap-2 text-sm text-main/70">
+              <Phone className="h-4 w-4 shrink-0 text-main/40" />
+              <span>{person.phone_number || "—"}</span>
             </div>
-          </div>
-
-          <div className="card-lg p-4 sm:p-6">
-            <h3 className="section-header">Hesap Bilgileri</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="flex items-start gap-3 p-3 rounded-lg bg-surface ring-1 ring-main/10 min-w-0">
-                <span className="icon-box shrink-0 mt-0.5">
-                  <Calendar className="h-4 w-4" />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="detail-label">Kayıt Tarihi</p>
-                  <p className="detail-value">
-                    {new Date(person.created_at).toLocaleDateString("tr-TR", {
-                      day: "numeric",
-                      month: "long",
-                      year: "numeric",
-                    })}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3 p-3 rounded-lg bg-surface ring-1 ring-main/10 min-w-0">
-                <span className="icon-box shrink-0 mt-0.5">
-                  <Tag className="h-4 w-4" />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="detail-label">Hesap ID</p>
-                  <p className="detail-value">{`#${profileData.data.id}`}</p>
-                </div>
-              </div>
+            <div className="hidden sm:block w-px h-4 bg-main/10" />
+            <div className="flex items-center gap-2 text-sm text-main/70">
+              <Mail className="h-4 w-4 shrink-0 text-main/40" />
+              <span className="truncate max-w-[220px]">{profileData.data.email}</span>
             </div>
           </div>
         </div>
 
-        <div className="space-y-6">
-          {currentRole === "admin" && (
-            <div className="card-lg p-4 sm:p-6">
-              <h3 className="section-header">Yönetici Paneli</h3>
-              <p className="text-sm text-main/60 mb-4 leading-relaxed">
-                Sistemin tam yetkili yöneticisisiniz. Tüm personel, kategori ve
-                randevu işlemlerini yönetebilirsiniz.
-              </p>
-              <div className="space-y-2">
-                <Link
-                  to="/admin"
-                  className="flex items-center justify-between w-full px-4 py-2.5 bg-violet-50 dark:bg-violet-900/20 hover:bg-violet-100 dark:hover:bg-violet-900/30 text-violet-800 dark:text-violet-300 rounded-lg text-sm font-medium transition-colors"
-                >
-                  Dashboard'a Git
-                  <ChevronRight className="h-4 w-4" />
-                </Link>
-                <Link
-                  to="/admin/staff"
-                  className="flex items-center justify-between w-full px-4 py-2.5 bg-back hover:bg-main/10 text-main/70 rounded-lg text-sm font-medium transition-colors"
-                >
-                  Personeli Yönet
-                  <ChevronRight className="h-4 w-4" />
-                </Link>
-              </div>
-            </div>
-          )}
+        <div className="mt-8 border-b border-main/10" />
+      </section>
 
+      {/* ── Body: role context (left) + navigation (right) ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-12">
+        {/* Left column: role-specific context */}
+        <div className="lg:col-span-2">
           {currentRole === "staff" && (
-            <div className="card-lg p-4 sm:p-6">
-              <h3 className="section-header">Personel Bilgileri</h3>
+            <section>
+              <h2 className="text-lg font-bold text-main mb-4">Personel Bilgileri</h2>
               <div className="space-y-3">
-                <div className="flex items-start gap-3 p-3 rounded-lg bg-surface ring-1 ring-main/10 min-w-0">
-                  <span className="icon-box shrink-0 mt-0.5">
-                    <Monitor className="h-4 w-4" />
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="detail-label">Pozisyon / Görev</p>
-                    <p className="detail-value">{profileData.data.job_title}</p>
+                <div className="flex items-center gap-3 py-2.5 border-b border-main/5">
+                  <Monitor className="h-5 w-5 shrink-0 text-main/40" />
+                  <div>
+                    <p className="text-xs text-main/40">Pozisyon / Görev</p>
+                    <p className="text-sm font-semibold text-main">{profileData.data.job_title}</p>
                   </div>
                 </div>
-                <div className="flex items-start gap-3 p-3 rounded-lg bg-surface ring-1 ring-main/10 min-w-0">
-                  <span className="icon-box shrink-0 mt-0.5">
-                    <Tag className="h-4 w-4" />
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="detail-label">Kategori</p>
-                    <p className="detail-value">{profileData.data.category?.name ?? "Atanmamış"}</p>
+                <div className="flex items-center gap-3 py-2.5 border-b border-main/5">
+                  <Tag className="h-5 w-5 shrink-0 text-main/40" />
+                  <div>
+                    <p className="text-xs text-main/40">Kategori</p>
+                    <p className="text-sm font-semibold text-main">{profileData.data.category?.name ?? "Atanmamış"}</p>
                   </div>
                 </div>
                 {profileData.data.managing_admin && (
-                  <div className="flex items-start gap-3 p-3 rounded-lg bg-surface ring-1 ring-main/10 min-w-0">
-                    <span className="icon-box shrink-0 mt-0.5">
-                      <Mail className="h-4 w-4" />
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <p className="detail-label">Yöneticisi</p>
-                      <p className="detail-value">{profileData.data.managing_admin.email}</p>
+                  <div className="flex items-center gap-3 py-2.5 border-b border-main/5">
+                    <Mail className="h-5 w-5 shrink-0 text-main/40" />
+                    <div>
+                      <p className="text-xs text-main/40">Yöneticisi</p>
+                      <p className="text-sm font-semibold text-main">{profileData.data.managing_admin.email}</p>
                     </div>
                   </div>
                 )}
               </div>
-              <Link
-                to="/staff"
-                className="mt-4 flex items-center justify-between w-full px-4 py-2.5 bg-sky-50 dark:bg-sky-900/20 hover:bg-sky-100 dark:hover:bg-sky-900/30 text-sky-800 dark:text-sky-300 rounded-lg text-sm font-medium transition-colors"
-              >
-                Randevularım
-                <ChevronRight className="h-4 w-4" />
-              </Link>
-            </div>
+            </section>
+          )}
+
+          {currentRole === "admin" && (
+            <section>
+              <h2 className="text-lg font-bold text-main mb-3">Yönetici Paneli</h2>
+              <p className="text-sm text-main/60 leading-relaxed mb-5">
+                Sistemin tam yetkili yöneticisisiniz. Tüm personel, kategori ve randevu işlemlerini yönetebilirsiniz.
+              </p>
+              <div className="space-y-2">
+                <Link
+                  to="/admin"
+                  className="flex items-center gap-3 px-4 py-3 rounded-lg bg-deep/10 text-deep hover:bg-deep/15 text-sm font-semibold transition-colors"
+                >
+                  <span className="w-6 h-6 rounded bg-deep/20 flex items-center justify-center">
+                    <ChevronRight className="h-3.5 w-3.5" />
+                  </span>
+                  Dashboard&apos;a Git
+                </Link>
+                <Link
+                  to="/admin/staff"
+                  className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-main/5 text-main/70 text-sm font-medium transition-colors"
+                >
+                  <span className="w-6 h-6 rounded bg-main/5 flex items-center justify-center">
+                    <ChevronRight className="h-3.5 w-3.5" />
+                  </span>
+                  Personeli Yönet
+                </Link>
+              </div>
+            </section>
           )}
 
           {currentRole === "customer" && (
-            <div className="card-lg p-4 sm:p-6">
-              <h3 className="section-header">Müşteri Hesabı</h3>
-              <p className="text-sm text-main/60 mb-4 leading-relaxed">
-                Bu panel üzerinden randevularınızı oluşturabilir,
-                görüntüleyebilir ve iptal edebilirsiniz.
+            <section>
+              <h2 className="text-lg font-bold text-main mb-4">Müşteri Hesabı</h2>
+              <p className="text-sm text-main/60 leading-relaxed mb-5">
+                Bu panel üzerinden randevularınızı oluşturabilir, görüntüleyebilir ve iptal edebilirsiniz.
               </p>
               <div className="space-y-2">
                 <Link
                   to="/appointments"
-                  className="flex items-center justify-between w-full px-4 py-2.5 bg-emerald-50 dark:bg-emerald-900/20 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300 rounded-lg text-sm font-medium transition-colors"
+                  className="flex items-center gap-3 px-4 py-3 rounded-lg bg-deep/10 text-deep hover:bg-deep/15 text-sm font-semibold transition-colors"
                 >
+                  <span className="w-6 h-6 rounded bg-deep/20 flex items-center justify-center">
+                    <Calendar className="h-3.5 w-3.5" />
+                  </span>
                   Randevularım
-                  <ChevronRight className="h-4 w-4" />
                 </Link>
                 <Link
                   to="/services"
-                  className="flex items-center justify-between w-full px-4 py-2.5 bg-back hover:bg-main/10 text-main/70 rounded-lg text-sm font-medium transition-colors"
+                  className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-main/5 text-main/70 text-sm font-medium transition-colors"
                 >
+                  <span className="w-6 h-6 rounded bg-main/5 flex items-center justify-center">
+                    <Calendar className="h-3.5 w-3.5" />
+                  </span>
                   Yeni Randevu Oluştur
-                    <Plus className="h-4 w-4" />
                 </Link>
               </div>
-            </div>
+            </section>
           )}
+        </div>
 
-          <div className="card-lg p-4 sm:p-6">
-            <h3 className="section-header">Güvenlik</h3>
+        {/* Right column: account info + security */}
+        <div className="space-y-8">
+          <section>
+            <h2 className="text-lg font-bold text-main mb-4">Hesap Bilgileri</h2>
+            <div className="space-y-3">
+              <div className="flex items-center gap-3 py-2.5 border-b border-main/5">
+                <Tag className="h-5 w-5 shrink-0 text-main/40" />
+                <div>
+                  <p className="text-xs text-main/40">Hesap ID</p>
+                  <p className="text-sm font-semibold text-main">#{profileData.data.id}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 py-2.5 border-b border-main/5">
+                <Calendar className="h-5 w-5 shrink-0 text-main/40" />
+                <div>
+                  <p className="text-xs text-main/40">Kayıt Tarihi</p>
+                  <p className="text-sm font-semibold text-main">{formatDate(person.created_at)}</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <h2 className="text-lg font-bold text-main mb-4">Güvenlik</h2>
             <div className="space-y-2">
               <button
                 onClick={() => alert("Şifre değiştirme yakında aktif olacak.")}
-                className="flex items-center justify-between w-full px-4 py-2.5 bg-back hover:bg-main/10 text-main/70 rounded-lg text-sm font-medium transition-colors text-left"
+                className="flex items-center justify-between w-full px-4 py-3 rounded-lg hover:bg-main/5 text-main/70 text-sm font-medium transition-colors text-left"
               >
                 Şifre Değiştir
                 <ChevronRight className="h-4 w-4 shrink-0" />
               </button>
               <button
                 onClick={handleLogout}
-                className="flex items-center justify-between w-full px-4 py-2.5 bg-canceld/10 hover:bg-canceld/15 text-canceld rounded-lg text-sm font-medium transition-colors text-left"
+                className="flex items-center justify-between w-full px-4 py-3 rounded-lg text-canceld hover:bg-canceld/10 text-sm font-medium transition-colors text-left"
               >
                 Oturumu Kapat
                 <LogOut className="h-4 w-4 shrink-0" />
               </button>
             </div>
-          </div>
+          </section>
         </div>
       </div>
     </div>

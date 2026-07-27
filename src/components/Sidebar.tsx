@@ -37,11 +37,22 @@ function SidebarContent({
     );
   };
 
-  const isActive = (path: string) =>
-    location.pathname === path || location.pathname.startsWith(`${path}/`);
+  const isChildActive = (path: string) => location.pathname === path;
+
+  const isDirectActive = (path: string) => {
+    if (location.pathname === path) return true;
+    if (!location.pathname.startsWith(`${path}/`)) return false;
+    const directPaths = items.filter((i) => !i.children && i.path).map((i) => i.path!);
+    return !directPaths.some(
+      (other) =>
+        other !== path &&
+        other.startsWith(`${path}/`) &&
+        location.pathname.startsWith(other),
+    );
+  };
 
   const hasActiveChild = (item: SidebarItem) =>
-    item.children?.some((c) => isActive(c.path)) ?? false;
+    item.children?.some((c) => isChildActive(c.path)) ?? false;
 
   return (
     <div className="flex h-full flex-col bg-surface pt-6">
@@ -76,7 +87,7 @@ function SidebarContent({
                   {item.label}
                 </span>
                 <ChevronDown
-                  className={`h-4 w-4 transition-transform ${openMenus.includes(item.label) ? "rotate-180" : ""}`}
+                  className={`h-4 w-4 transition-transform ${openMenus.includes(item.label) || hasActiveChild(item) ? "rotate-180" : ""}`}
                 />
               </button>
             ) : (
@@ -84,7 +95,7 @@ function SidebarContent({
                 to={item.path!}
                 onClick={onClose}
                 className={`flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all ${
-                  isActive(item.path!)
+                  isDirectActive(item.path!)
                     ? "bg-deep text-surface shadow-sm"
                     : "text-main/70 hover:bg-main/5 hover:text-main"
                 }`}
@@ -109,7 +120,7 @@ function SidebarContent({
                       to={child.path}
                       onClick={onClose}
                       className={`rounded-lg px-3 py-2 text-sm transition-all ${
-                        isActive(child.path)
+                        isChildActive(child.path)
                           ? "font-semibold text-deep bg-deep/5"
                           : "text-main/60 hover:text-main hover:bg-main/5"
                       }`}

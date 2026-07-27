@@ -19,7 +19,7 @@ const {
   useDeleteMutation: _useDelete,
 } = createCrudHooks(servicesApi, "services");
 
-export const useGetAllServicesQuery = () => _useGetAll<ServiceWithCategory>();
+export const useGetAllServicesQuery = (params?: Record<string, unknown>) => _useGetAll<ServiceWithCategory>(params);
 export const useGetServiceByIdQuery = (id: number | string) =>
   _useGetById<ServiceWithCategory>(id);
 export const useCreateServiceMutation = () =>

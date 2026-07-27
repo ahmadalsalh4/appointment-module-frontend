@@ -17,7 +17,7 @@ const {
   useDeleteMutation: _useDelete,
 } = createCrudHooks(staffApi, "staff");
 
-export const useGetAllStaffQuery = () => _useGetAll<StaffEntity>();
+export const useGetAllStaffQuery = (params?: Record<string, unknown>) => _useGetAll<StaffEntity>(params);
 export const useGetStaffByIdQuery = (id: number | string) =>
   _useGetById<StaffEntityDetailed>(id);
 export const useCreateStaffMutation = () =>

@@ -29,7 +29,15 @@ export default function ProfilePage() {
 
   const { data: profileData, isLoading, isError, error } = useGetProfileQuery(role);
 
-  if ((isError || !profileData) && !isLoading) {
+  if (isLoading) {
+    return (
+      <div className="loader">
+        <div className="spinner" />
+      </div>
+    );
+  }
+
+  if (isError || !profileData) {
     return (
       <div className="page-wide flex flex-col items-center justify-center min-h-[50vh] text-center">
         <div className="w-16 h-16 rounded-full bg-canceld/10 flex items-center justify-center mb-4">
@@ -50,7 +58,7 @@ export default function ProfilePage() {
   const currentRole = profileData.role;
 
   return (
-    <QueryGate isLoading={isLoading} isError={false} errorMessage="">
+    <QueryGate isLoading={false} isError={false} errorMessage="">
     <div className="page-wide">
       {/* ── Identity section ── */}
       <section className="relative pt-8 pb-6">
@@ -93,7 +101,7 @@ export default function ProfilePage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-12">
         {/* Left column: role-specific context */}
         <div className="lg:col-span-2">
-          {currentRole === "staff" && (
+          {profileData.role === "staff" && (
             <section>
               <h2 className="text-lg font-bold text-main mb-4">Personel Bilgileri</h2>
               <div className="space-y-3">
@@ -124,7 +132,7 @@ export default function ProfilePage() {
             </section>
           )}
 
-          {currentRole === "admin" && (
+          {profileData.role === "admin" && (
             <section>
               <h2 className="text-lg font-bold text-main mb-3">Yönetici Paneli</h2>
               <p className="text-sm text-main/60 leading-relaxed mb-5">
@@ -153,7 +161,7 @@ export default function ProfilePage() {
             </section>
           )}
 
-          {currentRole === "customer" && (
+          {profileData.role === "customer" && (
             <section>
               <h2 className="text-lg font-bold text-main mb-4">Müşteri Hesabı</h2>
               <p className="text-sm text-main/60 leading-relaxed mb-5">

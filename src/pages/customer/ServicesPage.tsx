@@ -3,33 +3,11 @@ import { ArrowRight, Clock } from "lucide-react";
 import { useGetAllServicesQuery } from "../../hooks/useServiceQueries";
 import type { ServiceWithCategory } from "../../other/types";
 import PageHeader from "../../components/PageHeader";
+import QueryGate from "../../components/QueryGate";
 import EmptyState from "../../components/EmptyState";
 
 export default function ServicesPage() {
   const { data: services, isLoading, isError } = useGetAllServicesQuery();
-
-  if (isLoading) {
-    return (
-      <div className="loader">
-        <div className="spinner" />
-      </div>
-    );
-  }
-
-  if (isError) {
-    return (
-      <div className="page-xl text-center">
-        <div className="bg-canceld/10 border border-canceld/20 text-canceld px-6 py-4 rounded-lg">
-          <p className="font-semibold text-lg">
-            Hizmetler yüklenirken bir hata oluştu.
-          </p>
-          <p className="text-sm mt-1">
-            Lütfen internet bağlantınızı kontrol edip tekrar deneyin.
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="page-xl">
@@ -40,6 +18,7 @@ export default function ServicesPage() {
         />
       </div>
 
+      <QueryGate isLoading={isLoading} isError={isError} errorMessage="Hizmetler yüklenirken bir hata oluştu.">
       {/* Grid Section */}
       {services && services.length === 0 ? (
         <EmptyState message="Şu anda aktif bir hizmet bulunmamaktadır." />
@@ -86,6 +65,7 @@ export default function ServicesPage() {
           ))}
         </div>
       )}
+      </QueryGate>
     </div>
   );
 }

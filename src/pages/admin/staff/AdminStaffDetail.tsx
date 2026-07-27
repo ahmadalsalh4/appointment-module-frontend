@@ -2,19 +2,12 @@ import { useParams, Link } from "react-router";
 import { Mail, Phone } from "lucide-react";
 import { useGetStaffByIdQuery } from "../../../hooks/useStaffQueries";
 import Breadcrumb from "../../../components/Breadcrumb";
+import QueryGate from "../../../components/QueryGate";
 import Avatar from "../../../components/Avatar";
 
 export default function AdminStaffDetail() {
   const { id } = useParams<{ id: string }>();
   const { data: staff, isLoading, isError } = useGetStaffByIdQuery(id || "");
-
-  if (isLoading) {
-    return (
-      <div className="loader">
-        <div className="spinner"></div>
-      </div>
-    );
-  }
 
   if (isError || !staff) {
     return (
@@ -31,7 +24,7 @@ export default function AdminStaffDetail() {
   }
 
   return (
-    <div className="page-wide">
+    <QueryGate isLoading={isLoading} isError={false} errorMessage="">
       <Breadcrumb items={[
         { label: "Personel", to: "/admin/staff" },
         { label: `${staff.person.name} ${staff.person.surname}` },
@@ -125,6 +118,6 @@ export default function AdminStaffDetail() {
           </div>
         </div>
       </div>
-    </div>
+    </QueryGate>
   );
 }

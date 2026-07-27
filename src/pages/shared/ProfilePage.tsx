@@ -3,7 +3,7 @@ import { Calendar, ChevronRight, LogOut, Mail, Monitor, Phone, Tag } from "lucid
 import { useAuth } from "../../contexts/auth/useAuth";
 import { useGetProfileQuery } from "../../hooks/useProfileQueries";
 import { useLogoutMutation } from "../../hooks/useAuthQueries";
-import Loading from "../components/Loading";
+import QueryGate from "../../components/QueryGate";
 import Avatar from "../../components/Avatar";
 import type { UserRole } from "../../other/types";
 import { formatDate } from "../../utils/dates";
@@ -29,8 +29,6 @@ export default function ProfilePage() {
 
   const { data: profileData, isLoading, isError, error } = useGetProfileQuery(role);
 
-  if (isLoading) return <Loading />;
-
   if (isError || !profileData) {
     return (
       <div className="page-wide flex flex-col items-center justify-center min-h-[50vh] text-center">
@@ -52,6 +50,7 @@ export default function ProfilePage() {
   const currentRole = profileData.role;
 
   return (
+    <QueryGate isLoading={isLoading} isError={false} errorMessage="">
     <div className="page-wide">
       {/* ── Identity section ── */}
       <section className="relative pt-8 pb-6">
@@ -227,6 +226,7 @@ export default function ProfilePage() {
           </section>
         </div>
       </div>
-    </div>
+      </div>
+    </QueryGate>
   );
 }

@@ -9,6 +9,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import type { UpdateStaffRequestBody, StaffEntityDetailed } from "../../../other/types";
 import Breadcrumb from "../../../components/Breadcrumb";
 import FormActions from "../../../components/FormActions";
+import QueryGate from "../../../components/QueryGate";
 
 function StaffEditForm({ staff }: { staff: StaffEntityDetailed }) {
   const { id } = useParams<{ id: string }>();
@@ -133,21 +134,9 @@ export default function AdminStaffEdit() {
     id || "",
   );
 
-  if (isLoadingStaff) {
-    return (
-      <div className="loader">
-        <div className="spinner"></div>
-      </div>
-    );
-  }
-
-  if (!staff) {
-    return (
-      <div className="text-center py-20 text-main/60">
-        Personel bulunamadı.
-      </div>
-    );
-  }
-
-  return <StaffEditForm key={staff.id} staff={staff} />;
+  return (
+    <QueryGate isLoading={isLoadingStaff} isError={!staff} errorMessage="Personel bulunamadı.">
+      {staff && <StaffEditForm key={staff.id} staff={staff} />}
+    </QueryGate>
+  );
 }

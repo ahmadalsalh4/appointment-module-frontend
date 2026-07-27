@@ -13,6 +13,7 @@ import { useGetCategoryStaffQuery } from "../../hooks/useCategoryQueries";
 import type { GetAvailabilityBody } from "../../other/types";
 import { useAuth } from "../../contexts/auth/useAuth";
 import Breadcrumb from "../../components/Breadcrumb";
+import QueryGate from "../../components/QueryGate";
 
 export default function ServiceDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -80,14 +81,6 @@ export default function ServiceDetailPage() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="loader">
-        <div className="spinner" />
-      </div>
-    );
-  }
-
   if (isError || !service) {
     return (
       <div className="page-xl text-center text-canceld">
@@ -103,6 +96,7 @@ export default function ServiceDetailPage() {
   }
 
   return (
+    <QueryGate isLoading={isLoading} isError={false} errorMessage="">
     <div className="page-xl">
       <Breadcrumb
         items={[
@@ -309,6 +303,7 @@ export default function ServiceDetailPage() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </QueryGate>
   );
 }

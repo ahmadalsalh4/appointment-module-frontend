@@ -2,6 +2,7 @@ import { useParams, Link } from "react-router";
 import { Clock, List } from "lucide-react";
 import { useGetCategoryByIdQuery } from "../../../hooks/useCategoryQueries";
 import Breadcrumb from "../../../components/Breadcrumb";
+import QueryGate from "../../../components/QueryGate";
 
 export default function AdminCategoryDetail() {
   const { id } = useParams<{ id: string }>();
@@ -10,14 +11,6 @@ export default function AdminCategoryDetail() {
     isLoading,
     isError,
   } = useGetCategoryByIdQuery(id || "");
-
-  if (isLoading) {
-    return (
-      <div className="loader">
-        <div className="spinner"></div>
-      </div>
-    );
-  }
 
   if (isError || !category) {
     return (
@@ -34,6 +27,7 @@ export default function AdminCategoryDetail() {
   }
 
   return (
+    <QueryGate isLoading={isLoading} isError={false} errorMessage="">
     <div className="page-wide">
       <Breadcrumb items={[
         { label: "Kategoriler", to: "/admin/categories" },
@@ -90,5 +84,6 @@ export default function AdminCategoryDetail() {
         </div>
       </div>
     </div>
+    </QueryGate>
   );
 }

@@ -4,10 +4,12 @@ import { ChevronRight } from "lucide-react";
 import {
   useCustomerGetAppointmentsQuery,
 } from "../../hooks/useAppointmentQueries";
-import type { AppointmentFilters } from "../../api/appointments";
+import type { AppointmentFilters as ApptFilters } from "../../api/appointments";
 import StatusBadge from "../../components/StatusBadge";
 import PageHeader from "../../components/PageHeader";
 import EmptyState from "../../components/EmptyState";
+import QueryGate from "../../components/QueryGate";
+import AppointmentFilters from "../admin/components/AppointmentFilters";
 import { formatDateTime, formatMonthDay } from "../../utils/dates";
 
 export default function MyAppointmentsPage() {
@@ -15,15 +17,13 @@ export default function MyAppointmentsPage() {
   const [staffId, setStaffId] = useState<string>("");
   const [date, setDate] = useState<string>("");
 
-  const filters: AppointmentFilters = {
+  const filters: ApptFilters = {
     ...(statusId && { status_id: statusId }),
     ...(staffId && { staff_id: staffId }),
     ...(date && { date }),
   };
 
-  // Herhangi bir filtre uygulanmamışken personelleri türet — böylece dropdown tüm
-  // personeli gösterir. Filtre uygulandığında sadece kalan personeller görünür.
-  const allParams = useMemo(() => ({} as AppointmentFilters), []);
+  const allParams = useMemo(() => ({} as ApptFilters), []);
 
   const {
     data: allAppointments,
@@ -35,7 +35,6 @@ export default function MyAppointmentsPage() {
     isError,
   } = useCustomerGetAppointmentsQuery(filters);
 
-  // Müşterinin randevu geçmişindeki benzersiz personeller
   const staffOptions = useMemo(() => {
     const map = new Map<
       number,
@@ -61,24 +60,6 @@ export default function MyAppointmentsPage() {
     setDate("");
   };
 
-  if (isLoading) {
-    return (
-      <div className="loader">
-        <div className="spinner" />
-      </div>
-    );
-  }
-
-  if (isError) {
-    return (
-      <div className="page-wide text-center text-canceld">
-        <p className="text-xl font-bold">
-          Randevularınız yüklenirken bir hata oluştu.
-        </p>
-      </div>
-    );
-  }
-
   return (
     <div className="page-wide">
       <div className="mb-8">
@@ -93,29 +74,17 @@ export default function MyAppointmentsPage() {
         />
       </div>
 
-      {/* Filtreler */}
-      <div className="card p-4 mb-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="mb-6">
+        <AppointmentFilters
+          statusId={statusId}
+          onStatusChange={setStatusId}
+          date={date}
+          onDateChange={setDate}
+          onClear={clearFilters}
+          hasActiveFilters={!!(statusId || staffId || date)}
+        >
           <div>
-            <label className="label-sm">
-              Durum
-            </label>
-            <select
-              value={statusId}
-              onChange={(e) => setStatusId(e.target.value)}
-              className="input-filter focus:border-deep focus:ring-2 focus:ring-deep/20"
-            >
-              <option value="">Tümü</option>
-              <option value="1">Beklemede</option>
-              <option value="2">Onaylandı</option>
-              <option value="3">Tamamlandı</option>
-              <option value="4">İptal Edildi</option>
-            </select>
-          </div>
-          <div>
-            <label className="label-sm">
-              Personel
-            </label>
+            <label className="label-sm">Personel</label>
             <select
               value={staffId}
               onChange={(e) => setStaffId(e.target.value)}
@@ -129,101 +98,82 @@ export default function MyAppointmentsPage() {
               ))}
             </select>
           </div>
-          <div>
-            <label className="label-sm">
-              Tarih
-            </label>
-            <input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="input-filter focus:border-deep focus:ring-2 focus:ring-deep/20"
-            />
-          </div>
-          <div className="flex items-end">
-            {(statusId || staffId || date) && (
-              <button
-                onClick={clearFilters}
-                className="w-full text-xs font-semibold text-deep hover:underline py-2"
-              >
-                Filtreleri Temizle
-              </button>
-            )}
-          </div>
-        </div>
+        </AppointmentFilters>
       </div>
 
-      {appointments && appointments.length === 0 ? (
-        <EmptyState
-          message={
-            statusId || staffId || date
-              ? "Seçili filtrelerle eşleşen randevu bulunamadı."
-              : "Henüz bir randevunuz bulunmuyor."
-          }
-          action={
-            !statusId && !staffId && !date ? (
+      <QueryGate isLoading={isLoading} isError={isError} errorMessage="Randevularınız yüklenirken bir hata oluştu.">
+        {appointments && appointments.length === 0 ? (
+          <EmptyState
+            message={
+              statusId || staffId || date
+                ? "Seçili filtrelerle eşleşen randevu bulunamadı."
+                : "Henüz bir randevunuz bulunmuyor."
+            }
+            action={
+              !statusId && !staffId && !date ? (
+                <Link
+                  to="/services"
+                  className="text-deep font-semibold hover:underline"
+                >
+                  İlk randevunuzu oluşturun
+                </Link>
+              ) : undefined
+            }
+          />
+        ) : (
+          <div className="space-y-4">
+            {appointments?.map((appointment) => {
+              const { day, month } = formatMonthDay(appointment.start_date);
+              return (
               <Link
-                to="/services"
-                className="text-deep font-semibold hover:underline"
+                key={appointment.id}
+                to={`/appointments/${appointment.id}`}
+                className="card block p-6 hover:shadow-md transition-all duration-200 group"
               >
-                İlk randevunuzu oluşturun
-              </Link>
-            ) : undefined
-          }
-        />
-      ) : (
-        <div className="space-y-4">
-          {appointments?.map((appointment) => {
-            const { day, month } = formatMonthDay(appointment.start_date);
-            return (
-            <Link
-              key={appointment.id}
-              to={`/appointments/${appointment.id}`}
-              className="card block p-6 hover:shadow-md transition-all duration-200 group"
-            >
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="flex items-center gap-4 min-w-0">
-                  <div className="hidden sm:flex flex-col items-center justify-center w-16 h-16 bg-deep/10 text-deep rounded-xl font-bold text-center shrink-0">
-                    <span className="text-xl sm:text-2xl leading-none">
-                      {day}
-                    </span>
-                    <span className="text-xs uppercase">
-                      {month}
-                    </span>
-                  </div>
-                  <div className="min-w-0">
-                    <p className="font-semibold text-main group-hover:text-deep transition-colors truncate">
-                      {appointment.service.name}
-                    </p>
-                    <p className="text-sm text-main/60 mt-1 truncate">
-                      {formatDateTime(appointment.start_date)} (
-                      {appointment.service.duration} dk)
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-4 sm:gap-6 shrink-0">
-                  {appointment.staff && (
-                    <div className="text-right hidden md:block max-w-[140px]">
-                      <p className="text-xs text-main/40 uppercase tracking-wide">
-                        Personel
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex items-center gap-4 min-w-0">
+                    <div className="hidden sm:flex flex-col items-center justify-center w-16 h-16 bg-deep/10 text-deep rounded-xl font-bold text-center shrink-0">
+                      <span className="text-xl sm:text-2xl leading-none">
+                        {day}
+                      </span>
+                      <span className="text-xs uppercase">
+                        {month}
+                      </span>
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-semibold text-main group-hover:text-deep transition-colors truncate">
+                        {appointment.service.name}
                       </p>
-                      <p className="text-sm font-medium text-main/80 truncate">
-                        {appointment.staff.person.name}{" "}
-                        {appointment.staff.person.surname}
+                      <p className="text-sm text-main/60 mt-1 truncate">
+                        {formatDateTime(appointment.start_date)} (
+                        {appointment.service.duration} dk)
                       </p>
                     </div>
-                  )}
+                  </div>
 
-                  <StatusBadge status={appointment.status.name} />
+                  <div className="flex items-center gap-4 sm:gap-6 shrink-0">
+                    {appointment.staff && (
+                      <div className="text-right hidden md:block max-w-[140px]">
+                        <p className="text-xs text-main/40 uppercase tracking-wide">
+                          Personel
+                        </p>
+                        <p className="text-sm font-medium text-main/80 truncate">
+                          {appointment.staff.person.name}{" "}
+                          {appointment.staff.person.surname}
+                        </p>
+                      </div>
+                    )}
 
-                  <ChevronRight className="h-5 w-5 text-main/15 group-hover:text-deep group-hover:translate-x-1 transition-all" />
+                    <StatusBadge status={appointment.status.name} />
+
+                    <ChevronRight className="h-5 w-5 text-main/15 group-hover:text-deep group-hover:translate-x-1 transition-all" />
+                  </div>
                 </div>
-              </div>
-            </Link>
-          )})}
-        </div>
-      )}
+              </Link>
+            )})}
+          </div>
+        )}
+      </QueryGate>
     </div>
   );
 }

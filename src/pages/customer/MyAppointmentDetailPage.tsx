@@ -7,6 +7,7 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import StatusBadge from "../../components/StatusBadge";
 import Breadcrumb from "../../components/Breadcrumb";
+import QueryGate from "../../components/QueryGate";
 import Avatar from "../../components/Avatar";
 import { formatDateTime } from "../../utils/dates";
 
@@ -35,14 +36,6 @@ export default function MyAppointmentDetailPage() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="loader">
-        <div className="spinner" />
-      </div>
-    );
-  }
-
   if (isError || !appointment) {
     return (
       <div className="page-wide text-center text-canceld">
@@ -62,6 +55,7 @@ export default function MyAppointmentDetailPage() {
     appointment.status.name === "confirmed";
 
   return (
+    <QueryGate isLoading={isLoading} isError={false} errorMessage="">
     <div className="page-wide">
       <Breadcrumb
         items={[
@@ -163,6 +157,7 @@ export default function MyAppointmentDetailPage() {
           )}
         </div>
       </div>
-    </div>
+      </div>
+    </QueryGate>
   );
 }

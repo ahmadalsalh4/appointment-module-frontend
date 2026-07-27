@@ -1,10 +1,9 @@
-import React, { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router";
 import { useCreateCategoryMutation } from "../../../hooks/useCategoryQueries";
 import { useQueryClient } from "@tanstack/react-query";
 import type { CategoryRequestBody } from "../../../other/types";
-import Breadcrumb from "../../../components/Breadcrumb";
-import FormActions from "../../../components/FormActions";
+import AdminFormPage from "../components/AdminFormPage";
 
 export default function AdminCategoryAdd() {
   const navigate = useNavigate();
@@ -15,7 +14,7 @@ export default function AdminCategoryAdd() {
     name: "",
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     try {
       await createMut.mutateAsync(formData);
@@ -27,41 +26,32 @@ export default function AdminCategoryAdd() {
   };
 
   return (
-    <div className="page">
-      <Breadcrumb items={[
+    <AdminFormPage
+      title="Yeni Kategori Oluştur"
+      breadcrumbs={[
         { label: "Kategoriler", to: "/admin/categories" },
         { label: "Yeni Ekle" },
-      ]} />
-
-      <div className="card-lg p-8">
-        <h1 className="text-xl sm:text-2xl font-bold text-main mb-6 text-balance">
-          Yeni Kategori Oluştur
-        </h1>
-
-        <form onSubmit={handleSubmit} className="section-gap-sm">
-          <div>
-            <label className="label">
-              Kategori Adı
-            </label>
-            <input
-              type="text"
-              required
-              value={formData.name}
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
-              className="input focus:border-deep focus:ring-2 focus:ring-deep/20"
-              placeholder="Örn: Eğitim, Sağlık, Teknoloji"
-            />
-          </div>
-
-          <FormActions
-            cancelTo="/admin/categories"
-            isPending={createMut.isPending}
-            submitLabel="Kategoriyi Kaydet"
-          />
-        </form>
+      ]}
+      cancelTo="/admin/categories"
+      isPending={createMut.isPending}
+      submitLabel="Kategoriyi Kaydet"
+      onSubmit={handleSubmit}
+    >
+      <div>
+        <label className="label">
+          Kategori Adı
+        </label>
+        <input
+          type="text"
+          required
+          value={formData.name}
+          onChange={(e) =>
+            setFormData({ ...formData, name: e.target.value })
+          }
+          className="input focus:border-deep focus:ring-2 focus:ring-deep/20"
+          placeholder="Örn: Eğitim, Sağlık, Teknoloji"
+        />
       </div>
-    </div>
+    </AdminFormPage>
   );
 }

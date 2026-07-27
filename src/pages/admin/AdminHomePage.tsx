@@ -6,6 +6,7 @@ import { useGetAllCategoriesQuery } from "../../hooks/useCategoryQueries";
 import type { CustomerProfile } from "../../other/types";
 import StatusBadge from "../../components/StatusBadge";
 import PageHeader from "../../components/PageHeader";
+import QueryGate from "../../components/QueryGate";
 import { formatTime, formatMonthDay } from "../../utils/dates";
 
 export default function AdminHomePage() {
@@ -138,11 +139,8 @@ export default function AdminHomePage() {
             </Link>
           </div>
 
-          {loadingAppos ? (
-            <div className="loader">
-              <div className="spinner"></div>
-            </div>
-          ) : pendingAppos.length === 0 ? (
+          <QueryGate isLoading={loadingAppos} isError={false} errorMessage="">
+          {pendingAppos.length === 0 ? (
             <p className="text-main/60 text-center py-8 bg-back rounded-lg">
               Onay bekleyen bir randevu yok.
             </p>
@@ -180,6 +178,7 @@ export default function AdminHomePage() {
               ))}
             </div>
           )}
+          </QueryGate>
         </div>
       </div>
     </div>

@@ -6,6 +6,7 @@ import {
 } from "../../../hooks/useStaffQueries";
 import { useQueryClient } from "@tanstack/react-query";
 import PageHeader from "../../../components/PageHeader";
+import QueryGate from "../../../components/QueryGate";
 import Avatar from "../../../components/Avatar";
 
 export default function AdminStaffList() {
@@ -28,24 +29,6 @@ export default function AdminStaffList() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="loader">
-        <div className="spinner"></div>
-      </div>
-    );
-  }
-
-  if (isError) {
-    return (
-      <div className="text-center py-20 text-canceld">
-        <p className="text-xl font-bold">
-          Personel listesi yüklenirken hata oluştu.
-        </p>
-      </div>
-    );
-  }
-
   return (
     <div className="page-xl space-y-6">
       <PageHeader
@@ -58,6 +41,7 @@ export default function AdminStaffList() {
         }
       />
 
+      <QueryGate isLoading={isLoading} isError={isError} errorMessage="Personel listesi yüklenirken hata oluştu.">
       {/* Cards Grid instead of table for better profile view */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {staffList && staffList.length > 0 ? (
@@ -125,6 +109,7 @@ export default function AdminStaffList() {
           </div>
         )}
       </div>
+      </QueryGate>
     </div>
   );
 }

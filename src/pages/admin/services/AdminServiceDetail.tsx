@@ -2,6 +2,7 @@ import { useParams, Link } from "react-router";
 import { Calendar, Clock } from "lucide-react";
 import { useGetServiceByIdQuery } from "../../../hooks/useServiceQueries";
 import Breadcrumb from "../../../components/Breadcrumb";
+import QueryGate from "../../../components/QueryGate";
 import { formatDate } from "../../../utils/dates";
 
 export default function AdminServiceDetail() {
@@ -11,14 +12,6 @@ export default function AdminServiceDetail() {
     isLoading,
     isError,
   } = useGetServiceByIdQuery(id || "");
-
-  if (isLoading) {
-    return (
-      <div className="loader">
-        <div className="spinner"></div>
-      </div>
-    );
-  }
 
   if (isError || !service) {
     return (
@@ -35,6 +28,7 @@ export default function AdminServiceDetail() {
   }
 
   return (
+    <QueryGate isLoading={isLoading} isError={false} errorMessage="">
     <div className="page-wide">
       <Breadcrumb items={[
         { label: "Hizmetler", to: "/admin/services" },
@@ -93,5 +87,6 @@ export default function AdminServiceDetail() {
         </div>
       </div>
     </div>
+    </QueryGate>
   );
 }

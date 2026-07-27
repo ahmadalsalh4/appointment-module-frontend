@@ -9,6 +9,7 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import StatusBadge from "../../components/StatusBadge";
 import Breadcrumb from "../../components/Breadcrumb";
+import QueryGate from "../../components/QueryGate";
 import Avatar from "../../components/Avatar";
 import { formatDate, formatTime } from "../../utils/dates";
 
@@ -58,14 +59,6 @@ export default function AdminAppointmentDetail() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="loader">
-        <div className="spinner"></div>
-      </div>
-    );
-  }
-
   if (isError || !appointment) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-20 text-center text-canceld">
@@ -81,7 +74,7 @@ export default function AdminAppointmentDetail() {
   }
 
   return (
-    <div className="page-wide">
+    <QueryGate isLoading={isLoading} isError={false} errorMessage="">
       <Breadcrumb items={[
         { label: "Randevular", to: "/admin/appointments" },
         { label: `#${appointment.id}` },
@@ -249,6 +242,6 @@ export default function AdminAppointmentDetail() {
           </div>
         </div>
       </div>
-    </div>
+    </QueryGate>
   );
 }

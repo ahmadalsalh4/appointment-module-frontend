@@ -1,5 +1,6 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import servicesApi from "../api/services";
+import { createCrudHooks } from "./crudQueries";
 import type { AxiosError } from "axios";
 import type {
   Service,
@@ -10,66 +11,27 @@ import type {
   StaffEntity,
 } from "../other/types";
 
-export const useGetAllServicesQuery = () => {
-  return useQuery<ServiceWithCategory[], AxiosError<LaravelErrorResponse>>({
-    queryKey: ["services"],
-    queryFn: async () => {
-      return await servicesApi.getAll();
-    },
-  });
-};
+const {
+  useGetAllQuery: _useGetAll,
+  useGetByIdQuery: _useGetById,
+  useCreateMutation: _useCreate,
+  useUpdateMutation: _useUpdate,
+  useDeleteMutation: _useDelete,
+} = createCrudHooks(servicesApi, "services");
 
-export const useGetServiceByIdQuery = (id: number | string) => {
-  return useQuery<ServiceWithCategory, AxiosError<LaravelErrorResponse>>({
-    queryKey: ["services", id],
-    queryFn: async () => {
-      return await servicesApi.getById(id);
-    },
-    enabled: !!id,
-  });
-};
+export const useGetAllServicesQuery = () => _useGetAll<ServiceWithCategory>();
+export const useGetServiceByIdQuery = (id: number | string) =>
+  _useGetById<ServiceWithCategory>(id);
+export const useCreateServiceMutation = () =>
+  _useCreate<ServiceWithCategory, ServiceRequestBody>();
+export const useUpdateServiceMutation = () =>
+  _useUpdate<Service, ServiceRequestBody>();
+export const useDeleteServiceMutation = () =>
+  _useDelete<DeleteServiceResponse>();
 
-export const useCreateServiceMutation = () => {
-  return useMutation<
-    ServiceWithCategory,
-    AxiosError<LaravelErrorResponse>,
-    ServiceRequestBody
-  >({
-    mutationFn: async (data) => {
-      return await servicesApi.create(data);
-    },
-  });
-};
-
-export const useUpdateServiceMutation = () => {
-  return useMutation<
-    Service,
-    AxiosError<LaravelErrorResponse>,
-    { id: number | string; data: ServiceRequestBody }
-  >({
-    mutationFn: async ({ id, data }) => {
-      return await servicesApi.update({ id, data });
-    },
-  });
-};
-
-export const useDeleteServiceMutation = () => {
-  return useMutation<
-    DeleteServiceResponse,
-    AxiosError<LaravelErrorResponse>,
-    number | string
-  >({
-    mutationFn: async (id) => {
-      return await servicesApi.delete(id);
-    },
-  });
-};
-export const useGetServiceStaffQuery = (serviceId: string | number) => {
-  return useQuery<StaffEntity[], AxiosError<LaravelErrorResponse>>({
+export const useGetServiceStaffQuery = (serviceId: string | number) =>
+  useQuery<StaffEntity[], AxiosError<LaravelErrorResponse>>({
     queryKey: ["services", serviceId, "staff"],
-    queryFn: async () => {
-      return await servicesApi.getServiceStaff(serviceId);
-    },
-    enabled: !!serviceId, // Always fetch if we have an ID (it's a public endpoint)
+    queryFn: () => servicesApi.getServiceStaff(serviceId),
+    enabled: !!serviceId,
   });
-};

@@ -1,6 +1,5 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
 import staffApi from "../api/staff";
-import type { AxiosError } from "axios";
+import { createCrudHooks } from "./crudQueries";
 import type {
   StaffEntity,
   StaffEntityDetailed,
@@ -8,60 +7,22 @@ import type {
   UpdateStaffRequestBody,
   UpdateStaffResponse,
   DeleteStaffResponse,
-  LaravelErrorResponse,
 } from "../other/types";
 
-export const useGetAllStaffQuery = () => {
-  return useQuery<StaffEntity[], AxiosError<LaravelErrorResponse>>({
-    queryKey: ["staff"],
-    queryFn: async () => {
-      return await staffApi.getAll();
-    },
-  });
-};
+const {
+  useGetAllQuery: _useGetAll,
+  useGetByIdQuery: _useGetById,
+  useCreateMutation: _useCreate,
+  useUpdateMutation: _useUpdate,
+  useDeleteMutation: _useDelete,
+} = createCrudHooks(staffApi, "staff");
 
-export const useGetStaffByIdQuery = (id: number | string) => {
-  return useQuery<StaffEntityDetailed, AxiosError<LaravelErrorResponse>>({
-    queryKey: ["staff", id],
-    queryFn: async () => {
-      return await staffApi.getById(id);
-    },
-    enabled: !!id,
-  });
-};
-
-export const useCreateStaffMutation = () => {
-  return useMutation<
-    StaffEntity,
-    AxiosError<LaravelErrorResponse>,
-    CreateStaffRequestBody
-  >({
-    mutationFn: async (data) => {
-      return await staffApi.create(data);
-    },
-  });
-};
-
-export const useUpdateStaffMutation = () => {
-  return useMutation<
-    UpdateStaffResponse,
-    AxiosError<LaravelErrorResponse>,
-    { id: number | string; data: UpdateStaffRequestBody }
-  >({
-    mutationFn: async ({ id, data }) => {
-      return await staffApi.update({ id, data });
-    },
-  });
-};
-
-export const useDeleteStaffMutation = () => {
-  return useMutation<
-    DeleteStaffResponse,
-    AxiosError<LaravelErrorResponse>,
-    number | string
-  >({
-    mutationFn: async (id) => {
-      return await staffApi.delete(id);
-    },
-  });
-};
+export const useGetAllStaffQuery = () => _useGetAll<StaffEntity>();
+export const useGetStaffByIdQuery = (id: number | string) =>
+  _useGetById<StaffEntityDetailed>(id);
+export const useCreateStaffMutation = () =>
+  _useCreate<StaffEntity, CreateStaffRequestBody>();
+export const useUpdateStaffMutation = () =>
+  _useUpdate<UpdateStaffResponse, UpdateStaffRequestBody>();
+export const useDeleteStaffMutation = () =>
+  _useDelete<DeleteStaffResponse>();

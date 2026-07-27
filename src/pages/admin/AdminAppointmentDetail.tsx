@@ -75,10 +75,12 @@ export default function AdminAppointmentDetail() {
 
   return (
     <QueryGate isLoading={isLoading} isError={false} errorMessage="">
-      <Breadcrumb items={[
-        { label: "Randevular", to: "/admin/appointments" },
-        { label: `#${appointment.id}` },
-      ]} />
+      <Breadcrumb
+        items={[
+          { label: "Randevular", to: "/admin/appointments" },
+          { label: `#${appointment.id}` },
+        ]}
+      />
 
       <div className="card-lg overflow-hidden">
         {/* Header Status Bar */}
@@ -89,7 +91,10 @@ export default function AdminAppointmentDetail() {
                 Mevcut Durum
               </p>
               <h1 className="text-3xl sm:text-4xl font-extrabold mt-1 text-balance">
-                <StatusBadge status={appointment.status.name} className="text-lg px-4 py-1.5" />
+                <StatusBadge
+                  status={appointment.status.name}
+                  className="text-lg px-4 py-1.5"
+                />
               </h1>
             </div>
 
@@ -117,9 +122,7 @@ export default function AdminAppointmentDetail() {
           {/* LEFT: Appointment Details */}
           <div className="md:col-span-2 space-y-8">
             <div>
-              <h2 className="section-header">
-                Randevu Detayları
-              </h2>
+              <h2 className="section-header">Randevu Detayları</h2>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div className="flex items-start gap-4 bg-back p-4 rounded-xl">
@@ -143,9 +146,7 @@ export default function AdminAppointmentDetail() {
                   </div>
                   <div>
                     <p className="detail-label">Hizmet ve Süre</p>
-                    <p className="detail-value">
-                      {appointment.service.name}
-                    </p>
+                    <p className="detail-value">{appointment.service.name}</p>
                     <p className="text-sm text-main/60">
                       {appointment.service.duration} Dakika
                     </p>
@@ -157,9 +158,7 @@ export default function AdminAppointmentDetail() {
             {/* Customer Info */}
             {appointment.customer && (
               <div>
-                <h2 className="section-header">
-                  Müşteri Bilgileri
-                </h2>
+                <h2 className="section-header">Müşteri Bilgileri</h2>
                 <div className="flex items-center gap-4 bg-back p-4 rounded-xl">
                   <Avatar
                     name={appointment.customer.person.name}
@@ -171,10 +170,10 @@ export default function AdminAppointmentDetail() {
                       {appointment.customer.person.name}{" "}
                       {appointment.customer.person.surname}
                     </p>
-                    <p className="text-sm text-main/60 break-words">
+                    <p className="text-sm text-main/60 wrap-break-word">
                       {appointment.customer.email}
                     </p>
-                    <p className="text-sm text-main/40 break-words">
+                    <p className="text-sm text-main/40 wrap-break-word">
                       {appointment.customer.person.phone_number}
                     </p>
                   </div>
@@ -186,11 +185,9 @@ export default function AdminAppointmentDetail() {
           {/* RIGHT: Staff Info & Danger Zone */}
           <div className="space-y-8">
             {/* Staff Info */}
-              {appointment.staff && (
+            {appointment.staff && (
               <div>
-                <h2 className="section-header">
-                  Personel Bilgileri
-                </h2>
+                <h2 className="section-header">Personel Bilgileri</h2>
                 <div className="flex items-center gap-4 bg-back p-4 rounded-xl">
                   <Avatar
                     name={appointment.staff.person.name}
@@ -205,7 +202,7 @@ export default function AdminAppointmentDetail() {
                     <p className="text-sm text-main/60">
                       {appointment.staff.job_title}
                     </p>
-                    <p className="text-sm text-main/40 break-words">
+                    <p className="text-sm text-main/40 wrap-break-word">
                       {appointment.staff.email}
                     </p>
                   </div>

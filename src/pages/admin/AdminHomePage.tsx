@@ -18,9 +18,9 @@ export default function AdminHomePage() {
 
   // Calculate metrics safely (Fixed .length error)
   const pendingAppos =
-    appointments?.filter((a) => a.status.name === "pending") || [];
+    appointments?.data?.filter((a) => a.status.name === "pending") || [];
   const uniqueCustomersMap = new Map(
-    appointments
+    appointments?.data
       ?.map((a) => [a.customer_id, a.customer])
       .filter((a) => a[1] !== undefined) as [number, CustomerProfile][],
   );
@@ -43,7 +43,7 @@ export default function AdminHomePage() {
           <div>
             <p className="text-sm font-medium text-main/60">Toplam Personel</p>
             <p className="text-2xl sm:text-3xl font-bold text-main">
-              {staffList?.length || 0}
+              {staffList?.data?.length || 0}
             </p>
           </div>
         </div>
@@ -56,7 +56,7 @@ export default function AdminHomePage() {
           <div>
             <p className="text-sm font-medium text-main/60">Kategoriler</p>
             <p className="text-2xl sm:text-3xl font-bold text-main">
-              {categories?.length || 0}
+              {categories?.data?.length || 0}
             </p>
           </div>
         </div>

@@ -7,15 +7,15 @@ import type {
   CreateAppointmentBody,
   UpdateAppointmentStateBody,
   GetAvailabilityBody,
-  CancelAppointmentResponse,
-  DeleteAppointmentResponse,
+  CustomerUpdateAppointmentBody,
   AvailabilityResponse,
   LaravelErrorResponse,
+  PaginatedResponse,
 } from "../other/types";
 
 // --- CUSTOMER HOOKS ---
 export const useCustomerGetAppointmentsQuery = (params?: AppointmentFilters) => {
-  return useQuery<Appointment[], AxiosError<LaravelErrorResponse>>({
+  return useQuery<PaginatedResponse<Appointment>, AxiosError<LaravelErrorResponse>>({
     queryKey: ["appointments", "customer", params],
     queryFn: async () => {
       return await appointmentsApi.myAppointments(params);
@@ -34,11 +34,7 @@ export const useCustomerGetAppointmentByIdQuery = (id: number | string) => {
 };
 
 export const useCreateAppointmentMutation = () => {
-  return useMutation<
-    Appointment,
-    AxiosError<LaravelErrorResponse>,
-    CreateAppointmentBody
-  >({
+  return useMutation<Appointment, AxiosError<LaravelErrorResponse>, CreateAppointmentBody>({
     mutationFn: async (data) => {
       return await appointmentsApi.create(data);
     },
@@ -46,20 +42,24 @@ export const useCreateAppointmentMutation = () => {
 };
 
 export const useCancelAppointmentMutation = () => {
-  return useMutation<
-    CancelAppointmentResponse,
-    AxiosError<LaravelErrorResponse>,
-    number | string
-  >({
+  return useMutation<Appointment, AxiosError<LaravelErrorResponse>, number | string>({
     mutationFn: async (id) => {
       return await appointmentsApi.cancel(id);
     },
   });
 };
 
+export const useUpdateMyAppointmentMutation = () => {
+  return useMutation<Appointment, AxiosError<LaravelErrorResponse>, { id: number | string; data: CustomerUpdateAppointmentBody }>({
+    mutationFn: async ({ id, data }) => {
+      return await appointmentsApi.updateMyAppointment(id, data);
+    },
+  });
+};
+
 // --- STAFF HOOKS ---
 export const useStaffGetAppointmentsQuery = (params?: AppointmentFilters) => {
-  return useQuery<Appointment[], AxiosError<LaravelErrorResponse>>({
+  return useQuery<PaginatedResponse<Appointment>, AxiosError<LaravelErrorResponse>>({
     queryKey: ["appointments", "staff", params],
     queryFn: async () => {
       return await appointmentsApi.staffAppointments(params);
@@ -78,11 +78,7 @@ export const useStaffGetAppointmentByIdQuery = (id: number | string) => {
 };
 
 export const useStaffUpdateStateMutation = () => {
-  return useMutation<
-    Appointment,
-    AxiosError<LaravelErrorResponse>,
-    { id: number | string; data: UpdateAppointmentStateBody }
-  >({
+  return useMutation<Appointment, AxiosError<LaravelErrorResponse>, { id: number | string; data: UpdateAppointmentStateBody }>({
     mutationFn: async ({ id, data }) => {
       return await appointmentsApi.staffUpdateStatus({ id, data });
     },
@@ -91,7 +87,7 @@ export const useStaffUpdateStateMutation = () => {
 
 // --- ADMIN HOOKS ---
 export const useAdminGetAppointmentsQuery = (params?: AppointmentFilters) => {
-  return useQuery<Appointment[], AxiosError<LaravelErrorResponse>>({
+  return useQuery<PaginatedResponse<Appointment>, AxiosError<LaravelErrorResponse>>({
     queryKey: ["appointments", "admin", params],
     queryFn: async () => {
       return await appointmentsApi.adminAppointments(params);
@@ -109,24 +105,16 @@ export const useAdminGetAppointmentByIdQuery = (id: number | string) => {
   });
 };
 
-export const useAdminUpdateStateMutation = () => {
-  return useMutation<
-    Appointment,
-    AxiosError<LaravelErrorResponse>,
-    { id: number | string; data: UpdateAppointmentStateBody }
-  >({
+export const useAdminUpdateAppointmentMutation = () => {
+  return useMutation<Appointment, AxiosError<LaravelErrorResponse>, { id: number | string; data: UpdateAppointmentStateBody }>({
     mutationFn: async ({ id, data }) => {
-      return await appointmentsApi.adminUpdateState({ id, data });
+      return await appointmentsApi.adminUpdateAppointment({ id, data });
     },
   });
 };
 
 export const useAdminDeleteAppointmentMutation = () => {
-  return useMutation<
-    DeleteAppointmentResponse,
-    AxiosError<LaravelErrorResponse>,
-    number | string
-  >({
+  return useMutation<{ message: string }, AxiosError<LaravelErrorResponse>, number | string>({
     mutationFn: async (id) => {
       return await appointmentsApi.adminDelete(id);
     },
@@ -135,11 +123,7 @@ export const useAdminDeleteAppointmentMutation = () => {
 
 // --- SHARED/PUBLIC HOOKS ---
 export const useGetAvailabilityMutation = () => {
-  return useMutation<
-    AvailabilityResponse,
-    AxiosError<LaravelErrorResponse>,
-    GetAvailabilityBody
-  >({
+  return useMutation<AvailabilityResponse, AxiosError<LaravelErrorResponse>, GetAvailabilityBody>({
     mutationFn: async (data) => {
       return await appointmentsApi.getAvailability(data);
     },

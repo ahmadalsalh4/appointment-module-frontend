@@ -1,23 +1,20 @@
 import { useState, useEffect } from "react";
 import Error from "../components/Error";
 import { Link, useNavigate } from "react-router";
-import type { LoginShape } from "../../other/types";
 import { useLoginMutation } from "../../hooks/useAuthQueries";
 import { useAuth } from "../../contexts/auth/useAuth";
 
 export default function Login() {
-  const [form, setForm] = useState<LoginShape>({
+  const [form, setForm] = useState({
     email: "",
     password: "",
-    role: "customer",
   });
 
   const { mutate: login, isPending, isError, error, data } = useLoginMutation();
-
   const { handleLoginSuccess } = useAuth();
   const navigate = useNavigate();
 
-  function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     login(form);
   }
@@ -51,38 +48,13 @@ export default function Login() {
         {isError && (
           <div className="mb-6">
             <Error
-              message={error.response?.data.message || "Giriş başarısız oldu."}
+              message={error.response?.data?.message || "Giriş başarısız oldu."}
             />
           </div>
         )}
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label
-              htmlFor="role"
-              className="label"
-            >
-              Giriş Türü
-            </label>
-
-            <select
-              id="role"
-              value={form.role || "customer"}
-              onChange={(e) =>
-                setForm({ ...form, role: e.target.value as LoginShape["role"] })
-              }
-              className="input focus:border-deep focus:ring-2 focus:ring-deep/20"
-            >
-              <option value="customer">Müşteri</option>
-              <option value="staff">Personel</option>
-              <option value="admin">Admin</option>
-            </select>
-          </div>
-
-          <div>
-            <label
-              htmlFor="email"
-              className="label"
-            >
+            <label htmlFor="email" className="label">
               E-posta Adresi
             </label>
             <input
@@ -97,10 +69,7 @@ export default function Login() {
           </div>
 
           <div>
-            <label
-              htmlFor="password"
-              className="label"
-            >
+            <label htmlFor="password" className="label">
               Şifre
             </label>
             <input
@@ -122,14 +91,9 @@ export default function Login() {
             {isPending ? "Giriş yapılıyor..." : "Giriş Yap"}
           </button>
         </form>
-        <div
-          className={`${form.role === "customer" ? "visible" : "invisible"} mt-6 text-center text-sm text-main/70 p-3 rounded-lg`}
-        >
+        <div className="mt-6 text-center text-sm text-main/70 p-3 rounded-lg">
           Hesabınız yok mu?
-          <Link
-            to="/register"
-            className="font-semibold text-waiting hover:underline"
-          >
+          <Link to="/register" className="font-semibold text-waiting hover:underline">
             Kayıt Olun
           </Link>
         </div>

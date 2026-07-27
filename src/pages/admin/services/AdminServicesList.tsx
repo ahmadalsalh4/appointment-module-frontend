@@ -42,13 +42,13 @@ export default function AdminServicesList() {
       addPath="/admin/services/add"
       addLabel="+ Yeni Hizmet Ekle"
       columns={columns}
-      itemsCount={services?.length ?? 0}
+      itemsCount={services?.data?.length ?? 0}
       emptyMessage="Sistemde henüz bir hizmet eklenmemiş."
       isLoading={isLoading}
       isError={isError}
       errorMessage="Hizmetler yüklenirken hata oluştu."
     >
-      {services?.map((service: ServiceWithCategory) => (
+      {services?.data?.map((service: ServiceWithCategory) => (
         <tr key={service.id} className="hover:bg-back transition-colors">
           <td className="table-cell whitespace-nowrap">
             <div className="text-sm font-semibold text-main">

@@ -44,8 +44,8 @@ export default function AdminStaffList() {
       <QueryGate isLoading={isLoading} isError={isError} errorMessage="Personel listesi yüklenirken hata oluştu.">
       {/* Cards Grid instead of table for better profile view */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {staffList && staffList.length > 0 ? (
-          staffList.map((staff) => (
+        {staffList?.data && staffList.data.length > 0 ? (
+          staffList?.data?.map((staff) => (
             <div
               key={staff.id}
               className="card p-6 hover:shadow-md transition-shadow flex flex-col"

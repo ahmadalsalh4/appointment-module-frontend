@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from "react-router";
 import { Calendar, Clock } from "lucide-react";
 import {
   useAdminGetAppointmentByIdQuery,
-  useAdminUpdateStateMutation,
+  useAdminUpdateAppointmentMutation,
   useAdminDeleteAppointmentMutation,
 } from "../../hooks/useAppointmentQueries";
 import { useQueryClient } from "@tanstack/react-query";
@@ -23,7 +23,7 @@ export default function AdminAppointmentDetail() {
     isLoading,
     isError,
   } = useAdminGetAppointmentByIdQuery(id || "");
-  const updateStateMut = useAdminUpdateStateMutation();
+  const updateAppointmentMut = useAdminUpdateAppointmentMutation();
   const deleteMut = useAdminDeleteAppointmentMutation();
 
   const handleStatusUpdate = async (
@@ -31,7 +31,7 @@ export default function AdminAppointmentDetail() {
   ) => {
     const newStateId = Number(e.target.value);
     try {
-      await updateStateMut.mutateAsync({
+      await updateAppointmentMut.mutateAsync({
         id: id!,
         data: { state_id: newStateId },
       });
@@ -106,7 +106,7 @@ export default function AdminAppointmentDetail() {
               <select
                 value={appointment.state_id}
                 onChange={handleStatusUpdate}
-                disabled={updateStateMut.isPending}
+                disabled={updateAppointmentMut.isPending}
                 className="bg-surface text-main font-bold rounded-lg shadow-sm border border-main/20 px-4 py-2.5 focus:ring-2 focus:ring-deep/20 focus:border-deep outline-none disabled:bg-main/15 disabled:text-main/40"
               >
                 <option value="1">Beklemede</option>

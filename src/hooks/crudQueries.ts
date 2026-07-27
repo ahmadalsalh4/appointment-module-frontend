@@ -1,9 +1,9 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
-import type { LaravelErrorResponse } from "../other/types";
+import type { LaravelErrorResponse, PaginatedResponse } from "../other/types";
 
 interface CrudApi {
-  getAll: () => Promise<unknown>;
+  getAll: (params?: Record<string, unknown>) => Promise<unknown>;
   getById: (id: number | string) => Promise<unknown>;
   create: (data: unknown) => Promise<unknown>;
   update: (params: { id: number | string; data: unknown }) => Promise<unknown>;
@@ -11,10 +11,10 @@ interface CrudApi {
 }
 
 export function createCrudHooks(api: CrudApi, key: string) {
-  const useGetAllQuery = <T>() =>
-    useQuery<T[], AxiosError<LaravelErrorResponse>>({
-      queryKey: [key],
-      queryFn: () => api.getAll() as Promise<T[]>,
+  const useGetAllQuery = <T>(params?: Record<string, unknown>) =>
+    useQuery<PaginatedResponse<T>, AxiosError<LaravelErrorResponse>>({
+      queryKey: [key, params],
+      queryFn: () => api.getAll(params) as Promise<PaginatedResponse<T>>,
     });
 
   const useGetByIdQuery = <T>(id: number | string) =>
@@ -30,13 +30,8 @@ export function createCrudHooks(api: CrudApi, key: string) {
     });
 
   const useUpdateMutation = <TData, TBody>() =>
-    useMutation<
-      TData,
-      AxiosError<LaravelErrorResponse>,
-      { id: number | string; data: TBody }
-    >({
-      mutationFn: ({ id, data }) =>
-        api.update({ id, data }) as Promise<TData>,
+    useMutation<TData, AxiosError<LaravelErrorResponse>, { id: number | string; data: TBody }>({
+      mutationFn: ({ id, data }) => api.update({ id, data }) as Promise<TData>,
     });
 
   const useDeleteMutation = <TResp>() =>
@@ -44,11 +39,5 @@ export function createCrudHooks(api: CrudApi, key: string) {
       mutationFn: (id) => api.delete(id) as Promise<TResp>,
     });
 
-  return {
-    useGetAllQuery,
-    useGetByIdQuery,
-    useCreateMutation,
-    useUpdateMutation,
-    useDeleteMutation,
-  };
+  return { useGetAllQuery, useGetByIdQuery, useCreateMutation, useUpdateMutation, useDeleteMutation };
 }

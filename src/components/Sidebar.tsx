@@ -4,6 +4,7 @@ import { ChevronDown, LogOut, Menu, X } from "lucide-react";
 import { useAuth } from "../contexts/auth/useAuth";
 import { useLogoutMutation } from "../hooks/useAuthQueries";
 import ThemeToggle from "../pages/components/ThemeToggle";
+import authApi from "../api/auth";
 import type { ReactNode } from "react";
 
 export interface SidebarItem {
@@ -27,9 +28,22 @@ function SidebarContent({
   onClose,
 }: SidebarProps & { onClose?: () => void }) {
   const location = useLocation();
-  const { role } = useAuth();
+  const { role, otherRoles, handleLogout, handleSwitchRole } = useAuth();
   const { mutate: logout } = useLogoutMutation();
   const [openMenus, setOpenMenus] = useState<string[]>([]);
+
+  const handleRoleSwitch = async (targetRole: string) => {
+    const password = window.prompt("Güvenlik için şifrenizi girin:");
+    if (!password) return;
+
+    try {
+      const result = await authApi.switchRole({ role: targetRole, password });
+      handleSwitchRole(result);
+      window.location.href = targetRole === "customer" ? "/" : `/${targetRole}`;
+    } catch (err) {
+      alert("Rol değiştirme başarısız oldu. Şifrenizi kontrol edin.");
+    }
+  };
 
   const toggleMenu = (label: string) => {
     setOpenMenus((prev) =>
@@ -134,6 +148,23 @@ function SidebarContent({
           </div>
         ))}
       </nav>
+
+      {otherRoles.length > 0 && (
+        <div className="mt-auto border-t border-main/5 pt-4">
+          <p className="px-4 text-[10px] font-bold text-main/30 uppercase tracking-widest mb-2">
+            Rol Değiştir
+          </p>
+          {otherRoles.map((r) => (
+            <button
+              key={r}
+              onClick={() => handleRoleSwitch(r)}
+              className="w-full text-left px-4 py-2 text-sm text-main/60 hover:text-deep hover:bg-deep/5 transition-colors"
+            >
+              {r === "customer" ? "Müşteri paneline geç" : r === "staff" ? "Personel paneline geç" : "Yönetici paneline geç"}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className="mt-auto p-3 border-t border-main/10 space-y-1">
         <div className="flex items-center gap-3 px-4 py-2">

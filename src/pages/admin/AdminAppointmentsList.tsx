@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router";
 import {
   useAdminGetAppointmentsQuery,
-  useAdminUpdateStateMutation,
+  useAdminUpdateAppointmentMutation,
   useAdminDeleteAppointmentMutation,
 } from "../../hooks/useAppointmentQueries";
 import { useGetAllStaffQuery } from "../../hooks/useStaffQueries";
@@ -11,45 +11,46 @@ import type { Appointment } from "../../other/types";
 import PageHeader from "../../components/PageHeader";
 import QueryGate from "../../components/QueryGate";
 import AppointmentFilters from "./components/AppointmentFilters";
+import Pagination from "../../components/Pagination";
 import { formatDate, formatTime } from "../../utils/dates";
 
 export default function AdminAppointmentsList() {
   const queryClient = useQueryClient();
 
+  const [tab, setTab] = useState<string>("");
   const [statusId, setStatusId] = useState<string>("");
   const [staffId, setStaffId] = useState<string>("");
   const [date, setDate] = useState<string>("");
   const [customerName, setCustomerName] = useState<string>("");
+  const [sortBy, setSortBy] = useState<string>("start_date");
+  const [sortOrder, setSortOrder] = useState<string>("asc");
+  const [perPage, setPerPage] = useState<number>(15);
+  const [page, setPage] = useState<number>(1);
 
   const filters = {
+    ...(tab && { tab }),
     ...(statusId && { status_id: statusId }),
     ...(staffId && { staff_id: staffId }),
     ...(date && { date }),
     ...(customerName.trim() && { customer_name: customerName.trim() }),
+    sort_by: sortBy,
+    sort_order: sortOrder,
+    per_page: perPage,
+    page,
   };
 
   const { data: staffList } = useGetAllStaffQuery();
-
-  const {
-    data: appointments,
-    isLoading,
-    isError,
-  } = useAdminGetAppointmentsQuery(filters);
-  const updateStateMut = useAdminUpdateStateMutation();
+  const { data: paginated, isLoading, isError } = useAdminGetAppointmentsQuery(filters);
+  const updateMut = useAdminUpdateAppointmentMutation();
   const deleteMut = useAdminDeleteAppointmentMutation();
 
   const [changingId, setChangingId] = useState<number | null>(null);
+  const appointments = paginated?.data ?? [];
 
-  const handleStatusChange = async (
-    appointmentId: number,
-    newStateId: number,
-  ) => {
+  const handleStatusChange = async (appointmentId: number, newStateId: number) => {
     setChangingId(appointmentId);
     try {
-      await updateStateMut.mutateAsync({
-        id: appointmentId,
-        data: { state_id: newStateId },
-      });
+      await updateMut.mutateAsync({ id: appointmentId, data: { state_id: newStateId } });
       queryClient.invalidateQueries({ queryKey: ["appointments", "admin"] });
     } catch {
       alert("Durum güncellenirken hata oluştu.");
@@ -59,8 +60,7 @@ export default function AdminAppointmentsList() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm("Bu randevuyu silmek istediğinize emin misiniz?"))
-      return;
+    if (!window.confirm("Bu randevuyu silmek istediğinize emin misiniz?")) return;
     try {
       await deleteMut.mutateAsync(id);
       queryClient.invalidateQueries({ queryKey: ["appointments", "admin"] });
@@ -70,42 +70,44 @@ export default function AdminAppointmentsList() {
   };
 
   const clearFilters = () => {
+    setTab("");
     setStatusId("");
     setStaffId("");
     setDate("");
     setCustomerName("");
+    setSortBy("start_date");
+    setSortOrder("asc");
+    setPage(1);
   };
 
   return (
     <div className="page-xl space-y-6">
-      <PageHeader
-        title="Randevular"
-        subtitle="Tüm personel ve müşterilerin randevularını buradan yönetin."
-      />
+      <PageHeader title="Randevular" subtitle="Tüm personel ve müşterilerin randevularını buradan yönetin." />
 
       <AppointmentFilters
         statusId={statusId}
         onStatusChange={setStatusId}
         date={date}
         onDateChange={setDate}
+        tab={tab}
+        onTabChange={setTab}
         customerName={customerName}
         onCustomerNameChange={setCustomerName}
-        onClear={clearFilters}
-        hasActiveFilters={!!(statusId || staffId || date || customerName)}
+        sortBy={sortBy}
+        onSortByChange={setSortBy}
+        sortOrder={sortOrder}
+        onSortOrderChange={setSortOrder}
+        showSort
         showCustomerSearch
+        onClear={clearFilters}
+        hasActiveFilters={!!(tab || statusId || staffId || date || customerName)}
       >
         <div>
           <label className="label-sm">Personel</label>
-          <select
-            value={staffId}
-            onChange={(e) => setStaffId(e.target.value)}
-            className="input-filter focus:border-deep focus:ring-2 focus:ring-deep/20"
-          >
+          <select value={staffId} onChange={(e) => setStaffId(e.target.value)} className="input-filter focus:border-deep focus:ring-2 focus:ring-deep/20">
             <option value="">Tümü</option>
-            {staffList?.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.person?.name} {s.person?.surname}
-              </option>
+            {staffList?.data?.map((s) => (
+              <option key={s.id} value={s.id}>{s.person?.name} {s.person?.surname}</option>
             ))}
           </select>
         </div>
@@ -117,87 +119,37 @@ export default function AdminAppointmentsList() {
             <table className="min-w-full divide-y divide-main/10">
               <thead className="bg-back">
                 <tr>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-bold text-main/60 uppercase tracking-wider"
-                  >
-                    Müşteri / Personel
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-bold text-main/60 uppercase tracking-wider"
-                  >
-                    Hizmet
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-bold text-main/60 uppercase tracking-wider"
-                  >
-                    Tarih & Saat
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-bold text-main/60 uppercase tracking-wider"
-                  >
-                    Durum
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-right text-xs font-bold text-main/60 uppercase tracking-wider"
-                  >
-                    İşlemler
-                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-bold text-main/60 uppercase tracking-wider">Müşteri / Personel</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold text-main/60 uppercase tracking-wider">Hizmet</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold text-main/60 uppercase tracking-wider">Tarih & Saat</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold text-main/60 uppercase tracking-wider">Durum</th>
+                  <th className="px-6 py-3 text-right text-xs font-bold text-main/60 uppercase tracking-wider">İşlemler</th>
                 </tr>
               </thead>
               <tbody className="bg-surface divide-y divide-main/5">
-                {appointments && appointments.length > 0 ? (
+                {appointments.length > 0 ? (
                   appointments.map((appo: Appointment) => (
-                    <tr
-                      key={appo.id}
-                      className="hover:bg-back transition-colors"
-                    >
+                    <tr key={appo.id} className="hover:bg-back transition-colors">
                       <td className="table-cell whitespace-nowrap">
                         <div className="flex flex-col">
-                          <span className="text-sm font-semibold text-main">
-                            {appo.customer?.person.name}{" "}
-                            {appo.customer?.person.surname}
-                          </span>
-                          <span className="text-xs text-main/60">
-                            → {appo.staff?.person.name}{" "}
-                            {appo.staff?.person.surname}
-                          </span>
+                          <span className="text-sm font-semibold text-main">{appo.customer?.person.name} {appo.customer?.person.surname}</span>
+                          <span className="text-xs text-main/60">→ {appo.staff?.person.name} {appo.staff?.person.surname}</span>
                         </div>
                       </td>
-
                       <td className="table-cell whitespace-nowrap">
-                        <div className="text-sm text-main">
-                          {appo.service.name}
-                        </div>
-                        <div className="text-xs text-main/40">
-                          {appo.service.duration} dk
-                        </div>
+                        <div className="text-sm text-main">{appo.service.name}</div>
+                        <div className="text-xs text-main/40">{appo.service.duration} dk</div>
                       </td>
-
                       <td className="table-cell whitespace-nowrap">
-                        <div className="text-sm text-main">
-                          {formatDate(appo.start_date)}
-                        </div>
-                        <div className="text-sm font-medium text-deep">
-                          {formatTime(appo.start_date)}
-                        </div>
+                        <div className="text-sm text-main">{formatDate(appo.start_date)}</div>
+                        <div className="text-sm font-medium text-deep">{formatTime(appo.start_date)}</div>
                       </td>
-
                       <td className="table-cell whitespace-nowrap">
                         {changingId === appo.id ? (
                           <div className="spinner-sm"></div>
                         ) : (
-                          <select
-                            value={appo.state_id}
-                            onChange={(e) =>
-                              handleStatusChange(appo.id, Number(e.target.value))
-                            }
-                            className={`badge badge-${appo.status.name} cursor-pointer focus:ring-2 focus:ring-offset-1`}
-                          >
+                          <select value={appo.state_id} onChange={(e) => handleStatusChange(appo.id, Number(e.target.value))}
+                            className={`badge badge-${appo.status.name} cursor-pointer focus:ring-2 focus:ring-offset-1`}>
                             <option value="1">Beklemede</option>
                             <option value="2">Onaylandı</option>
                             <option value="3">Tamamlandı</option>
@@ -205,38 +157,32 @@ export default function AdminAppointmentsList() {
                           </select>
                         )}
                       </td>
-
                       <td className="table-cell whitespace-nowrap text-right text-sm font-medium">
-                        <Link
-                          to={`/admin/appointments/${appo.id}`}
-                          className="text-deep hover:text-deep/80 mr-4"
-                        >
-                          Detay
-                        </Link>
-                        <button
-                          onClick={() => handleDelete(appo.id)}
-                          disabled={deleteMut.isPending}
-                          className="text-canceld hover:text-canceld/80 disabled:text-main/40"
-                        >
-                          Sil
-                        </button>
+                        <Link to={`/admin/appointments/${appo.id}`} className="text-deep hover:text-deep/80 mr-4">Detay</Link>
+                        <button onClick={() => handleDelete(appo.id)} disabled={deleteMut.isPending} className="text-canceld hover:text-canceld/80 disabled:text-main/40">Sil</button>
                       </td>
                     </tr>
                   ))
                 ) : (
-                  <tr>
-                    <td
-                      colSpan={5}
-                      className="px-6 py-12 text-center text-main/60"
-                    >
-                      Seçili filtrelerle eşleşen randevu bulunamadı.
-                    </td>
-                  </tr>
+                  <tr><td colSpan={5} className="px-6 py-12 text-center text-main/60">Seçili filtrelerle eşleşen randevu bulunamadı.</td></tr>
                 )}
               </tbody>
             </table>
           </div>
         </div>
+
+        {paginated && (
+          <Pagination
+            currentPage={paginated.current_page}
+            lastPage={paginated.last_page}
+            perPage={paginated.per_page}
+            total={paginated.total}
+            from={paginated.from}
+            to={paginated.to}
+            onPageChange={(p) => setPage(p)}
+            onPerPageChange={(pp) => { setPerPage(pp); setPage(1); }}
+          />
+        )}
       </QueryGate>
     </div>
   );

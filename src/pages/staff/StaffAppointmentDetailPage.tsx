@@ -63,6 +63,7 @@ export default function StaffAppointmentDetailPage() {
               <option value="">Durum Seçin</option>
               <option value="2">Onaylandı</option>
               <option value="3">Tamamlandı</option>
+              <option value="4">İptal Et</option>
             </select>
             <button
               type="submit"

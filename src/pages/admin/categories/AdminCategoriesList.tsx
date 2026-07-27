@@ -47,13 +47,13 @@ export default function AdminCategoriesList() {
       addPath="/admin/categories/add"
       addLabel="+ Yeni Kategori Ekle"
       columns={columns}
-      itemsCount={categories?.length ?? 0}
+      itemsCount={categories?.data?.length ?? 0}
       emptyMessage="Sistemde henüz bir kategori eklenmemiş."
       isLoading={isLoading}
       isError={isError}
       errorMessage="Kategoriler yüklenirken hata oluştu."
     >
-      {categories?.map((category: Category) => (
+      {categories?.data?.map((category: Category) => (
         <tr key={category.id} className="hover:bg-back transition-colors">
           <td className="table-cell whitespace-nowrap">
             <div className="flex items-center gap-3">

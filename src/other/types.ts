@@ -88,7 +88,7 @@ export interface CustomerRegisterBody {
 export interface LoginBody {
   email: string;
   password: string;
-  role: UserRole;
+  role?: UserRole; // optional — unified login doesn't need it
 }
 
 /** Aliases kept so existing hooks (useAuth.ts) don't need renaming */
@@ -136,6 +136,42 @@ export type AnyAuthResponse =
  */
 export type LoginResponse = AnyAuthResponse;
 
+// ==========================================
+// UNIFIED LOGIN (Phase 2)
+// ==========================================
+
+export interface UnifiedLoginBody {
+  email: string;
+  password: string;
+}
+
+export interface UnifiedLoginResponse {
+  user: AnyUser;
+  token: string;
+  role: UserRole;
+  other_roles: UserRole[];
+}
+
+// ==========================================
+// ROLE SWITCHING (Phase 2)
+// ==========================================
+
+export interface MyRolesResponse {
+  current_role: UserRole;
+  other_roles: UserRole[];
+}
+
+export interface SwitchRoleBody {
+  role: UserRole;
+  password: string;
+}
+
+export interface SwitchRoleResponse {
+  user: AnyUser;
+  token: string;
+  role: UserRole;
+}
+
 /** A union of all possible profile shapes, discriminated by `role` */
 export type AnyProfileResponse =
   | { role: "customer"; data: CustomerProfile }
@@ -157,7 +193,9 @@ export interface AuthContextValue {
   user: AnyUser | null;
   token: string | null;
   role: UserRole | null;
-  handleLoginSuccess: (data: AnyAuthResponse) => void;
+  otherRoles: UserRole[];
+  handleLoginSuccess: (data: UnifiedLoginResponse) => void;
+  handleSwitchRole: (data: UnifiedLoginResponse) => void;
   handleLogout: () => void;
   saveToken: (token: string | null) => void;
   saveRole: (role: UserRole | null) => void;
@@ -320,7 +358,16 @@ export interface CreateAppointmentBody {
 }
 
 export interface UpdateAppointmentStateBody {
-  state_id: number;
+  state_id?: number;
+  staff_id?: number;
+  service_id?: number;
+  start_date?: string;
+}
+
+export interface CustomerUpdateAppointmentBody {
+  staff_id?: number;
+  service_id?: number;
+  start_date?: string;
 }
 
 export interface GetAvailabilityBody {
@@ -333,14 +380,35 @@ export interface GetAvailabilityBody {
 // APPOINTMENT SPECIFIC RESPONSES
 // ==========================================
 
-/** Response for Customer Cancel */
-export interface CancelAppointmentResponse extends MessageResponse {
-  appointment: Appointment;
-}
+/** Response for Customer Cancel — now returns Appointment directly */
+export type CancelAppointmentResponse = Appointment;
 
 export type DeleteAppointmentResponse = MessageResponse;
 
 /** Response for Availability Check */
 export interface AvailabilityResponse {
   available_slots: string[]; // Array of "HH:mm" strings
+}
+
+// ==========================================
+// PAGINATION
+// ==========================================
+
+export interface PaginationMeta {
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+  from: number;
+  to: number;
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+  from: number;
+  to: number;
 }

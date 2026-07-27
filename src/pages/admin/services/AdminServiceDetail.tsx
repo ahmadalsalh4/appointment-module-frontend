@@ -1,4 +1,5 @@
 import { useParams, Link } from "react-router";
+import { Calendar, Clock } from "lucide-react";
 import { useGetServiceByIdQuery } from "../../../hooks/useServiceQueries";
 import Breadcrumb from "../../../components/Breadcrumb";
 import { formatDate } from "../../../utils/dates";
@@ -65,20 +66,7 @@ export default function AdminServiceDetail() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="flex items-start gap-4 bg-back p-6 rounded-xl">
             <div className="icon-box">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
+              <Clock className="h-6 w-6" />
             </div>
             <div>
               <p className="detail-label">Süre</p>
@@ -93,20 +81,7 @@ export default function AdminServiceDetail() {
 
           <div className="flex items-start gap-4 bg-back p-6 rounded-xl">
             <div className="icon-box">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                />
-              </svg>
+              <Calendar className="h-6 w-6" />
             </div>
             <div>
               <p className="detail-label">Oluşturulma Tarihi</p>

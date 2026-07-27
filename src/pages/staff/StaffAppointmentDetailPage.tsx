@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router";
+import { ArrowLeft } from "lucide-react";
 import {
   useStaffGetAppointmentByIdQuery,
   useStaffUpdateStateMutation,
@@ -42,19 +43,7 @@ export default function StaffAppointmentDetailPage() {
         onClick={() => navigate(-1)}
         className="mb-6 flex items-center gap-2 text-sm text-main/70 hover:text-main transition"
       >
-        <svg
-          className="h-4 w-4"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={2}
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M10 19l-7-7m0 0l7-7m-7 7h18"
-          />
-        </svg>
+        <ArrowLeft className="h-4 w-4" />
         Listeye Dön
       </button>
 

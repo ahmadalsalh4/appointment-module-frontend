@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router";
+import { ChevronRight } from "lucide-react";
 import {
   useCustomerGetAppointmentsQuery,
 } from "../../hooks/useAppointmentQueries";
@@ -216,20 +217,7 @@ export default function MyAppointmentsPage() {
 
                   <StatusBadge status={appointment.status.name} />
 
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 text-main/15 group-hover:text-deep group-hover:translate-x-1 transition-all"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
+                  <ChevronRight className="h-5 w-5 text-main/15 group-hover:text-deep group-hover:translate-x-1 transition-all" />
                 </div>
               </div>
             </Link>

@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import { ArrowLeft } from "lucide-react";
 import { useAuth } from "../../contexts/auth/useAuth";
 
 export default function NotFoundPage() {
@@ -31,19 +32,7 @@ export default function NotFoundPage() {
         to={linkTo}
         className="mt-8 inline-flex items-center gap-2 rounded-lg bg-deep px-6 py-3 text-sm font-semibold text-surface shadow-md transition-all hover:bg-deep/90 hover:shadow-lg active:scale-95"
       >
-        <svg
-          className="h-4 w-4"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={2}
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M10 19l-7-7m0 0l7-7m-7 7h18"
-          />
-        </svg>
+        <ArrowLeft className="h-4 w-4" />
         Ana Sayfaya Dön
       </Link>
     </div>

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useParams, useNavigate } from "react-router";
+import { ArrowLeft, Clock, User } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useGetServiceByIdQuery } from "../../hooks/useServiceQueries";
 import {
@@ -125,20 +126,7 @@ export default function ServiceDetailPage() {
             </h1>
 
             <div className="flex items-center text-main/80 bg-back rounded-lg p-4 mb-6">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6 mr-3 text-deep"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
+              <Clock className="h-6 w-6 mr-3 text-deep" />
               <div>
                 <p className="text-xs text-main/60 uppercase font-semibold">
                   Süre
@@ -156,20 +144,7 @@ export default function ServiceDetailPage() {
               to="/services"
               className="inline-flex items-center text-sm font-semibold text-deep hover:text-deep/80"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4 mr-1"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M7 16l-4-4m0 0l4-4m-4 4h18"
-                />
-              </svg>
+              <ArrowLeft className="h-4 w-4 mr-1" />
               Tüm Hizmetlere Dön
             </Link>
           </div>
@@ -181,20 +156,7 @@ export default function ServiceDetailPage() {
             {/* --- GATE: Check if user is logged in --- */}
             {!token ? (
               <div className="text-center py-16 bg-back rounded-xl border border-main/10">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="mx-auto h-16 w-16 text-main/15 mb-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={1}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                  />
-                </svg>
+                <User className="mx-auto h-16 w-16 text-main/15 mb-4" strokeWidth={1} />
                 <h3 className="text-xl font-bold text-main mb-2">
                   Randevu Oluşturmak İçin Giriş Yapın
                 </h3>

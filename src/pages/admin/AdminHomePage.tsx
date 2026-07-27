@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import { Briefcase, ChevronRight, Clock, User, Users } from "lucide-react";
 import { useAdminGetAppointmentsQuery } from "../../hooks/useAppointmentQueries";
 import { useGetAllStaffQuery } from "../../hooks/useStaffQueries";
 import { useGetAllCategoriesQuery } from "../../hooks/useCategoryQueries";
@@ -36,20 +37,7 @@ export default function AdminHomePage() {
         {/* Total Staff Card */}
         <div className="card p-6 flex items-center gap-4">
           <div className="icon-box">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-8 w-8"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
-              />
-            </svg>
+            <Users className="h-8 w-8" />
           </div>
           <div>
             <p className="text-sm font-medium text-main/60">Toplam Personel</p>
@@ -62,20 +50,7 @@ export default function AdminHomePage() {
         {/* Total Categories Card */}
         <div className="card p-6 flex items-center gap-4">
           <div className="icon-box">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-8 w-8"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-              />
-            </svg>
+            <Briefcase className="h-8 w-8" />
           </div>
           <div>
             <p className="text-sm font-medium text-main/60">Kategoriler</p>
@@ -91,20 +66,7 @@ export default function AdminHomePage() {
           className="card p-6 flex items-center gap-4 hover:shadow-md transition-shadow"
         >
           <div className="p-3 bg-waiting/10 rounded-lg text-waiting">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-8 w-8"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
+            <Clock className="h-8 w-8" />
           </div>
           <div>
             <p className="text-sm font-medium text-main/60">Onay Bekleyen</p>
@@ -117,20 +79,7 @@ export default function AdminHomePage() {
         {/* Total Customers Card */}
         <div className="card p-6 flex items-center gap-4">
           <div className="p-3 bg-completed/10 rounded-lg text-completed">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-8 w-8"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-              />
-            </svg>
+            <User className="h-8 w-8" />
           </div>
           <div>
             <p className="text-sm font-medium text-main/60">
@@ -156,60 +105,21 @@ export default function AdminHomePage() {
               className="flex items-center justify-between w-full px-4 py-3 bg-back rounded-lg text-sm font-medium text-main/80 hover:bg-deep/5 hover:text-deep transition-colors"
             >
               <span>+ Yeni Personel Ekle</span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
+              <ChevronRight className="h-4 w-4" />
             </Link>
             <Link
               to="/admin/categories/add"
               className="flex items-center justify-between w-full px-4 py-3 bg-back rounded-lg text-sm font-medium text-main/80 hover:bg-deep/5 hover:text-deep transition-colors"
             >
               <span>+ Yeni Kategori Ekle</span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
+              <ChevronRight className="h-4 w-4" />
             </Link>
             <Link
               to="/admin/services/add"
               className="flex items-center justify-between w-full px-4 py-3 bg-back rounded-lg text-sm font-medium text-main/80 hover:bg-deep/5 hover:text-deep transition-colors"
             >
               <span>+ Yeni Hizmet Ekle</span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
+              <ChevronRight className="h-4 w-4" />
             </Link>
           </div>
         </div>

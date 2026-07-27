@@ -1,46 +1,13 @@
 import { Link, useLocation } from "react-router";
 import { useState } from "react";
+import { Calendar, LogOut, Menu, User, X } from "lucide-react";
 import { useAuth } from "../../../contexts/auth/useAuth";
 import { useLogoutMutation } from "../../../hooks/useAuthQueries";
 import ThemeToggle from "../../components/ThemeToggle";
 
-// 1. SVG'leri dışarı çıkardık (React 19 static-component hatasını çözer)
-const CalendarIcon = () => (
-  <svg
-    className="h-5 w-5"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-    strokeWidth={2}
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-    />
-  </svg>
-);
-
-const ProfileIcon = () => (
-  <svg
-    className="h-5 w-5"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-    strokeWidth={2}
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-    />
-  </svg>
-);
-
-// 2. Linkleri sadece veri olarak tuttuk
 const navLinks = [
-  { label: "Randevularım", path: "/staff", Icon: CalendarIcon },
-  { label: "Profilim", path: "/staff/profile", Icon: ProfileIcon },
+  { label: "Randevularım", path: "/staff", icon: <Calendar className="h-5 w-5" /> },
+  { label: "Profilim", path: "/staff/profile", icon: <User className="h-5 w-5" /> },
 ];
 
 interface SidebarContentProps {
@@ -71,19 +38,7 @@ function SidebarContent({ onClose }: SidebarContentProps) {
       <div className="mb-4 flex items-center justify-between px-4 lg:hidden">
         <span className="text-lg font-bold text-deep">Personel Menüsü</span>
         <button onClick={onClose} className="text-main/70 hover:text-main">
-          <svg
-            className="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
+          <X className="h-6 w-6" />
         </button>
       </div>
 
@@ -97,7 +52,7 @@ function SidebarContent({ onClose }: SidebarContentProps) {
 
       {/* Navigation Links */}
       <nav className="flex-1 space-y-1 px-3">
-        {navLinks.map(({ label, path, Icon }) => (
+        {navLinks.map(({ label, path, icon }) => (
           <Link
             key={path}
             to={path}
@@ -108,7 +63,7 @@ function SidebarContent({ onClose }: SidebarContentProps) {
                 : "text-main/70 hover:bg-main/5 hover:text-main" // Değilse soluk
             }`}
           >
-            <Icon />
+            {icon}
             {label}
           </Link>
         ))}
@@ -126,19 +81,7 @@ function SidebarContent({ onClose }: SidebarContentProps) {
           onClick={() => role && logout(role)}
           className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
         >
-          <svg
-            className="h-5 w-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-            />
-          </svg>
+          <LogOut className="h-5 w-5" />
           Çıkış Yap
         </button>
       </div>
@@ -157,19 +100,7 @@ export default function StaffSidebar() {
         onClick={() => setIsMobileMenuOpen(true)}
         className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-deep text-surface shadow-lg transition hover:bg-deep/90 lg:hidden"
       >
-        <svg
-          className="h-6 w-6"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={2}
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M4 6h16M4 12h16M4 18h16"
-          />
-        </svg>
+        <Menu className="h-6 w-6" />
       </button>
 
       {/* MOBILE: Overlay Backdrop */}

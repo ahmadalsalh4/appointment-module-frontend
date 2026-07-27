@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import { Calendar, ChevronRight, LogOut, Mail, Monitor, Pencil, Phone, Plus, Tag } from "lucide-react";
 import { useAuth } from "../../contexts/auth/useAuth";
 import { useGetProfileQuery } from "../../hooks/useProfileQueries";
 import { useLogoutMutation } from "../../hooks/useAuthQueries";
@@ -70,19 +71,7 @@ export default function ProfilePage() {
               onClick={() => alert("Profil düzenleme yakında aktif olacak.")}
               className="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold text-white bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-lg shadow-sm transition"
             >
-              <svg
-                className="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                />
-              </svg>
+              <Pencil className="h-4 w-4" />
               <span className="hidden sm:inline">Profili Düzenle</span>
               <span className="sm:hidden">Düzenle</span>
             </button>
@@ -126,9 +115,7 @@ export default function ProfilePage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="flex items-start gap-3 p-3 rounded-lg bg-surface ring-1 ring-main/10 min-w-0">
                 <span className="icon-box shrink-0 mt-0.5">
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                  </svg>
+                  <Phone className="h-4 w-4" />
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="detail-label">Telefon</p>
@@ -137,9 +124,7 @@ export default function ProfilePage() {
               </div>
               <div className="flex items-start gap-3 p-3 rounded-lg bg-surface ring-1 ring-main/10 min-w-0">
                 <span className="icon-box shrink-0 mt-0.5">
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
+                  <Mail className="h-4 w-4" />
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="detail-label">E-posta</p>
@@ -154,9 +139,7 @@ export default function ProfilePage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="flex items-start gap-3 p-3 rounded-lg bg-surface ring-1 ring-main/10 min-w-0">
                 <span className="icon-box shrink-0 mt-0.5">
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
+                  <Calendar className="h-4 w-4" />
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="detail-label">Kayıt Tarihi</p>
@@ -171,9 +154,7 @@ export default function ProfilePage() {
               </div>
               <div className="flex items-start gap-3 p-3 rounded-lg bg-surface ring-1 ring-main/10 min-w-0">
                 <span className="icon-box shrink-0 mt-0.5">
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                  </svg>
+                  <Tag className="h-4 w-4" />
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="detail-label">Hesap ID</p>
@@ -198,18 +179,14 @@ export default function ProfilePage() {
                   className="flex items-center justify-between w-full px-4 py-2.5 bg-violet-50 dark:bg-violet-900/20 hover:bg-violet-100 dark:hover:bg-violet-900/30 text-violet-800 dark:text-violet-300 rounded-lg text-sm font-medium transition-colors"
                 >
                   Dashboard'a Git
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                  </svg>
+                  <ChevronRight className="h-4 w-4" />
                 </Link>
                 <Link
                   to="/admin/staff"
                   className="flex items-center justify-between w-full px-4 py-2.5 bg-back hover:bg-main/10 text-main/70 rounded-lg text-sm font-medium transition-colors"
                 >
                   Personeli Yönet
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                  </svg>
+                  <ChevronRight className="h-4 w-4" />
                 </Link>
               </div>
             </div>
@@ -221,9 +198,7 @@ export default function ProfilePage() {
               <div className="space-y-3">
                 <div className="flex items-start gap-3 p-3 rounded-lg bg-surface ring-1 ring-main/10 min-w-0">
                   <span className="icon-box shrink-0 mt-0.5">
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
+                    <Monitor className="h-4 w-4" />
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="detail-label">Pozisyon / Görev</p>
@@ -232,9 +207,7 @@ export default function ProfilePage() {
                 </div>
                 <div className="flex items-start gap-3 p-3 rounded-lg bg-surface ring-1 ring-main/10 min-w-0">
                   <span className="icon-box shrink-0 mt-0.5">
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                    </svg>
+                    <Tag className="h-4 w-4" />
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="detail-label">Kategori</p>
@@ -244,9 +217,7 @@ export default function ProfilePage() {
                 {profileData.data.managing_admin && (
                   <div className="flex items-start gap-3 p-3 rounded-lg bg-surface ring-1 ring-main/10 min-w-0">
                     <span className="icon-box shrink-0 mt-0.5">
-                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                      </svg>
+                      <Mail className="h-4 w-4" />
                     </span>
                     <div className="min-w-0 flex-1">
                       <p className="detail-label">Yöneticisi</p>
@@ -260,9 +231,7 @@ export default function ProfilePage() {
                 className="mt-4 flex items-center justify-between w-full px-4 py-2.5 bg-sky-50 dark:bg-sky-900/20 hover:bg-sky-100 dark:hover:bg-sky-900/30 text-sky-800 dark:text-sky-300 rounded-lg text-sm font-medium transition-colors"
               >
                 Randevularım
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
+                <ChevronRight className="h-4 w-4" />
               </Link>
             </div>
           )}
@@ -280,18 +249,14 @@ export default function ProfilePage() {
                   className="flex items-center justify-between w-full px-4 py-2.5 bg-emerald-50 dark:bg-emerald-900/20 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300 rounded-lg text-sm font-medium transition-colors"
                 >
                   Randevularım
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                  </svg>
+                  <ChevronRight className="h-4 w-4" />
                 </Link>
                 <Link
                   to="/services"
                   className="flex items-center justify-between w-full px-4 py-2.5 bg-back hover:bg-main/10 text-main/70 rounded-lg text-sm font-medium transition-colors"
                 >
                   Yeni Randevu Oluştur
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                  </svg>
+                    <Plus className="h-4 w-4" />
                 </Link>
               </div>
             </div>
@@ -305,18 +270,14 @@ export default function ProfilePage() {
                 className="flex items-center justify-between w-full px-4 py-2.5 bg-back hover:bg-main/10 text-main/70 rounded-lg text-sm font-medium transition-colors text-left"
               >
                 Şifre Değiştir
-                <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
+                <ChevronRight className="h-4 w-4 shrink-0" />
               </button>
               <button
                 onClick={handleLogout}
                 className="flex items-center justify-between w-full px-4 py-2.5 bg-canceld/10 hover:bg-canceld/15 text-canceld rounded-lg text-sm font-medium transition-colors text-left"
               >
                 Oturumu Kapat
-                <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
+                <LogOut className="h-4 w-4 shrink-0" />
               </button>
             </div>
           </div>

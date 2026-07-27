@@ -1,4 +1,5 @@
 import { useParams, Link } from "react-router";
+import { Clock, List } from "lucide-react";
 import { useGetCategoryByIdQuery } from "../../../hooks/useCategoryQueries";
 import Breadcrumb from "../../../components/Breadcrumb";
 
@@ -43,20 +44,7 @@ export default function AdminCategoryDetail() {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8 border-b border-main/5 pb-6">
           <div className="flex items-center gap-4">
             <div className="icon-box">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-8 w-8"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M4 6h16M4 10h16M4 14h16M4 18h16"
-                />
-              </svg>
+              <List className="h-8 w-8" />
             </div>
             <h1 className="page-header">
               {category.name}
@@ -88,20 +76,7 @@ export default function AdminCategoryDetail() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2 text-sm text-main/60">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
+                    <Clock className="h-4 w-4" />
                     {service.duration} dk
                   </div>
                 </div>

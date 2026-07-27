@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import { ArrowRight, Clock } from "lucide-react";
 import { useGetAllServicesQuery } from "../../hooks/useServiceQueries";
 import type { ServiceWithCategory } from "../../other/types";
 import PageHeader from "../../components/PageHeader";
@@ -73,39 +74,13 @@ export default function ServicesPage() {
               {/* Footer Info */}
               <div className="flex items-center justify-between pt-4 sm:pt-6 border-t border-main/5 mt-auto">
                 <div className="flex items-center text-main/70">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 mr-2 text-deep"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
+                  <Clock className="h-5 w-5 mr-2 text-deep" />
                   <span className="text-sm font-semibold">
                     {service.duration} dk
                   </span>
                 </div>
 
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 text-main/20 group-hover:text-deep group-hover:translate-x-1 transition-all"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M17 8l4 4m0 0l-4 4m4-4H3"
-                  />
-                </svg>
+                <ArrowRight className="h-5 w-5 text-main/20 group-hover:text-deep group-hover:translate-x-1 transition-all" />
               </div>
             </Link>
           ))}

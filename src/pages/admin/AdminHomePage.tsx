@@ -22,7 +22,7 @@ export default function AdminHomePage() {
   const uniqueCustomersMap = new Map(
     appointments?.data
       ?.map((a) => [a.customer_id, a.customer])
-      .filter((a) => a[1] !== undefined) as [number, CustomerProfile][],
+      ?.filter((a) => a[1] !== undefined) as [number, CustomerProfile][] ?? [],
   );
   const totalCustomers = Array.from(uniqueCustomersMap.values());
 

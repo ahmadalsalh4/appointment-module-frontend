@@ -1,4 +1,4 @@
-import { useState, useEffect, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { useParams, useNavigate } from "react-router";
 import {
   useGetCategoryByIdQuery,
@@ -21,12 +21,6 @@ export default function AdminCategoryEdit() {
     name: category?.name ?? "",
   }));
 
-  useEffect(() => {
-    if (category) {
-      setFormData({ name: category.name ?? "" });
-    }
-  }, [category]);
-
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!id) return;
@@ -41,6 +35,7 @@ export default function AdminCategoryEdit() {
 
   return (
     <AdminFormPage
+      key={category?.id ?? "loading"}
       title="Kategoriyi Düzenle"
       breadcrumbs={[
         { label: "Kategoriler", to: "/admin/categories" },

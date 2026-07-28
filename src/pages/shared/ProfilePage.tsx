@@ -3,7 +3,6 @@ import { Calendar, ChevronRight, LogOut, Mail, Monitor, Phone, Tag } from "lucid
 import { useAuth } from "../../contexts/auth/useAuth";
 import { useGetProfileQuery } from "../../hooks/useProfileQueries";
 import { useLogoutMutation } from "../../hooks/useAuthQueries";
-import QueryGate from "../../components/QueryGate";
 import Avatar from "../../components/Avatar";
 import type { UserRole } from "../../other/types";
 import { formatDate } from "../../utils/dates";
@@ -45,7 +44,7 @@ export default function ProfilePage() {
         </div>
         <h1 className="page-header">Profil Yüklenemedi</h1>
         <p className="mt-2 text-main/60">
-          {(error as any)?.response?.data?.message || "Lütfen tekrar giriş yapın."}
+          {error?.response?.data?.message || "Lütfen tekrar giriş yapın."}
         </p>
         <Link to="/login" className="btn-primary mt-6">
           Giriş Yap
@@ -58,7 +57,6 @@ export default function ProfilePage() {
   const currentRole = profileData.role;
 
   return (
-    <QueryGate isLoading={false} isError={false} errorMessage="">
     <div className="page-wide">
       {/* ── Identity section ── */}
       <section className="relative pt-8 pb-6">
@@ -235,6 +233,5 @@ export default function ProfilePage() {
         </div>
       </div>
       </div>
-    </QueryGate>
   );
 }

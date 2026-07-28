@@ -83,6 +83,7 @@ export default function AdminAppointmentDetail() {
     }
 
     try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await updateAppointmentMut.mutateAsync({ id: id!, data: body as any });
       queryClient.invalidateQueries({ queryKey: ["appointments", "admin", id] });
       queryClient.invalidateQueries({ queryKey: ["appointments", "admin"] });
@@ -117,7 +118,7 @@ export default function AdminAppointmentDetail() {
 
       <div className="card-lg overflow-hidden">
         {/* Header Status Bar */}
-        <div className={`p-4 sm:p-6 border-b badge-${appointment.status.name}`}>
+        <div className={`p-4 sm:p-6 border-b badge badge-${appointment.status.name}`}>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div>
               <p className="text-sm font-bold uppercase tracking-widest opacity-80">

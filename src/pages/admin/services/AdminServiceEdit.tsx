@@ -1,4 +1,4 @@
-import { useState, useEffect, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { useParams, useNavigate } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import type { Category, ServiceRequestBody } from "../../../other/types";
@@ -26,16 +26,6 @@ export default function AdminServiceEdit() {
     duration: service?.duration ?? 30,
   }));
 
-  useEffect(() => {
-    if (service) {
-      setFormData({
-        catagory_id: service.catagory_id ?? "",
-        name: service.name ?? "",
-        duration: service.duration ?? 30,
-      });
-    }
-  }, [service]);
-
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!id) return;
@@ -50,6 +40,7 @@ export default function AdminServiceEdit() {
 
   return (
     <AdminFormPage
+      key={service?.id ?? "loading"}
       title="Hizmeti Düzenle"
       breadcrumbs={[
         { label: "Hizmetler", to: "/admin/services" },

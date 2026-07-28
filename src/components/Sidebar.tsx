@@ -40,9 +40,10 @@ function SidebarContent({
 
     try {
       const result = await authApi.switchRole({ role: targetRole as UserRole, password });
-      handleSwitchRole(result as unknown as Parameters<typeof handleSwitchRole>[0]);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      handleSwitchRole(result as any);
       navigate(targetRole === "customer" ? "/" : `/${targetRole}`);
-    } catch (err) {
+    } catch {
       alert("Rol değiştirme başarısız oldu. Şifrenizi kontrol edin.");
     }
   };

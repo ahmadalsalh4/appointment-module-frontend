@@ -86,27 +86,27 @@ export default function StaffAppointmentDetailPage() {
         <div className="p-4 sm:p-6 lg:p-8 grid gap-6 sm:gap-8 sm:grid-cols-2">
           <div className="section-gap-sm">
             <h3 className="section-header">Müşteri Bilgileri</h3>
-            <div>
+            <dl>
               <dt className="detail-label">Ad Soyad</dt>
               <dd className="text-base sm:text-lg font-semibold text-main break-words">
                 {apt?.customer?.person.name} {apt?.customer?.person.surname}
               </dd>
-            </div>
-            <div>
+            </dl>
+            <dl>
               <dt className="detail-label">Telefon</dt>
               <dd className="text-main break-words">
                 {apt?.customer?.person.phone_number}
               </dd>
-            </div>
-            <div>
+            </dl>
+            <dl>
               <dt className="detail-label">E-posta</dt>
               <dd className="text-main break-words">{apt?.customer?.email}</dd>
-            </div>
+            </dl>
           </div>
 
           <div className="section-gap-sm">
             <h3 className="section-header">Randevu Detayı</h3>
-            <div>
+            <dl>
               <dt className="detail-label">Hizmet</dt>
               <dd className="text-base sm:text-lg font-semibold text-main break-words">
                 {apt?.service.name}{" "}
@@ -114,27 +114,27 @@ export default function StaffAppointmentDetailPage() {
                   ({apt?.service.duration} dk)
                 </span>
               </dd>
-            </div>
-            <div>
+            </dl>
+            <dl>
               <dt className="detail-label">Tarih</dt>
               <dd className="detail-value">
                 {apt ? formatDate(apt.start_date) : ""}
               </dd>
-            </div>
-            <div>
+            </dl>
+            <dl>
               <dt className="detail-label">Saat Aralığı</dt>
               <dd className="text-main font-medium">
                 {apt
                   ? `${formatTime(apt.start_date)} - ${formatTime(apt.end_date)}`
                   : ""}
               </dd>
-            </div>
-            <div>
+            </dl>
+            <dl>
               <dt className="detail-label">Mevcut Durum</dt>
               <dd className="mt-1">
                 <StatusBadge status={apt?.status.name ?? ""} />
               </dd>
-            </div>
+            </dl>
           </div>
         </div>
       </div>

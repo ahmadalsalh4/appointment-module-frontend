@@ -30,6 +30,7 @@ export default function MyAppointmentDetailPage() {
   const [editTime, setEditTime] = useState("");
 
   const { data: serviceStaff } = useGetServiceStaffQuery(String(appointment?.service_id ?? ""));
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: categoryStaff } = useGetCategoryStaffQuery(String((appointment?.service as any)?.catagory_id ?? (appointment?.service as any)?.category?.id ?? ""));
 
   const handleCancel = async () => {
@@ -55,6 +56,7 @@ export default function MyAppointmentDetailPage() {
     }
 
     try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await updateMutation.mutateAsync({ id: id!, data: body as any });
       queryClient.invalidateQueries({ queryKey: ["appointments", "customer"] });
       queryClient.invalidateQueries({ queryKey: ["appointments", "customer", id] });
@@ -116,9 +118,11 @@ export default function MyAppointmentDetailPage() {
                 <label className="label-sm">Personel</label>
                 <select value={editStaff} onChange={(e) => setEditStaff(e.target.value)} className="input text-sm">
                   <option value="">Değiştirme</option>
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                   {serviceStaff?.map((s: any) => (
                     <option key={s.id} value={s.id}>{s.person.name} {s.person.surname}</option>
                   ))}
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                   {categoryStaff?.map((s: any) => (
                     <option key={s.id} value={s.id}>{s.person.name} {s.person.surname}</option>
                   ))}

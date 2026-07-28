@@ -31,6 +31,8 @@ export default function Stepper({ steps, currentStep, onStepChange }: StepperPro
               type="button"
               onClick={() => isClickable && onStepChange?.(index)}
               disabled={!isClickable}
+              aria-disabled={!isClickable}
+              aria-current={isCurrent ? "step" : undefined}
               className={`flex items-center gap-2 sm:gap-3 group ${isClickable ? "cursor-pointer" : "cursor-default"}`}
             >
               <span

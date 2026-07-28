@@ -21,7 +21,7 @@ export default function Pagination({
   onPageChange,
   onPerPageChange,
 }: PaginationProps) {
-  const perPageOptions = [10, 15, 25, 50, 100];
+  const perPageOptions = [10, 12, 15, 25, 50, 100];
 
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 pt-4 border-t border-main/5">
@@ -34,7 +34,7 @@ export default function Pagination({
       <div className="flex items-center gap-2">
         <select
           value={perPage}
-          onChange={(e) => onPerPageChange(Number(e.target.value))}
+          onChange={(e) => onPerPageChange(Number(e.target.value) || 10)}
           className="text-sm border border-main/10 rounded-lg px-2 py-1.5 bg-surface text-main/70 focus:border-deep focus:ring-1 focus:ring-deep/20 outline-none"
         >
           {perPageOptions.map((n) => (

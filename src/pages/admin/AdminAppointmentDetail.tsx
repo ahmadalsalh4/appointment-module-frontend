@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router";
 import { Calendar, Clock, Edit3 } from "lucide-react";
 import {
@@ -34,11 +34,21 @@ export default function AdminAppointmentDetail() {
   const confirm = useConfirm();
   const toast = useToast();
 
+  // Guard: bad URL → don't send a request with an invalid id.
+  if (!id || !/^\d+$/.test(id)) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-20 text-center text-canceld">
+        <p className="text-xl font-bold">Geçersiz randevu.</p>
+        <Link to="/admin/appointments" className="mt-4 inline-block text-deep hover:underline">Randevulara Dön</Link>
+      </div>
+    );
+  }
+
   const {
     data: appointment,
     isLoading,
     isError,
-  } = useAdminGetAppointmentByIdQuery(id || "");
+  } = useAdminGetAppointmentByIdQuery(id);
   const updateAppointmentMut = useAdminUpdateAppointmentMutation();
   const deleteMut = useAdminDeleteAppointmentMutation();
 
@@ -48,14 +58,29 @@ export default function AdminAppointmentDetail() {
   const [editDate, setEditDate] = useState("");
   const [editTime, setEditTime] = useState("");
 
-  const { data: allServices } = useGetAllServicesQuery({ per_page: 9999 });
-  const { data: allStaff } = useGetAllStaffQuery({ per_page: 9999 });
+  // Tracks the "original" status so that a rapid second change (or a
+  // failed second change) reverts to the value the user started from,
+  // not to the in-flight optimistic value. Without this, two quick
+  // dropdown changes in a row could leave the UI showing a value the
+  // server never accepted.
+  const originalStateId = useRef<number | null>(null);
+
+  // Use a small per_page to populate the edit dropdowns. Previously
+  // used 9999 which scales O(n) with the whole table; with a real
+  // customer base this would be the slowest page in the app.
+  const { data: allServices } = useGetAllServicesQuery({ per_page: 100 });
+  const { data: allStaff } = useGetAllStaffQuery({ per_page: 100 });
 
   const handleStatusUpdate = async (
     e: React.ChangeEvent<HTMLSelectElement>,
   ) => {
     const newStateId = Number(e.target.value);
-    const previousStateId = appointment?.state_id;
+    // Capture the pre-change value the first time, then keep it stable
+    // across subsequent re-renders / second changes.
+    if (originalStateId.current === null) {
+      originalStateId.current = appointment?.state_id ?? null;
+    }
+    const previousStateId = originalStateId.current;
     const targetName = STATUS_NAME_BY_ID[newStateId as AppointmentStatusId] ?? "";
     const targetLabel = STATUS_LABELS[targetName] ?? "bilinmiyor";
     const variant: "primary" | "success" | "danger" =
@@ -73,7 +98,7 @@ export default function AdminAppointmentDetail() {
     }
     try {
       await updateAppointmentMut.mutateAsync({
-        id: id!,
+        id,
         data: { state_id: newStateId },
       });
       queryClient.invalidateQueries({
@@ -81,9 +106,11 @@ export default function AdminAppointmentDetail() {
       });
       queryClient.invalidateQueries({ queryKey: ["appointments", "admin"] });
       toast.success("Durum güncellendi.");
+      originalStateId.current = null;
     } catch {
       toast.error("Durum güncellenirken bir hata oluştu.");
       e.target.value = String(previousStateId ?? "");
+      originalStateId.current = null;
     }
   };
 
@@ -97,7 +124,7 @@ export default function AdminAppointmentDetail() {
     });
     if (!ok) return;
     try {
-      await deleteMut.mutateAsync(id!);
+      await deleteMut.mutateAsync(id);
       queryClient.invalidateQueries({ queryKey: ["appointments", "admin"] });
       toast.success("Randevu silindi.");
       navigate("/admin/appointments");
@@ -117,7 +144,7 @@ export default function AdminAppointmentDetail() {
 
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await updateAppointmentMut.mutateAsync({ id: id!, data: body as any });
+      await updateAppointmentMut.mutateAsync({ id, data: body as any });
       queryClient.invalidateQueries({ queryKey: ["appointments", "admin", id] });
       queryClient.invalidateQueries({ queryKey: ["appointments", "admin"] });
       setIsEditing(false);

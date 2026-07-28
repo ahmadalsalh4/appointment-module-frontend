@@ -7,7 +7,7 @@ interface ProtectedRouteProps {
 }
 
 export default function ProtectedRoute({ allowedRole }: ProtectedRouteProps) {
-  const { token, role } = useAuth();
+  const { token, role, user } = useAuth();
 
   if (!token || !role) {
     return <Navigate to="/login" replace />;
@@ -15,6 +15,14 @@ export default function ProtectedRoute({ allowedRole }: ProtectedRouteProps) {
 
   if (allowedRole && role !== allowedRole) {
     return <Navigate to="/unauthorized" replace />;
+  }
+
+  // While rehydration is in progress, render nothing (no flash of
+  // protected content with a null user). BookAppointmentPage depends
+  // on `user` and would otherwise briefly show
+  // "İletişim bilgileri yüklenemedi".
+  if (token && role && user === null) {
+    return null;
   }
 
   return <Outlet />;

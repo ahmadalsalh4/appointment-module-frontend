@@ -31,7 +31,19 @@ export default function MyAppointmentDetailPage() {
   const confirm = useConfirm();
   const toast = useToast();
 
-  const { data: appointment, isLoading, isError } = useCustomerGetAppointmentByIdQuery(id || "");
+  // Guard: don't send a request with an invalid id. A bad URL otherwise
+  // triggers a confusing 404 (or worse, a request with the string
+  // "undefined").
+  if (!id || !/^\d+$/.test(id)) {
+    return (
+      <div className="page-wide text-center text-canceld">
+        <p className="text-xl font-bold">Geçersiz randevu.</p>
+        <Link to="/appointments" className="mt-4 inline-block text-deep hover:underline">Randevularıma Dön</Link>
+      </div>
+    );
+  }
+
+  const { data: appointment, isLoading, isError } = useCustomerGetAppointmentByIdQuery(id);
   const cancelMutation = useCancelAppointmentMutation();
   const updateMutation = useUpdateMyAppointmentMutation();
 
@@ -53,7 +65,7 @@ export default function MyAppointmentDetailPage() {
     });
     if (!ok) return;
     try {
-      await cancelMutation.mutateAsync(id!);
+      await cancelMutation.mutateAsync(id);
       queryClient.invalidateQueries({ queryKey: ["appointments", "customer"] });
       toast.success("Randevu iptal edildi.");
       navigate("/appointments");
@@ -77,7 +89,7 @@ export default function MyAppointmentDetailPage() {
 
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await updateMutation.mutateAsync({ id: id!, data: body as any });
+      await updateMutation.mutateAsync({ id, data: body as any });
       queryClient.invalidateQueries({ queryKey: ["appointments", "customer"] });
       queryClient.invalidateQueries({ queryKey: ["appointments", "customer", id] });
       setIsEditing(false);

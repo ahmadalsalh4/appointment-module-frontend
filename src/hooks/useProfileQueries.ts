@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import profilesApi, { type ProfileUpdateBody } from "../api/profiles";
 import type { AxiosError } from "axios";
 import type {
@@ -14,11 +14,12 @@ export const useGetProfileQuery = (role: UserRole | null) => {
       if (!role) throw new Error("No role provided");
       return await profilesApi.get(role);
     },
-    enabled: !!role, // Don't run if we don't know the role yet
+    enabled: !!role,
   });
 };
 
 export const useUpdateProfileMutation = () => {
+  const queryClient = useQueryClient();
   return useMutation<
     AnyProfileResponse,
     AxiosError<LaravelErrorResponse>,
@@ -26,6 +27,12 @@ export const useUpdateProfileMutation = () => {
   >({
     mutationFn: async ({ role, data }) => {
       return await profilesApi.update(role, data);
+    },
+    onSuccess: (_data, variables) => {
+      // The profile query stays stale until we explicitly invalidate it;
+      // before this fix the UI kept showing the old name/email until
+      // a manual refresh.
+      queryClient.invalidateQueries({ queryKey: ["profile", variables.role] });
     },
   });
 };

@@ -6,6 +6,7 @@ import {
 } from "../../../hooks/useCategoryQueries";
 import { useQueryClient } from "@tanstack/react-query";
 import type { CategoryRequestBody, CategoryWithServices } from "../../../other/types";
+import { useToast } from "../../../hooks/useToast";
 import AdminFormPage from "../components/AdminFormPage";
 import Loading from "../../components/Loading";
 
@@ -57,6 +58,7 @@ export default function AdminCategoryEdit() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const toast = useToast();
 
   const { data: category, isLoading: isLoadingCategory } = useGetCategoryByIdQuery(id || "");
   const updateMut = useUpdateCategoryMutation();
@@ -67,8 +69,9 @@ export default function AdminCategoryEdit() {
       await updateMut.mutateAsync({ id, data: formData });
       queryClient.invalidateQueries({ queryKey: ["categories"] });
       navigate("/admin/categories");
-    } catch {
-      alert("Kategori güncellenirken bir hata oluştu.");
+    } catch (err) {
+      const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      toast.error(message || "Kategori güncellenirken bir hata oluştu.");
     }
   };
 

@@ -2,18 +2,12 @@ import { Link, useNavigate } from "react-router";
 import { LogOut, User } from "lucide-react";
 import { useAuth } from "../../contexts/auth/useAuth";
 import { useLogoutMutation } from "../../hooks/useAuthQueries";
+import { ROLE_HOME, ROLE_PROFILE } from "../../utils/roleHome";
 import ThemeToggle from "./ThemeToggle";
 
 export default function Header() {
   const { token, role } = useAuth();
-  const linkTo =
-    role === "customer"
-      ? "/"
-      : role === "admin"
-        ? "/admin"
-        : role === "staff"
-          ? "/staff"
-          : "/login";
+  const linkTo = role ? ROLE_HOME[role] : "/login";
   const navigate = useNavigate();
   const { mutate: logout } = useLogoutMutation();
 
@@ -39,9 +33,7 @@ export default function Header() {
             <>
               {/* Profile Button */}
               <button
-                onClick={() =>
-                  navigate(role === "customer" ? "/profile" : `/${role}/profile`)
-                }
+                onClick={() => navigate(ROLE_PROFILE[role])}
                 className="flex items-center gap-2 rounded-lg bg-back px-4 py-2 text-sm font-medium text-main transition hover:bg-main/10"
               >
                 <User className="h-5 w-5" />

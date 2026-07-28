@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import type { Category, ServiceRequestBody } from "../../../other/types";
 import { useCreateServiceMutation } from "../../../hooks/useServiceQueries";
 import { useGetAllCategoriesQuery } from "../../../hooks/useCategoryQueries";
+import { useToast } from "../../../hooks/useToast";
 import AdminFormPage from "../components/AdminFormPage";
 
 export default function AdminServiceAdd() {
@@ -11,6 +12,7 @@ export default function AdminServiceAdd() {
   const queryClient = useQueryClient();
   const createMut = useCreateServiceMutation();
   const { data: categories } = useGetAllCategoriesQuery();
+  const toast = useToast();
 
   const [formData, setFormData] = useState<ServiceRequestBody>({
     catagory_id: "",
@@ -24,8 +26,9 @@ export default function AdminServiceAdd() {
       await createMut.mutateAsync(formData);
       queryClient.invalidateQueries({ queryKey: ["services"] });
       navigate("/admin/services");
-    } catch {
-      alert("Hizmet eklenirken bir hata oluştu.");
+    } catch (err) {
+      const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      toast.error(message || "Hizmet eklenirken bir hata oluştu.");
     }
   };
 

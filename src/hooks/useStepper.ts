@@ -1,27 +1,52 @@
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import type { StepperStep } from "../components/Stepper";
 
 export function useStepper(steps: StepperStep[], initialStep = 0) {
-  const safeInitial = steps.length > 0
-    ? Math.max(0, Math.min(initialStep, steps.length - 1))
-    : 0;
-  const [currentStep, setCurrentStep] = useState(safeInitial);
+  const clamp = useCallback(
+    (i: number) => (steps.length === 0 ? 0 : Math.max(0, Math.min(i, steps.length - 1))),
+    [steps.length],
+  );
+
+  // We hold the user's "intended" step in state, but always render the
+  // clamped value. If steps shrinks after a re-render, the rendered
+  // step is silently clamped without us having to call setState in an
+  // effect (which the React linter rightly flags as a cascading
+  // render).
+  const [requestedStep, setRequestedStep] = useState(() => clamp(initialStep));
+  const currentStep = useMemo(() => clamp(requestedStep), [clamp, requestedStep]);
+
+  const canAdvanceCurrent = steps[currentStep]?.canAdvance?.() ?? true;
 
   const next = useCallback(() => {
-    setCurrentStep((i) => Math.min(i + 1, steps.length - 1));
-  }, [steps.length]);
+    if (!canAdvanceCurrent) return;
+    setRequestedStep((i) => clamp(i + 1));
+  }, [canAdvanceCurrent, clamp]);
 
   const prev = useCallback(() => {
-    setCurrentStep((i) => Math.max(i - 1, 0));
-  }, []);
+    setRequestedStep((i) => clamp(i - 1));
+  }, [clamp]);
 
-  const goTo = useCallback((index: number) => {
-    setCurrentStep(() => Math.max(0, Math.min(index, steps.length - 1)));
-  }, [steps.length]);
+  const goTo = useCallback(
+    (index: number) => {
+      // Only allow jumping to a step that has already been completed
+      // (or to the current one). The Stepper component also enforces
+      // this on click; we repeat it here so programmatic goTo() calls
+      // can't bypass the gate.
+      const target = clamp(index);
+      if (target <= currentStep) {
+        setRequestedStep(target);
+      }
+    },
+    [currentStep, clamp],
+  );
 
-  const canAdvance = steps[currentStep]?.canAdvance?.() ?? true;
-  const isFirst = currentStep === 0;
-  const isLast = steps.length === 0 || currentStep === steps.length - 1;
-
-  return { currentStep, next, prev, goTo, canAdvance, isFirst, isLast };
+  return {
+    currentStep,
+    next,
+    prev,
+    goTo,
+    canAdvance: canAdvanceCurrent,
+    isFirst: currentStep === 0,
+    isLast: steps.length === 0 || currentStep === steps.length - 1,
+  };
 }

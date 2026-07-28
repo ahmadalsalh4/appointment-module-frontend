@@ -26,6 +26,18 @@ function statusLabel(id: number): string {
 export default function StaffAppointmentDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+
+  // Guard: a non-numeric id (e.g. URL with garbage) used to call
+  // Number(undefined) and send "NaN" in the API request. Bail out early
+  // with a friendlier message instead.
+  if (!id || !/^\d+$/.test(id)) {
+    return (
+      <div className="page-wide text-center text-canceld">
+        <p className="text-xl font-bold">Geçersiz randevu.</p>
+      </div>
+    );
+  }
+
   const {
     data: apt,
     isPending,
@@ -38,7 +50,6 @@ export default function StaffAppointmentDetailPage() {
   const queryClient = useQueryClient();
 
   const handleStatusUpdate = async (newStateId: number) => {
-    if (!id) return;
     const ok = await confirm({
       title: "Durumu Güncelle",
       description: `Randevunun durumunu "${statusLabel(newStateId)}" olarak değiştirmek istediğinize emin misiniz?`,

@@ -7,6 +7,7 @@ import {
 import { useGetAllCategoriesQuery } from "../../../hooks/useCategoryQueries";
 import { useQueryClient } from "@tanstack/react-query";
 import type { Category, UpdateStaffRequestBody, StaffEntityDetailed } from "../../../other/types";
+import { useToast } from "../../../hooks/useToast";
 import Breadcrumb from "../../../components/Breadcrumb";
 import FormActions from "../../../components/FormActions";
 import QueryGate from "../../../components/QueryGate";
@@ -17,6 +18,7 @@ function StaffEditForm({ staff }: { staff: StaffEntityDetailed }) {
   const queryClient = useQueryClient();
   const { data: categories } = useGetAllCategoriesQuery();
   const updateMut = useUpdateStaffMutation();
+  const toast = useToast();
 
   const [formData, setFormData] = useState<UpdateStaffRequestBody>({
     job_title: staff.job_title || "",
@@ -39,8 +41,9 @@ function StaffEditForm({ staff }: { staff: StaffEntityDetailed }) {
       await updateMut.mutateAsync({ id, data: payload });
       queryClient.invalidateQueries({ queryKey: ["staff"] });
       navigate("/admin/staff");
-    } catch {
-      alert("Personel güncellenirken bir hata oluştu.");
+    } catch (err) {
+      const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      toast.error(message || "Personel güncellenirken bir hata oluştu.");
     }
   };
 

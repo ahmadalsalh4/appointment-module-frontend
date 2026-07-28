@@ -26,6 +26,15 @@ const SIZE_CLASSES: Record<ModalSize, string> = {
 const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
+// Module-level counter so stacked modals don't fight over body overflow.
+// Each open() bumps the count; the first close that takes it to 0
+// restores the original overflow. Previously each modal independently
+// saved/restored body.style.overflow, so opening a second modal on
+// top of the first would restore the body to scrolling behind the
+// second one.
+let openModalCount = 0;
+let savedBodyOverflow = "";
+
 export default function Modal({
   open,
   onClose,
@@ -42,11 +51,21 @@ export default function Modal({
   const titleId = useId();
   const descriptionId = useId();
 
+  // Keep the latest onClose in a ref so we can attach a stable
+  // keydown listener that doesn't churn on every parent render.
+  const onCloseRef = useRef(onClose);
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
+
   useEffect(() => {
     if (!open) return;
 
     previousActive.current = document.activeElement as HTMLElement | null;
-    const originalOverflow = document.body.style.overflow;
+    if (openModalCount === 0) {
+      savedBodyOverflow = document.body.style.overflow;
+    }
+    openModalCount += 1;
     document.body.style.overflow = "hidden";
 
     const getFocusable = () =>
@@ -57,7 +76,7 @@ export default function Modal({
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === "Escape" && closeOnEscape) {
         e.preventDefault();
-        onClose();
+        onCloseRef.current();
         return;
       }
       if (e.key !== "Tab") return;
@@ -78,10 +97,13 @@ export default function Modal({
 
     return () => {
       document.removeEventListener("keydown", handleKey);
-      document.body.style.overflow = originalOverflow;
+      openModalCount = Math.max(0, openModalCount - 1);
+      if (openModalCount === 0) {
+        document.body.style.overflow = savedBodyOverflow;
+      }
       previousActive.current?.focus();
     };
-  }, [open, onClose, closeOnEscape]);
+  }, [open, closeOnEscape]);
 
   if (!open) return null;
 

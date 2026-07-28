@@ -3,6 +3,7 @@ import Error from "../components/Error";
 import { Link, useNavigate } from "react-router";
 import { useLoginMutation } from "../../hooks/useAuthQueries";
 import { useAuth } from "../../contexts/auth/useAuth";
+import { ROLE_HOME } from "../../utils/roleHome";
 
 export default function Login() {
   const [form, setForm] = useState({
@@ -11,8 +12,17 @@ export default function Login() {
   });
 
   const { mutate: login, isPending, isError, error, data } = useLoginMutation();
-  const { handleLoginSuccess } = useAuth();
+  const { handleLoginSuccess, token, role } = useAuth();
   const navigate = useNavigate();
+
+  // If the user is already logged in, send them to their home —
+  // before this fix a logged-in user could re-submit the login form
+  // and accidentally replace their session.
+  useEffect(() => {
+    if (token && role) {
+      navigate(ROLE_HOME[role], { replace: true });
+    }
+  }, [token, role, navigate]);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -22,14 +32,7 @@ export default function Login() {
   useEffect(() => {
     if (data) {
       handleLoginSuccess(data);
-
-      if (data.role === "customer") {
-        navigate("/");
-      } else if (data.role === "staff") {
-        navigate("/staff");
-      } else if (data.role === "admin") {
-        navigate("/admin");
-      }
+      navigate(ROLE_HOME[data.role] ?? "/login", { replace: true });
     }
   }, [data, handleLoginSuccess, navigate]);
 

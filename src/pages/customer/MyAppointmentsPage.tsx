@@ -23,6 +23,14 @@ export default function MyAppointmentsPage() {
   const [perPage, setPerPage] = useState<number>(15);
   const [page, setPage] = useState<number>(1);
 
+  // Filter setters that also reset pagination (filter change otherwise
+  // keeps the user on a stale page number that may be out of range).
+  const setTabP = (v: string) => { setTab(v); setPage(1); };
+  const setStatusIdP = (v: string) => { setStatusId(v); setPage(1); };
+  const setStaffIdP = (v: string) => { setStaffId(v); setPage(1); };
+  const setDateP = (v: string) => { setDate(v); setPage(1); };
+  const setCustomerNameP = (v: string) => { setCustomerName(v); setPage(1); };
+
   const filters: ApptFilters = {
     ...(tab && { tab }),
     ...(statusId && { status_id: statusId }),
@@ -84,13 +92,13 @@ export default function MyAppointmentsPage() {
       <div className="mb-6">
         <AppointmentFilters
           statusId={statusId}
-          onStatusChange={setStatusId}
+          onStatusChange={setStatusIdP}
           date={date}
-          onDateChange={setDate}
+          onDateChange={setDateP}
           tab={tab}
-          onTabChange={setTab}
+          onTabChange={setTabP}
           customerName={customerName}
-          onCustomerNameChange={setCustomerName}
+          onCustomerNameChange={setCustomerNameP}
           sortBy={sortBy}
           onSortByChange={setSortBy}
           sortOrder={sortOrder}
@@ -104,7 +112,7 @@ export default function MyAppointmentsPage() {
             <label className="label-sm">Personel</label>
             <select
               value={staffId}
-              onChange={(e) => setStaffId(e.target.value)}
+              onChange={(e) => setStaffIdP(e.target.value)}
               className="input-filter focus:border-deep focus:ring-2 focus:ring-deep/20"
             >
               <option value="">Tümü</option>

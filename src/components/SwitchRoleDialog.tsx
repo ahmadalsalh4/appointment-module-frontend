@@ -5,6 +5,7 @@ import Modal from "./Modal";
 import { useMyRolesQuery } from "../hooks/useMyRolesQuery";
 import { useAuth } from "../contexts/auth/useAuth";
 import authApi from "../api/auth";
+import { ROLE_HOME } from "../utils/roleHome";
 import type { UserRole } from "../other/types";
 
 interface SwitchRoleDialogProps {
@@ -17,12 +18,6 @@ const ROLE_LABEL: Record<UserRole, string> = {
   customer: "Müşteri",
   staff: "Personel",
   admin: "Yönetici",
-};
-
-const ROLE_PATH: Record<UserRole, string> = {
-  customer: "/",
-  staff: "/staff",
-  admin: "/admin",
 };
 
 export default function SwitchRoleDialog({ open, onClose, targetRole }: SwitchRoleDialogProps) {
@@ -41,7 +36,7 @@ export default function SwitchRoleDialog({ open, onClose, targetRole }: SwitchRo
       const result = await authApi.switchRole({ role: targetRole, password });
       handleSwitchRole(result);
       await refetchMyRoles();
-      navigate(ROLE_PATH[targetRole], { replace: true });
+      navigate(ROLE_HOME[targetRole], { replace: true });
     } catch (err) {
       const e2 = err as { response?: { data?: { message?: string } } };
       setError(e2?.response?.data?.message || "Rol değiştirme başarısız oldu. Şifrenizi kontrol edin.");
@@ -97,7 +92,8 @@ export default function SwitchRoleDialog({ open, onClose, targetRole }: SwitchRo
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="input focus:border-deep focus:ring-2 focus:ring-deep/20"
+            disabled={submitting}
+            className="input focus:border-deep focus:ring-2 focus:ring-deep/20 disabled:opacity-50"
             placeholder="••••••••"
             autoComplete="current-password"
             required

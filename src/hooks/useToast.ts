@@ -10,7 +10,7 @@ export interface ToastInput {
 }
 
 interface ToastItem extends Required<Omit<ToastInput, "duration">> {
-  id: number;
+  id: string;
   duration: number;
 }
 
@@ -22,10 +22,13 @@ const initialState: ToastState = { items: [] };
 
 const [useToastStore, setToastStore] = create<ToastState>(initialState);
 
-let nextId = 1;
+const newId = (): string =>
+  typeof crypto !== "undefined" && "randomUUID" in crypto
+    ? crypto.randomUUID()
+    : `toast-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
-function push(input: ToastInput): number {
-  const id = nextId++;
+function push(input: ToastInput): string {
+  const id = newId();
   const item: ToastItem = {
     id,
     message: input.message,
@@ -36,7 +39,7 @@ function push(input: ToastInput): number {
   return id;
 }
 
-function dismiss(id: number) {
+function dismiss(id: string) {
   setToastStore((s) => ({ items: s.items.filter((i) => i.id !== id) }));
 }
 
@@ -57,29 +60,30 @@ export function useToastItems() {
 
 export function useToastTimer() {
   const items = useToastItems();
-  const seenIds = useRef<Set<number>>(new Set());
-  const timers = useRef<Map<number, ReturnType<typeof setTimeout>>>(new Map());
+  const timers = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
 
+  // Schedule dismissal for any new item that doesn't already have a timer.
   useEffect(() => {
-    const currentIds = new Set(items.map((i) => i.id));
-
     for (const item of items) {
-      if (seenIds.current.has(item.id)) continue;
-      const timer = setTimeout(() => dismiss(item.id), item.duration);
-      timers.current.set(item.id, timer);
-      seenIds.current.add(item.id);
+      if (timers.current.has(item.id)) continue;
+      const t = setTimeout(() => dismiss(item.id), item.duration);
+      timers.current.set(item.id, t);
     }
+  }, [items]);
 
-    for (const id of [...seenIds.current]) {
-      if (!currentIds.has(id)) {
-        const t = timers.current.get(id);
-        if (t) clearTimeout(t);
+  // Cancel timers for items that have been removed (e.g. manually
+  // dismissed or replaced).
+  useEffect(() => {
+    const liveIds = new Set(items.map((i) => i.id));
+    for (const [id, t] of [...timers.current]) {
+      if (!liveIds.has(id)) {
+        clearTimeout(t);
         timers.current.delete(id);
-        seenIds.current.delete(id);
       }
     }
   }, [items]);
 
+  // Final cleanup on unmount.
   useEffect(() => {
     const map = timers.current;
     return () => {

@@ -1,17 +1,11 @@
 import { Link } from "react-router";
 import { Lock } from "lucide-react";
 import { useAuth } from "../../contexts/auth/useAuth";
+import { ROLE_HOME } from "../../utils/roleHome";
 
 export default function UnauthorizedPage() {
   const { role } = useAuth();
-  const linkTo =
-    role === "customer"
-      ? "/"
-      : role === "admin"
-        ? "/admin"
-        : role === "staff"
-          ? "/staff"
-          : "/login";
+  const linkTo = role ? ROLE_HOME[role] : "/login";
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-back p-6 text-center">

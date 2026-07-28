@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { ChevronDown, LogOut, Menu, RefreshCw, X } from "lucide-react";
 import { useAuth } from "../contexts/auth/useAuth";
 import { useLogoutMutation } from "../hooks/useAuthQueries";
@@ -56,10 +56,17 @@ function SidebarContent({
 
   const isChildActive = (path: string) => location.pathname === path;
 
+  // Memoize the list of direct (non-children) paths so each Sidebar
+  // item render doesn't re-scan the whole list. With many items this
+  // was O(n²) per render.
+  const directPaths = useMemo(
+    () => items.filter((i) => !i.children && i.path).map((i) => i.path!),
+    [items],
+  );
+
   const isDirectActive = (path: string) => {
     if (location.pathname === path) return true;
     if (!location.pathname.startsWith(`${path}/`)) return false;
-    const directPaths = items.filter((i) => !i.children && i.path).map((i) => i.path!);
     return !directPaths.some(
       (other) =>
         other !== path &&

@@ -3,12 +3,14 @@ import { useNavigate } from "react-router";
 import { useCreateCategoryMutation } from "../../../hooks/useCategoryQueries";
 import { useQueryClient } from "@tanstack/react-query";
 import type { CategoryRequestBody } from "../../../other/types";
+import { useToast } from "../../../hooks/useToast";
 import AdminFormPage from "../components/AdminFormPage";
 
 export default function AdminCategoryAdd() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const createMut = useCreateCategoryMutation();
+  const toast = useToast();
 
   const [formData, setFormData] = useState<CategoryRequestBody>({
     name: "",
@@ -20,8 +22,9 @@ export default function AdminCategoryAdd() {
       await createMut.mutateAsync(formData);
       queryClient.invalidateQueries({ queryKey: ["categories"] });
       navigate("/admin/categories");
-    } catch {
-      alert("Kategori eklenirken bir hata oluştu.");
+    } catch (err) {
+      const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      toast.error(message || "Kategori eklenirken bir hata oluştu.");
     }
   };
 

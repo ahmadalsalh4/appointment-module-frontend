@@ -35,6 +35,15 @@ export default function AdminAppointmentsList() {
   const [perPage, setPerPage] = useState<number>(15);
   const [page, setPage] = useState<number>(1);
 
+  // Filter setters that also reset pagination. Without this, the user
+  // could be on page 5, change a filter that returns 2 pages, and
+  // see an empty result.
+  const setTabP = (v: string) => { setTab(v); setPage(1); };
+  const setStatusIdP = (v: string) => { setStatusId(v); setPage(1); };
+  const setStaffIdP = (v: string) => { setStaffId(v); setPage(1); };
+  const setDateP = (v: string) => { setDate(v); setPage(1); };
+  const setCustomerNameP = (v: string) => { setCustomerName(v); setPage(1); };
+
   const filters = {
     ...(tab && { tab }),
     ...(statusId && { status_id: statusId }),
@@ -124,13 +133,13 @@ export default function AdminAppointmentsList() {
 
       <AppointmentFilters
         statusId={statusId}
-        onStatusChange={setStatusId}
+        onStatusChange={setStatusIdP}
         date={date}
-        onDateChange={setDate}
+        onDateChange={setDateP}
         tab={tab}
-        onTabChange={setTab}
+        onTabChange={setTabP}
         customerName={customerName}
-        onCustomerNameChange={setCustomerName}
+        onCustomerNameChange={setCustomerNameP}
         sortBy={sortBy}
         onSortByChange={setSortBy}
         sortOrder={sortOrder}
@@ -142,7 +151,7 @@ export default function AdminAppointmentsList() {
       >
         <div>
           <label className="label-sm">Personel</label>
-          <select value={staffId} onChange={(e) => setStaffId(e.target.value)} className="input-filter focus:border-deep focus:ring-2 focus:ring-deep/20">
+          <select value={staffId} onChange={(e) => setStaffIdP(e.target.value)} className="input-filter focus:border-deep focus:ring-2 focus:ring-deep/20">
             <option value="">Tümü</option>
             {staffList?.data?.map((s) => (
               <option key={s.id} value={String(s.id)}>{s.person?.name} {s.person?.surname}</option>
@@ -179,8 +188,8 @@ export default function AdminAppointmentsList() {
                     <tr key={appo.id} className="hover:bg-back transition-colors">
                       <td className="table-cell whitespace-nowrap">
                         <div className="flex flex-col">
-                          <span className="text-sm font-semibold text-main">{appo.customer?.person.name} {appo.customer?.person.surname}</span>
-                          <span className="text-xs text-main/60">→ {appo.staff?.person.name} {appo.staff?.person.surname}</span>
+                          <span className="text-sm font-semibold text-main">{appo.customer?.person?.name} {appo.customer?.person?.surname}</span>
+                          <span className="text-xs text-main/60">→ {appo.staff?.person?.name} {appo.staff?.person?.surname}</span>
                         </div>
                       </td>
                       <td className="table-cell whitespace-nowrap">
@@ -196,7 +205,8 @@ export default function AdminAppointmentsList() {
                           <div className="spinner-sm"></div>
                         ) : (
                           <select value={appo.state_id} onChange={(e) => handleStatusChange(appo.id, Number(e.target.value))}
-                            className={`badge badge-${appo.status.name} cursor-pointer focus:ring-2 focus:ring-offset-1`}>
+                            disabled={changingId !== null}
+                            className={`badge badge-${appo.status.name} cursor-pointer focus:ring-2 focus:ring-offset-1 disabled:opacity-50`}>
                             <option value="1">Beklemede</option>
                             <option value="2">Onaylandı</option>
                             <option value="3">Tamamlandı</option>

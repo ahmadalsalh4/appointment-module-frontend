@@ -4,6 +4,7 @@ import { useCreateStaffMutation } from "../../../hooks/useStaffQueries";
 import { useQueryClient } from "@tanstack/react-query";
 import type { Category, CreateStaffRequestBody } from "../../../other/types";
 import { useGetAllCategoriesQuery } from "../../../hooks/useCategoryQueries";
+import { useToast } from "../../../hooks/useToast";
 import Breadcrumb from "../../../components/Breadcrumb";
 import FormActions from "../../../components/FormActions";
 
@@ -11,7 +12,8 @@ export default function AdminStaffAdd() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const createMut = useCreateStaffMutation();
-  const { data: categories } = useGetAllCategoriesQuery(); // BUNU EKLEYİN
+  const { data: categories } = useGetAllCategoriesQuery();
+  const toast = useToast();
 
   const [formData, setFormData] = useState<CreateStaffRequestBody>({
     name: "",
@@ -19,7 +21,7 @@ export default function AdminStaffAdd() {
     email: "",
     phone_number: "",
     password: "",
-    catagory_id: "", // BUNU EKLEYİN
+    catagory_id: "",
     job_title: "",
   });
 
@@ -29,8 +31,9 @@ export default function AdminStaffAdd() {
       await createMut.mutateAsync(formData);
       queryClient.invalidateQueries({ queryKey: ["staff"] });
       navigate("/admin/staff");
-    } catch {
-      alert("Personel eklenirken bir hata oluştu.");
+    } catch (err) {
+      const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      toast.error(message || "Personel eklenirken bir hata oluştu.");
     }
   };
 
@@ -97,11 +100,11 @@ export default function AdminStaffAdd() {
             <input
               type="password"
               required
-              minLength={6}
+              minLength={8}
               value={formData.password}
               onChange={(e) => updateField("password", e.target.value)}
               className="input focus:border-deep focus:ring-2 focus:ring-deep/20"
-              placeholder="En az 6 karakter"
+              placeholder="En az 8 karakter"
             />
           </div>
 

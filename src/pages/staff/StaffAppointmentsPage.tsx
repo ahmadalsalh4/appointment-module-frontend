@@ -22,6 +22,12 @@ export default function StaffAppointmentsPage() {
   const [perPage, setPerPage] = useState<number>(15);
   const [page, setPage] = useState<number>(1);
 
+  // Reset pagination when any filter changes.
+  const setTabP = (v: string) => { setTab(v); setPage(1); };
+  const setStatusIdP = (v: string) => { setStatusId(v); setPage(1); };
+  const setDateP = (v: string) => { setDate(v); setPage(1); };
+  const setCustomerNameP = (v: string) => { setCustomerName(v); setPage(1); };
+
   const filters: ApptFilters = {
     ...(tab && { tab }),
     ...(statusId && { status_id: statusId }),
@@ -65,13 +71,13 @@ export default function StaffAppointmentsPage() {
       <div className="mb-6">
         <AppointmentFilters
           statusId={statusId}
-          onStatusChange={setStatusId}
+          onStatusChange={setStatusIdP}
           date={date}
-          onDateChange={setDate}
+          onDateChange={setDateP}
           tab={tab}
-          onTabChange={setTab}
+          onTabChange={setTabP}
           customerName={customerName}
-          onCustomerNameChange={setCustomerName}
+          onCustomerNameChange={setCustomerNameP}
           sortBy={sortBy}
           onSortByChange={setSortBy}
           sortOrder={sortOrder}

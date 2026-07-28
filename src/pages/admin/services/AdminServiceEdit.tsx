@@ -7,6 +7,7 @@ import {
   useUpdateServiceMutation,
 } from "../../../hooks/useServiceQueries";
 import { useGetAllCategoriesQuery } from "../../../hooks/useCategoryQueries";
+import { useToast } from "../../../hooks/useToast";
 import AdminFormPage from "../components/AdminFormPage";
 import Loading from "../../components/Loading";
 
@@ -91,6 +92,7 @@ export default function AdminServiceEdit() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const toast = useToast();
 
   const { data: service, isLoading: isLoadingService } = useGetServiceByIdQuery(id || "");
   const { data: categories } = useGetAllCategoriesQuery();
@@ -102,8 +104,9 @@ export default function AdminServiceEdit() {
       await updateMut.mutateAsync({ id, data: formData });
       queryClient.invalidateQueries({ queryKey: ["services"] });
       navigate("/admin/services");
-    } catch {
-      alert("Hizmet güncellenirken bir hata oluştu.");
+    } catch (err) {
+      const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      toast.error(message || "Hizmet güncellenirken bir hata oluştu.");
     }
   };
 

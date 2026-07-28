@@ -12,11 +12,14 @@ import { Skeleton } from "../../components/skeletons/Skeleton";
 import { formatTime, formatMonthDay } from "../../utils/dates";
 
 export default function AdminHomePage() {
-  // Fetch real data for the dashboard cards
+  // The dashboard only needs the latest 4 pending appointments and a
+  // count of staff/categories. We use a small per_page and filter
+  // client-side so we don't load the entire table on every visit.
+  // (Previously used per_page: 9999 which is dangerous at scale.)
   const { data: appointments, isLoading: loadingAppos } =
-    useAdminGetAppointmentsQuery({ per_page: 9999 });
-  const { data: staffList } = useGetAllStaffQuery({ per_page: 9999 });
-  const { data: categories } = useGetAllCategoriesQuery({ per_page: 9999 });
+    useAdminGetAppointmentsQuery({ per_page: 50, tab: "pending" });
+  const { data: staffList } = useGetAllStaffQuery({ per_page: 1 });
+  const { data: categories } = useGetAllCategoriesQuery({ per_page: 1 });
 
   const pendingAppos =
     appointments?.data?.filter((a) => a.status.name === "pending") ?? [];
@@ -27,6 +30,12 @@ export default function AdminHomePage() {
     [];
   const uniqueCustomersMap = new Map<number, CustomerProfile>(customerEntries);
   const totalCustomers = Array.from(uniqueCustomersMap.values());
+
+  // With per_page: 1 we only get the metadata back, not the data array.
+  // Read the totals from the paginated response so the count cards
+  // stay accurate without loading every row.
+  const totalStaff = staffList?.total ?? 0;
+  const totalCategories = categories?.total ?? 0;
 
   return (
     <div className="page-xl space-y-8">
@@ -46,7 +55,7 @@ export default function AdminHomePage() {
             <div>
               <p className="text-sm font-medium text-main/60">Toplam Personel</p>
               <p className="text-2xl sm:text-3xl font-bold text-main">
-                {staffList.data?.length || 0}
+                {totalStaff}
               </p>
             </div>
           </div>
@@ -63,7 +72,7 @@ export default function AdminHomePage() {
             <div>
               <p className="text-sm font-medium text-main/60">Kategoriler</p>
               <p className="text-2xl sm:text-3xl font-bold text-main">
-                {categories.data?.length || 0}
+                {totalCategories}
               </p>
             </div>
           </div>

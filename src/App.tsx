@@ -25,22 +25,23 @@ export default function App() {
         <Route path="*" element={<NotFoundPage />} />
       </Route>
 
-      {/* Role-based dashboards (sidebar only) */}
-      <RoleRoutes
-        allowedRole="customer"
-        layout={CustomerLayout}
-        routes={customerRoutes}
-      />
-      <RoleRoutes
-        allowedRole="staff"
-        layout={StaffLayout}
-        routes={staffRoutes}
-      />
-      <RoleRoutes
-        allowedRole="admin"
-        layout={AdminLayout}
-        routes={adminRoutes}
-      />
+      {/* Role-based dashboards (sidebar only) — must be called as a function so the
+          returned <Fragment> is inlined as a direct child of <Routes>. */}
+      {RoleRoutes({
+        allowedRole: "customer",
+        layout: CustomerLayout,
+        routes: customerRoutes,
+      })}
+      {RoleRoutes({
+        allowedRole: "staff",
+        layout: StaffLayout,
+        routes: staffRoutes,
+      })}
+      {RoleRoutes({
+        allowedRole: "admin",
+        layout: AdminLayout,
+        routes: adminRoutes,
+      })}
     </Routes>
   );
 }

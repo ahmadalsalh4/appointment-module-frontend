@@ -1,4 +1,5 @@
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
+import type { ReactNode } from "react";
 
 interface SortableThProps {
   field: string;
@@ -6,7 +7,7 @@ interface SortableThProps {
   currentOrder?: "asc" | "desc";
   onSort: (field: string) => void;
   className?: string;
-  children: React.ReactNode;
+  children: ReactNode;
   align?: "left" | "right" | "center";
 }
 

@@ -1,6 +1,11 @@
 import { CheckCircle2, AlertCircle, Info, AlertTriangle, X } from "lucide-react";
-import { useToastItems, useToastTimer, type ToastVariant } from "../hooks/useToast";
-import { useToast } from "../hooks/useToast";
+import type { ComponentType } from "react";
+import {
+  useToast,
+  useToastItems,
+  useToastTimer,
+  type ToastVariant,
+} from "../hooks/useToast";
 
 const VARIANT_STYLES: Record<ToastVariant, string> = {
   success: "bg-completed/10 border-completed/30 text-completed",
@@ -9,7 +14,7 @@ const VARIANT_STYLES: Record<ToastVariant, string> = {
   warning: "bg-waiting/10 border-waiting/30 text-waiting",
 };
 
-const VARIANT_ICONS: Record<ToastVariant, React.ComponentType<{ className?: string }>> = {
+const VARIANT_ICONS: Record<ToastVariant, ComponentType<{ className?: string }>> = {
   success: CheckCircle2,
   error: AlertCircle,
   info: Info,

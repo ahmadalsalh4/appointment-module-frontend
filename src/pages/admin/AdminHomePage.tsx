@@ -18,14 +18,14 @@ export default function AdminHomePage() {
   const { data: staffList } = useGetAllStaffQuery({ per_page: 9999 });
   const { data: categories } = useGetAllCategoriesQuery({ per_page: 9999 });
 
-  // Calculate metrics safely (Fixed .length error)
   const pendingAppos =
-    appointments?.data?.filter((a) => a.status.name === "pending") || [];
-  const uniqueCustomersMap = new Map(
+    appointments?.data?.filter((a) => a.status.name === "pending") ?? [];
+  const customerEntries =
     appointments?.data
-      ?.map((a) => [a.customer_id, a.customer])
-      ?.filter((a) => a[1] !== undefined) as [number, CustomerProfile][] ?? [],
-  );
+      ?.map((a) => [a.customer_id, a.customer] as [number, CustomerProfile | undefined])
+      ?.filter((entry): entry is [number, CustomerProfile] => entry[1] !== undefined) ??
+    [];
+  const uniqueCustomersMap = new Map<number, CustomerProfile>(customerEntries);
   const totalCustomers = Array.from(uniqueCustomersMap.values());
 
   return (

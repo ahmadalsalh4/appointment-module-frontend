@@ -149,7 +149,7 @@ export interface UnifiedLoginResponse {
   user: AnyUser;
   token: string;
   role: UserRole;
-  other_roles: UserRole[];
+  other_roles?: UserRole[];
 }
 
 // ==========================================
@@ -170,6 +170,7 @@ export interface SwitchRoleResponse {
   user: AnyUser;
   token: string;
   role: UserRole;
+  other_roles?: UserRole[];
 }
 
 /** A union of all possible profile shapes, discriminated by `role` */

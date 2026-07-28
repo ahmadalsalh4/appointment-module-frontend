@@ -71,7 +71,6 @@ export default function AdminServicesList() {
   };
 
   return (
-    <>
     <AdminListPage
       title="Hizmetler"
       subtitle="Sistemdeki tüm hizmetleri görüntüleyin ve yönetin."
@@ -102,6 +101,20 @@ export default function AdminServicesList() {
             />
           </div>
         </div>
+      }
+      footer={
+        servicesData && (
+          <Pagination
+            currentPage={servicesData.current_page}
+            lastPage={servicesData.last_page}
+            perPage={servicesData.per_page}
+            total={servicesData.total}
+            from={servicesData.from}
+            to={servicesData.to}
+            onPageChange={setPage}
+            onPerPageChange={(pp) => { setPerPage(pp); setPage(1); }}
+          />
+        )
       }
     >
       {services.map((service: ServiceWithCategory) => (
@@ -150,21 +163,5 @@ export default function AdminServicesList() {
         </tr>
       ))}
     </AdminListPage>
-
-    {servicesData && (
-      <div className="page-xl">
-        <Pagination
-          currentPage={servicesData.current_page}
-          lastPage={servicesData.last_page}
-          perPage={servicesData.per_page}
-          total={servicesData.total}
-          from={servicesData.from}
-          to={servicesData.to}
-          onPageChange={setPage}
-          onPerPageChange={(pp) => { setPerPage(pp); setPage(1); }}
-        />
-      </div>
-    )}
-    </>
   );
 }

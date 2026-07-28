@@ -36,7 +36,7 @@ export default function MyAppointmentsPage() {
   };
 
   const { data: paginated, isLoading, isError } = useCustomerGetAppointmentsQuery(filters);
-  const { data: allAppointments } = useCustomerGetAppointmentsQuery({ per_page: 200 });
+  const { data: allAppointments } = useCustomerGetAppointmentsQuery({ per_page: 100 });
 
   const appointments = paginated?.data ?? [];
 

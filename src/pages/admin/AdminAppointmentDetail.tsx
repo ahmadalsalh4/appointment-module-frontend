@@ -14,7 +14,16 @@ import Avatar from "../../components/Avatar";
 import SkeletonDetail from "../../components/skeletons/SkeletonDetail";
 import { useConfirm } from "../../hooks/useConfirm";
 import { useToast } from "../../hooks/useToast";
-import { formatDate, formatTime } from "../../utils/dates";
+import { STATUS_LABELS, STATUS_NAME_BY_ID } from "../../other/constants";
+import type { AppointmentStatusId } from "../../other/constants";
+import {
+  combineLocal,
+  formatDate,
+  formatTime,
+  localDateInputValue,
+  localTimeInputValue,
+  todayLocalDateInputValue,
+} from "../../utils/dates";
 import { useGetAllServicesQuery } from "../../hooks/useServiceQueries";
 import { useGetAllStaffQuery } from "../../hooks/useStaffQueries";
 
@@ -46,6 +55,22 @@ export default function AdminAppointmentDetail() {
     e: React.ChangeEvent<HTMLSelectElement>,
   ) => {
     const newStateId = Number(e.target.value);
+    const previousStateId = appointment?.state_id;
+    const targetName = STATUS_NAME_BY_ID[newStateId as AppointmentStatusId] ?? "";
+    const targetLabel = STATUS_LABELS[targetName] ?? "bilinmiyor";
+    const variant: "primary" | "success" | "danger" =
+      newStateId === 3 ? "success" : newStateId === 4 ? "danger" : "primary";
+    const ok = await confirm({
+      title: "Durumu Güncelle",
+      description: `Randevunun durumunu "${targetLabel}" olarak değiştirmek istediğinize emin misiniz?`,
+      confirmLabel: "Evet, Güncelle",
+      cancelLabel: "Vazgeç",
+      variant,
+    });
+    if (!ok) {
+      e.target.value = String(previousStateId ?? "");
+      return;
+    }
     try {
       await updateAppointmentMut.mutateAsync({
         id: id!,
@@ -58,6 +83,7 @@ export default function AdminAppointmentDetail() {
       toast.success("Durum güncellendi.");
     } catch {
       toast.error("Durum güncellenirken bir hata oluştu.");
+      e.target.value = String(previousStateId ?? "");
     }
   };
 
@@ -84,11 +110,9 @@ export default function AdminAppointmentDetail() {
     const body: Record<string, unknown> = {};
     if (editStaff) body.staff_id = Number(editStaff);
     if (editService) body.service_id = Number(editService);
-    if (editDate && editTime) {
-      body.start_date = `${editDate}T${editTime}:00.000000Z`;
-    } else if (editDate) {
-      const oldTime = appointment?.start_date?.slice(11, 16) ?? "09:00";
-      body.start_date = `${editDate}T${oldTime}:00.000000Z`;
+    if (editDate) {
+      const fallbackTime = appointment ? localTimeInputValue(appointment.start_date) : "09:00";
+      body.start_date = combineLocal(editDate, editTime, fallbackTime);
     }
 
     try {
@@ -164,7 +188,7 @@ export default function AdminAppointmentDetail() {
                 </div>
                 <div className="flex flex-col gap-1">
                   <label className="text-xs font-bold uppercase opacity-80">Tarih</label>
-                  <input type="date" value={editDate} onChange={(e) => setEditDate(e.target.value)} className="bg-surface text-main rounded-lg shadow-sm border border-main/20 px-3 py-1.5 text-sm" />
+                  <input type="date" value={editDate} onChange={(e) => setEditDate(e.target.value)} min={todayLocalDateInputValue()} className="bg-surface text-main rounded-lg shadow-sm border border-main/20 px-3 py-1.5 text-sm" />
                 </div>
                 <div className="flex flex-col gap-1">
                   <label className="text-xs font-bold uppercase opacity-80">Saat</label>
@@ -187,8 +211,8 @@ export default function AdminAppointmentDetail() {
                   setIsEditing(true);
                   setEditStaff(String(appointment.staff_id || ""));
                   setEditService(String(appointment.service_id || ""));
-                  setEditDate(appointment.start_date?.slice(0, 10) || "");
-                  setEditTime(appointment.start_date?.slice(11, 16) || "");
+                  setEditDate(appointment ? localDateInputValue(appointment.start_date) : "");
+                  setEditTime(appointment ? localTimeInputValue(appointment.start_date) : "");
                 }}
                 className="flex items-center gap-1.5 bg-surface text-main font-bold rounded-lg shadow-sm border border-main/20 px-3 py-2 text-sm hover:bg-deep/5"
               >

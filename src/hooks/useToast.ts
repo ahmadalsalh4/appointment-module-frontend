@@ -1,5 +1,5 @@
 import { create } from "./createStore";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 export type ToastVariant = "success" | "error" | "info" | "warning";
 
@@ -24,50 +24,30 @@ const [useToastStore, setToastStore] = create<ToastState>(initialState);
 
 let nextId = 1;
 
+function push(input: ToastInput): number {
+  const id = nextId++;
+  const item: ToastItem = {
+    id,
+    message: input.message,
+    variant: input.variant ?? "info",
+    duration: input.duration ?? 4000,
+  };
+  setToastStore((s) => ({ items: [...s.items, item] }));
+  return id;
+}
+
+function dismiss(id: number) {
+  setToastStore((s) => ({ items: s.items.filter((i) => i.id !== id) }));
+}
+
 export function useToast() {
   return {
-    push: (input: ToastInput) => {
-      const id = nextId++;
-      const item: ToastItem = {
-        id,
-        message: input.message,
-        variant: input.variant ?? "info",
-        duration: input.duration ?? 4000,
-      };
-      setToastStore((s) => ({ items: [...s.items, item] }));
-      return id;
-    },
-    success: (message: string) => {
-      const id = nextId++;
-      setToastStore((s) => ({
-        items: [...s.items, { id, message, variant: "success", duration: 4000 }],
-      }));
-      return id;
-    },
-    error: (message: string) => {
-      const id = nextId++;
-      setToastStore((s) => ({
-        items: [...s.items, { id, message, variant: "error", duration: 5000 }],
-      }));
-      return id;
-    },
-    info: (message: string) => {
-      const id = nextId++;
-      setToastStore((s) => ({
-        items: [...s.items, { id, message, variant: "info", duration: 4000 }],
-      }));
-      return id;
-    },
-    warning: (message: string) => {
-      const id = nextId++;
-      setToastStore((s) => ({
-        items: [...s.items, { id, message, variant: "warning", duration: 4000 }],
-      }));
-      return id;
-    },
-    dismiss: (id: number) => {
-      setToastStore((s) => ({ items: s.items.filter((i) => i.id !== id) }));
-    },
+    push: (input: ToastInput) => push(input),
+    success: (message: string) => push({ message, variant: "success" }),
+    error: (message: string) => push({ message, variant: "error", duration: 5000 }),
+    info: (message: string) => push({ message, variant: "info" }),
+    warning: (message: string) => push({ message, variant: "warning" }),
+    dismiss,
   };
 }
 
@@ -77,12 +57,34 @@ export function useToastItems() {
 
 export function useToastTimer() {
   const items = useToastItems();
-  const dismiss = useToast().dismiss;
+  const seenIds = useRef<Set<number>>(new Set());
+  const timers = useRef<Map<number, ReturnType<typeof setTimeout>>>(new Map());
+
   useEffect(() => {
-    if (items.length === 0) return;
-    const timers = items.map((item) =>
-      setTimeout(() => dismiss(item.id), item.duration),
-    );
-    return () => timers.forEach(clearTimeout);
-  }, [items, dismiss]);
+    const currentIds = new Set(items.map((i) => i.id));
+
+    for (const item of items) {
+      if (seenIds.current.has(item.id)) continue;
+      const timer = setTimeout(() => dismiss(item.id), item.duration);
+      timers.current.set(item.id, timer);
+      seenIds.current.add(item.id);
+    }
+
+    for (const id of [...seenIds.current]) {
+      if (!currentIds.has(id)) {
+        const t = timers.current.get(id);
+        if (t) clearTimeout(t);
+        timers.current.delete(id);
+        seenIds.current.delete(id);
+      }
+    }
+  }, [items]);
+
+  useEffect(() => {
+    const map = timers.current;
+    return () => {
+      map.forEach((t) => clearTimeout(t));
+      map.clear();
+    };
+  }, []);
 }

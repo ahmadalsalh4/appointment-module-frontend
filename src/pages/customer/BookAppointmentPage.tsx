@@ -18,7 +18,7 @@ import { useToast } from "../../hooks/useToast";
 import Breadcrumb from "../../components/Breadcrumb";
 import QueryGate from "../../components/QueryGate";
 import Avatar from "../../components/Avatar";
-import { formatDate } from "../../utils/dates";
+import { formatDate, toLocalIsoString, todayLocalDateInputValue } from "../../utils/dates";
 import type { StaffEntity, CustomerProfile } from "../../other/types";
 import type { GetAvailabilityBody } from "../../other/types";
 
@@ -98,7 +98,7 @@ export default function BookAppointmentPage() {
 
   const handleConfirm = async () => {
     if (!selectedTime || !selectedStaffId || !selectedDate || !serviceId) return;
-    const start_date = `${selectedDate}T${selectedTime}:00.000000Z`;
+    const start_date = toLocalIsoString(selectedDate, selectedTime);
     try {
       await createAppointment.mutateAsync({
         staff_id: Number(selectedStaffId),
@@ -125,7 +125,7 @@ export default function BookAppointmentPage() {
     );
   }
 
-  const today = new Date().toISOString().split("T")[0];
+  const today = todayLocalDateInputValue();
 
   return (
     <QueryGate isLoading={isLoading} isError={false} errorMessage="">
@@ -200,7 +200,11 @@ export default function BookAppointmentPage() {
                   {staffList.map((s) => (
                     <button
                       key={s.id}
-                      onClick={() => setSelectedStaffId(String(s.id))}
+                      onClick={() => {
+                        setSelectedStaffId(String(s.id));
+                        setSlots([]);
+                        setSelectedTime(null);
+                      }}
                       className={`text-left p-4 rounded-xl border transition-all flex items-center gap-3 ${
                         selectedStaffId === String(s.id)
                           ? "border-deep bg-deep/5 shadow-sm"
@@ -392,6 +396,7 @@ export default function BookAppointmentPage() {
                 !selectedTime ||
                 !selectedStaffId ||
                 !selectedDate ||
+                !customerProfile ||
                 createAppointment.isPending
               }
               className="btn-primary"

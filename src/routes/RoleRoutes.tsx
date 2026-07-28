@@ -1,8 +1,9 @@
 import { Route } from "react-router";
+import type { ReactNode, ComponentType } from "react";
 import ProtectedRoute from "../other/ProtectedRoute";
 import type { UserRole } from "../other/types";
 
-type RouteConfig = { path: string; element: React.ReactNode };
+type RouteConfig = { path: string; element: ReactNode };
 
 export default function RoleRoutes({
   allowedRole,
@@ -10,7 +11,7 @@ export default function RoleRoutes({
   routes,
 }: {
   allowedRole: UserRole;
-  layout: React.ComponentType;
+  layout: ComponentType;
   routes: RouteConfig[];
 }) {
   return (

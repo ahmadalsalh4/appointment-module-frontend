@@ -26,21 +26,21 @@ export default function App() {
       </Route>
 
       {/* Role-based dashboards (sidebar only) */}
-      {RoleRoutes({
-        allowedRole: "customer",
-        layout: CustomerLayout,
-        routes: customerRoutes,
-      })}
-      {RoleRoutes({
-        allowedRole: "staff",
-        layout: StaffLayout,
-        routes: staffRoutes,
-      })}
-      {RoleRoutes({
-        allowedRole: "admin",
-        layout: AdminLayout,
-        routes: adminRoutes,
-      })}
+      <RoleRoutes
+        allowedRole="customer"
+        layout={CustomerLayout}
+        routes={customerRoutes}
+      />
+      <RoleRoutes
+        allowedRole="staff"
+        layout={StaffLayout}
+        routes={staffRoutes}
+      />
+      <RoleRoutes
+        allowedRole="admin"
+        layout={AdminLayout}
+        routes={adminRoutes}
+      />
     </Routes>
   );
 }

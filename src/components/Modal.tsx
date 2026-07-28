@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useId, useRef, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 
@@ -23,6 +23,9 @@ const SIZE_CLASSES: Record<ModalSize, string> = {
   xl: "max-w-2xl",
 };
 
+const FOCUSABLE_SELECTOR =
+  'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 export default function Modal({
   open,
   onClose,
@@ -36,6 +39,8 @@ export default function Modal({
 }: ModalProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
   const previousActive = useRef<HTMLElement | null>(null);
+  const titleId = useId();
+  const descriptionId = useId();
 
   useEffect(() => {
     if (!open) return;
@@ -44,10 +49,10 @@ export default function Modal({
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
-    const focusable = dialogRef.current?.querySelectorAll<HTMLElement>(
-      'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])',
-    );
-    focusable?.[0]?.focus();
+    const getFocusable = () =>
+      dialogRef.current?.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR);
+
+    getFocusable()?.[0]?.focus();
 
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === "Escape" && closeOnEscape) {
@@ -55,7 +60,9 @@ export default function Modal({
         onClose();
         return;
       }
-      if (e.key !== "Tab" || !focusable || focusable.length === 0) return;
+      if (e.key !== "Tab") return;
+      const focusable = getFocusable();
+      if (!focusable || focusable.length === 0) return;
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
       if (e.shiftKey && document.activeElement === first) {
@@ -72,7 +79,7 @@ export default function Modal({
     return () => {
       document.removeEventListener("keydown", handleKey);
       document.body.style.overflow = originalOverflow;
-      previousActive.current?.focus?.();
+      previousActive.current?.focus();
     };
   }, [open, onClose, closeOnEscape]);
 
@@ -83,7 +90,8 @@ export default function Modal({
       className="fixed inset-0 z-[100] flex items-center justify-center p-4"
       role="dialog"
       aria-modal="true"
-      aria-labelledby={title ? "modal-title" : undefined}
+      aria-labelledby={title ? titleId : undefined}
+      aria-describedby={description ? descriptionId : undefined}
     >
       <div
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
@@ -97,12 +105,14 @@ export default function Modal({
           <div className="flex items-start justify-between gap-4 p-6 border-b border-main/10">
             <div className="min-w-0">
               {title && (
-                <h2 id="modal-title" className="text-lg sm:text-xl font-bold text-main text-balance">
+                <h2 id={titleId} className="text-lg sm:text-xl font-bold text-main text-balance">
                   {title}
                 </h2>
               )}
               {description && (
-                <p className="text-sm text-main/60 mt-1 text-balance">{description}</p>
+                <p id={descriptionId} className="text-sm text-main/60 mt-1 text-balance">
+                  {description}
+                </p>
               )}
             </div>
             <button

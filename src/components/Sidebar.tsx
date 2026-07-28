@@ -16,6 +16,12 @@ export interface SidebarItem {
   children?: { label: string; path: string }[];
 }
 
+const ROLE_SWITCH_LABEL: Record<UserRole, string> = {
+  customer: "Müşteri paneline geç",
+  staff: "Personel paneline geç",
+  admin: "Yönetici paneline geç",
+};
+
 interface SidebarProps {
   items: SidebarItem[];
   mobileTitle: string;
@@ -66,10 +72,10 @@ function SidebarContent({
     item.children?.some((c) => isChildActive(c.path)) ?? false;
 
   return (
-    <div className="flex h-full flex-col bg-surface pt-6">
+    <div className="flex h-full flex-col bg-surface pt-6 overflow-hidden">
       <div className="mb-4 flex items-center justify-between px-4 lg:hidden">
         <span className="text-lg font-bold text-deep">{mobileTitle}</span>
-        <button onClick={onClose} className="text-main/70 hover:text-main">
+        <button onClick={onClose} className="text-main/70 hover:text-main" aria-label="Menüyü kapat">
           <X className="h-6 w-6" />
         </button>
       </div>
@@ -87,6 +93,7 @@ function SidebarContent({
             {item.children ? (
               <button
                 onClick={() => toggleMenu(item.label)}
+                aria-expanded={openMenus.includes(item.label) || hasActiveChild(item)}
                 className={`flex w-full items-center justify-between rounded-lg px-4 py-3 text-sm font-medium transition-all ${
                   hasActiveChild(item)
                     ? "text-deep bg-deep/5"
@@ -105,6 +112,7 @@ function SidebarContent({
               <Link
                 to={item.path!}
                 onClick={onClose}
+                aria-current={isDirectActive(item.path!) ? "page" : undefined}
                 className={`flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all ${
                   isDirectActive(item.path!)
                     ? "bg-deep text-surface shadow-sm"
@@ -146,38 +154,40 @@ function SidebarContent({
         ))}
       </nav>
 
-      {otherRoles.length > 0 && (
-        <div className="mt-auto border-t border-main/5 pt-4">
-          <p className="px-4 text-[10px] font-bold text-main/30 uppercase tracking-widest mb-2">
-            Rol Değiştir
-          </p>
-          {otherRoles.map((r) => (
-            <button
-              key={r}
-              onClick={() => openSwitchDialog(r)}
-              className="w-full text-left px-4 py-2 text-sm text-main/60 hover:text-deep hover:bg-deep/5 transition-colors flex items-center gap-2"
-            >
-              <RefreshCw className="h-3.5 w-3.5" />
-              {r === "customer" ? "Müşteri paneline geç" : r === "staff" ? "Personel paneline geç" : "Yönetici paneline geç"}
-            </button>
-          ))}
-        </div>
-      )}
+      <div className="mt-auto">
+        {otherRoles.length > 0 && (
+          <div className="border-t border-main/5 pt-4 pb-2">
+            <p className="px-4 text-[10px] font-bold text-main/30 uppercase tracking-widest mb-2">
+              Rol Değiştir
+            </p>
+            {otherRoles.map((r) => (
+              <button
+                key={r}
+                onClick={() => openSwitchDialog(r)}
+                className="w-full text-left px-4 py-2 text-sm text-main/60 hover:text-deep hover:bg-deep/5 transition-colors flex items-center gap-2"
+              >
+                <RefreshCw className="h-3.5 w-3.5" />
+                {ROLE_SWITCH_LABEL[r]}
+              </button>
+            ))}
+          </div>
+        )}
 
-      <div className="mt-auto p-3 border-t border-main/10 space-y-1">
-        <div className="flex items-center gap-3 px-4 py-2">
-          <span className="text-xs font-semibold text-main/60 uppercase tracking-wider">
-            Tema
-          </span>
-          <ThemeToggle />
+        <div className="p-3 border-t border-main/10 space-y-1">
+          <div className="flex items-center gap-3 px-4 py-2">
+            <span className="text-xs font-semibold text-main/60 uppercase tracking-wider">
+              Tema
+            </span>
+            <ThemeToggle />
+          </div>
+          <button
+            onClick={() => role && logout(role)}
+            className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-canceld hover:bg-canceld/10 transition-colors"
+          >
+            <LogOut className="h-5 w-5" />
+            Çıkış Yap
+          </button>
         </div>
-        <button
-          onClick={() => role && logout(role)}
-          className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-canceld hover:bg-canceld/10 transition-colors"
-        >
-          <LogOut className="h-5 w-5" />
-          Çıkış Yap
-        </button>
       </div>
 
       <SwitchRoleDialog
@@ -198,6 +208,7 @@ export default function Sidebar(props: SidebarProps) {
       <button
         onClick={() => setIsMobileMenuOpen(true)}
         className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-deep text-surface shadow-lg transition hover:bg-deep/90 lg:hidden"
+        aria-label="Menüyü aç"
       >
         <Menu className="h-6 w-6" />
       </button>

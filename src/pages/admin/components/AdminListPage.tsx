@@ -25,6 +25,7 @@ interface AdminListPageProps {
   errorMessage: string;
   loading?: ReactNode;
   toolbar?: ReactNode;
+  footer?: ReactNode;
   sortBy?: string;
   sortOrder?: "asc" | "desc";
   onSort?: (field: string) => void;
@@ -44,6 +45,7 @@ export default function AdminListPage({
   errorMessage,
   loading,
   toolbar,
+  footer,
   sortBy,
   sortOrder,
   onSort,
@@ -78,7 +80,7 @@ export default function AdminListPage({
                     if (col.sortField && onSort) {
                       return (
                         <SortableTh
-                          key={i}
+                          key={`${col.header}-${i}`}
                           field={col.sortField}
                           currentField={sortBy}
                           currentOrder={sortOrder}
@@ -92,7 +94,7 @@ export default function AdminListPage({
                     }
                     return (
                       <th
-                        key={i}
+                        key={`${col.header}-${i}`}
                         scope="col"
                         className={
                           col.className ??
@@ -123,6 +125,8 @@ export default function AdminListPage({
           </div>
         </div>
       </QueryGate>
+
+      {footer}
     </div>
   );
 }

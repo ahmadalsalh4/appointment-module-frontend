@@ -1,4 +1,6 @@
 import { useState } from "react";
+import type { FormEvent } from "react";
+import { useNavigate } from "react-router";
 import Modal from "./Modal";
 import { useMyRolesQuery } from "../hooks/useMyRolesQuery";
 import { useAuth } from "../contexts/auth/useAuth";
@@ -26,22 +28,24 @@ const ROLE_PATH: Record<UserRole, string> = {
 export default function SwitchRoleDialog({ open, onClose, targetRole }: SwitchRoleDialogProps) {
   const { handleSwitchRole } = useAuth();
   const { refetch: refetchMyRoles } = useMyRolesQuery();
+  const navigate = useNavigate();
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError(null);
     setSubmitting(true);
     try {
       const result = await authApi.switchRole({ role: targetRole, password });
-      handleSwitchRole({ ...result, other_roles: [] });
+      handleSwitchRole(result);
       await refetchMyRoles();
-      window.location.href = ROLE_PATH[targetRole];
+      navigate(ROLE_PATH[targetRole], { replace: true });
     } catch (err) {
       const e2 = err as { response?: { data?: { message?: string } } };
       setError(e2?.response?.data?.message || "Rol değiştirme başarısız oldu. Şifrenizi kontrol edin.");
+    } finally {
       setSubmitting(false);
     }
   };
@@ -101,7 +105,7 @@ export default function SwitchRoleDialog({ open, onClose, targetRole }: SwitchRo
           />
         </div>
         {error && (
-          <div className="text-sm text-canceld bg-canceld/10 border border-canceld/20 rounded-lg px-3 py-2">
+          <div role="alert" className="text-sm text-canceld bg-canceld/10 border border-canceld/20 rounded-lg px-3 py-2">
             {error}
           </div>
         )}

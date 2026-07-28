@@ -6,7 +6,7 @@ interface SkeletonCardProps {
 
 export default function SkeletonCard({ showCategory = true }: SkeletonCardProps) {
   return (
-    <div className="bg-surface rounded-2xl shadow-sm border border-main/5 p-6 lg:p-8 flex flex-col">
+    <div className="relative bg-surface rounded-2xl shadow-sm border border-main/5 p-6 lg:p-8 flex flex-col">
       <div className="absolute inset-x-0 top-0 h-1 bg-main/5 rounded-t-2xl" />
       {showCategory && <Skeleton className="h-5 w-20 mb-6" />}
       <Skeleton className="h-5 w-3/4 mb-3" />

@@ -16,7 +16,13 @@ import Avatar from "../../components/Avatar";
 import SkeletonDetail from "../../components/skeletons/SkeletonDetail";
 import { useConfirm } from "../../hooks/useConfirm";
 import { useToast } from "../../hooks/useToast";
-import { formatDateTime } from "../../utils/dates";
+import {
+  combineLocal,
+  formatDateTime,
+  localDateInputValue,
+  localTimeInputValue,
+  todayLocalDateInputValue,
+} from "../../utils/dates";
 
 export default function MyAppointmentDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -64,11 +70,9 @@ export default function MyAppointmentDetailPage() {
     }
     const body: Record<string, unknown> = {};
     if (editStaff) body.staff_id = Number(editStaff);
-    if (editDate && editTime) {
-      body.start_date = `${editDate}T${editTime}:00.000000Z`;
-    } else if (editDate) {
-      const oldTime = appointment?.start_date?.split("T")[1]?.slice(0, 5) ?? "09:00";
-      body.start_date = `${editDate}T${oldTime}:00.000000Z`;
+    if (editDate) {
+      const fallbackTime = appointment ? localTimeInputValue(appointment.start_date) : "09:00";
+      body.start_date = combineLocal(editDate, editTime, fallbackTime);
     }
 
     try {
@@ -114,7 +118,7 @@ export default function MyAppointmentDetailPage() {
             </div>
             <div className="flex gap-2">
               {isEditable && (
-                <button onClick={() => { setIsEditing(!isEditing); setEditStaff(String(appointment.staff_id || "")); setEditDate(appointment.start_date?.slice(0, 10) || ""); }} className="btn-primary flex items-center gap-1.5">
+                <button onClick={() => { setIsEditing(!isEditing); setEditStaff(String(appointment.staff_id || "")); setEditDate(appointment ? localDateInputValue(appointment.start_date) : ""); setEditTime(appointment ? localTimeInputValue(appointment.start_date) : ""); }} className="btn-primary flex items-center gap-1.5">
                   <Edit3 className="h-4 w-4" /> Düzenle
                 </button>
               )}
@@ -147,7 +151,7 @@ export default function MyAppointmentDetailPage() {
               </div>
               <div>
                 <label className="label-sm">Tarih</label>
-                <input type="date" value={editDate} onChange={(e) => setEditDate(e.target.value)} className="input text-sm" min={new Date().toISOString().split("T")[0]} />
+                <input type="date" value={editDate} onChange={(e) => setEditDate(e.target.value)} className="input text-sm" min={todayLocalDateInputValue()} />
               </div>
               <div className="flex items-end gap-2">
                 <div className="flex-1">

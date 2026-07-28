@@ -72,7 +72,6 @@ export default function AdminCategoriesList() {
   };
 
   return (
-    <>
     <AdminListPage
       title="Kategoriler"
       subtitle="Hizmetleri gruplandırmak için kategorileri yönetin."
@@ -103,6 +102,20 @@ export default function AdminCategoriesList() {
             />
           </div>
         </div>
+      }
+      footer={
+        categoriesData && (
+          <Pagination
+            currentPage={categoriesData.current_page}
+            lastPage={categoriesData.last_page}
+            perPage={categoriesData.per_page}
+            total={categoriesData.total}
+            from={categoriesData.from}
+            to={categoriesData.to}
+            onPageChange={setPage}
+            onPerPageChange={(pp) => { setPerPage(pp); setPage(1); }}
+          />
+        )
       }
     >
       {categories.map((category: Category) => (
@@ -144,21 +157,5 @@ export default function AdminCategoriesList() {
         </tr>
       ))}
     </AdminListPage>
-
-    {categoriesData && (
-      <div className="page-xl">
-        <Pagination
-          currentPage={categoriesData.current_page}
-          lastPage={categoriesData.last_page}
-          perPage={categoriesData.per_page}
-          total={categoriesData.total}
-          from={categoriesData.from}
-          to={categoriesData.to}
-          onPageChange={setPage}
-          onPerPageChange={(pp) => { setPerPage(pp); setPage(1); }}
-        />
-      </div>
-    )}
-    </>
   );
 }

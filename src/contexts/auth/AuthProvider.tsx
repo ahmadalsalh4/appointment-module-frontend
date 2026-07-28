@@ -36,7 +36,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     saveToken(data.token);
     saveRole(data.role);
     setUser(extractUser(data));
-    setOtherRoles([]);
+    setOtherRoles(data.other_roles ?? []);
   };
 
   const handleLogout = () => {

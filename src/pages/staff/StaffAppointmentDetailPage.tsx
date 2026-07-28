@@ -11,21 +11,16 @@ import Error from "../components/Error";
 import StatusBadge from "../../components/StatusBadge";
 import { useConfirm } from "../../hooks/useConfirm";
 import { useToast } from "../../hooks/useToast";
-import { APPOINTMENT_STATUS, STATUS_LABELS } from "../../other/constants";
+import {
+  APPOINTMENT_STATUS,
+  STATUS_LABELS,
+  STATUS_NAME_BY_ID,
+} from "../../other/constants";
+import type { AppointmentStatusId } from "../../other/constants";
 import { formatTime, formatDate } from "../../utils/dates";
 
-function stateName(id: number): string {
-  switch (id) {
-    case APPOINTMENT_STATUS.PENDING: return "pending";
-    case APPOINTMENT_STATUS.CONFIRMED: return "confirmed";
-    case APPOINTMENT_STATUS.COMPLETED: return "completed";
-    case APPOINTMENT_STATUS.CANCELLED: return "cancelled";
-    default: return "";
-  }
-}
-
 function statusLabel(id: number): string {
-  return STATUS_LABELS[stateName(id)] ?? "";
+  return STATUS_LABELS[STATUS_NAME_BY_ID[id as AppointmentStatusId]] ?? "bilinmiyor";
 }
 
 export default function StaffAppointmentDetailPage() {

@@ -181,18 +181,16 @@ export default function AdminStaffList() {
       </QueryGate>
 
       {staffData && (
-        <div className="mt-6">
-          <Pagination
-            currentPage={staffData.current_page}
-            lastPage={staffData.last_page}
-            perPage={staffData.per_page}
-            total={staffData.total}
-            from={staffData.from}
-            to={staffData.to}
-            onPageChange={setPage}
-            onPerPageChange={(pp) => { setPerPage(pp); setPage(1); }}
-          />
-        </div>
+        <Pagination
+          currentPage={staffData.current_page}
+          lastPage={staffData.last_page}
+          perPage={staffData.per_page}
+          total={staffData.total}
+          from={staffData.from}
+          to={staffData.to}
+          onPageChange={setPage}
+          onPerPageChange={(pp) => { setPerPage(pp); setPage(1); }}
+        />
       )}
     </div>
   );

@@ -16,6 +16,8 @@ import SortableTh from "../../components/SortableTh";
 import { SkeletonTable } from "../../components/skeletons/SkeletonTableRow";
 import { useConfirm } from "../../hooks/useConfirm";
 import { useToast } from "../../hooks/useToast";
+import { STATUS_LABELS, STATUS_NAME_BY_ID } from "../../other/constants";
+import type { AppointmentStatusId } from "../../other/constants";
 import { formatDate, formatTime } from "../../utils/dates";
 
 export default function AdminAppointmentsList() {
@@ -64,6 +66,18 @@ export default function AdminAppointmentsList() {
   };
 
   const handleStatusChange = async (appointmentId: number, newStateId: number) => {
+    const targetName = STATUS_NAME_BY_ID[newStateId as AppointmentStatusId] ?? "";
+    const targetLabel = STATUS_LABELS[targetName] ?? "bilinmiyor";
+    const variant: "primary" | "success" | "danger" =
+      newStateId === 3 ? "success" : newStateId === 4 ? "danger" : "primary";
+    const ok = await confirm({
+      title: "Durumu Güncelle",
+      description: `Randevunun durumunu "${targetLabel}" olarak değiştirmek istediğinize emin misiniz?`,
+      confirmLabel: "Evet, Güncelle",
+      cancelLabel: "Vazgeç",
+      variant,
+    });
+    if (!ok) return;
     setChangingId(appointmentId);
     try {
       await updateMut.mutateAsync({ id: appointmentId, data: { state_id: newStateId } });

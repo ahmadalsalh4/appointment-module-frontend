@@ -1,4 +1,4 @@
-import { useSyncExternalStore } from "react";
+import { useCallback, useSyncExternalStore } from "react";
 
 type Updater<T> = (state: T) => T;
 
@@ -20,15 +20,17 @@ export function create<T>(initial: T) {
 
   const subscribe = (listener: () => void) => {
     listeners.add(listener);
-    return () => listeners.delete(listener);
+    return () => {
+      listeners.delete(listener);
+    };
   };
 
-  function useStore<U = T>(selector: (s: T) => U = (s) => s as unknown as U): U {
-    return useSyncExternalStore(
-      subscribe,
-      () => selector(getState()),
-      () => selector(initial),
-    );
+  function useStore(): T;
+  function useStore<U>(selector: (s: T) => U): U;
+  function useStore<U>(selector: (s: T) => U = (s) => s as unknown as U): U {
+    const getSelected = useCallback(() => selector(getState()), [selector]);
+    const getServerSelected = useCallback(() => selector(initial), [selector]);
+    return useSyncExternalStore(subscribe, getSelected, getServerSelected);
   }
 
   return [useStore, setState, getState] as const;

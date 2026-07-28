@@ -100,6 +100,7 @@ Backend seed edildikten sonra aşağıdaki hesaplarla giriş yapılabilir:
 | Personel | `ahmet@test.com`, `burcu@test.com` | `staff123` | Yazılım |
 | Personel | `huseyin@test.com`, `sevgi@test.com` | `staff123` | Temizlik |
 | Müşteri | `ahmad@test.com`, `elif@test.com`, `burak@test.com` | `customer123` | — |
+| **Çoklu rol** | `multi@test.com` | `multi123` | Hem müşteri hem personel (sidebar'daki rol değiştiriciyi test etmek için) |
 
 ## Layout Mimarisi
 

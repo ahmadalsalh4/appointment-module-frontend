@@ -12,10 +12,16 @@ import PageHeader from "../../components/PageHeader";
 import QueryGate from "../../components/QueryGate";
 import AppointmentFilters from "./components/AppointmentFilters";
 import Pagination from "../../components/Pagination";
+import SortableTh from "../../components/SortableTh";
+import { SkeletonTable } from "../../components/skeletons/SkeletonTableRow";
+import { useConfirm } from "../../hooks/useConfirm";
+import { useToast } from "../../hooks/useToast";
 import { formatDate, formatTime } from "../../utils/dates";
 
 export default function AdminAppointmentsList() {
   const queryClient = useQueryClient();
+  const confirm = useConfirm();
+  const toast = useToast();
 
   const [tab, setTab] = useState<string>("");
   const [statusId, setStatusId] = useState<string>("");
@@ -47,25 +53,43 @@ export default function AdminAppointmentsList() {
   const [changingId, setChangingId] = useState<number | null>(null);
   const appointments = paginated?.data ?? [];
 
+  const handleSort = (field: string) => {
+    if (sortBy === field) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(field);
+      setSortOrder("asc");
+    }
+    setPage(1);
+  };
+
   const handleStatusChange = async (appointmentId: number, newStateId: number) => {
     setChangingId(appointmentId);
     try {
       await updateMut.mutateAsync({ id: appointmentId, data: { state_id: newStateId } });
       queryClient.invalidateQueries({ queryKey: ["appointments", "admin"] });
+      toast.success("Durum güncellendi.");
     } catch {
-      alert("Durum güncellenirken hata oluştu.");
+      toast.error("Durum güncellenirken hata oluştu.");
     } finally {
       setChangingId(null);
     }
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm("Bu randevuyu silmek istediğinize emin misiniz?")) return;
+    const ok = await confirm({
+      title: "Randevuyu Sil",
+      description: "Bu randevuyu kalıcı olarak silmek istediğinize emin misiniz?",
+      confirmLabel: "Evet, Sil",
+      variant: "danger",
+    });
+    if (!ok) return;
     try {
       await deleteMut.mutateAsync(id);
       queryClient.invalidateQueries({ queryKey: ["appointments", "admin"] });
+      toast.success("Randevu silindi.");
     } catch {
-      alert("Randevu silinirken hata oluştu.");
+      toast.error("Randevu silinirken hata oluştu.");
     }
   };
 
@@ -113,7 +137,12 @@ export default function AdminAppointmentsList() {
         </div>
       </AppointmentFilters>
 
-      <QueryGate isLoading={isLoading} isError={isError} errorMessage="Randevular yüklenirken hata oluştu.">
+      <QueryGate
+        isLoading={isLoading}
+        isError={isError}
+        errorMessage="Randevular yüklenirken hata oluştu."
+        loading={<SkeletonTable rows={8} columns={5} />}
+      >
         <div className="table-container">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-main/10">
@@ -121,8 +150,12 @@ export default function AdminAppointmentsList() {
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-bold text-main/60 uppercase tracking-wider">Müşteri / Personel</th>
                   <th className="px-6 py-3 text-left text-xs font-bold text-main/60 uppercase tracking-wider">Hizmet</th>
-                  <th className="px-6 py-3 text-left text-xs font-bold text-main/60 uppercase tracking-wider">Tarih & Saat</th>
-                  <th className="px-6 py-3 text-left text-xs font-bold text-main/60 uppercase tracking-wider">Durum</th>
+                  <SortableTh field="start_date" currentField={sortBy} currentOrder={sortOrder as "asc" | "desc"} onSort={handleSort}>
+                    Tarih &amp; Saat
+                  </SortableTh>
+                  <SortableTh field="state_id" currentField={sortBy} currentOrder={sortOrder as "asc" | "desc"} onSort={handleSort}>
+                    Durum
+                  </SortableTh>
                   <th className="px-6 py-3 text-right text-xs font-bold text-main/60 uppercase tracking-wider">İşlemler</th>
                 </tr>
               </thead>

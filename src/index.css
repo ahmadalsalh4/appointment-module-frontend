@@ -73,7 +73,10 @@
   @apply max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12;
 }
 @utility page-wide {
-  @apply max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12;
+  @apply max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12;
+}
+@utility page-2xl {
+  @apply max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12;
 }
 @utility page-xl {
   @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12;

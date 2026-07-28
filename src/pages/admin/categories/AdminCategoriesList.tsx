@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router";
-import { List } from "lucide-react";
+import { List, Search } from "lucide-react";
 import {
   useGetAllCategoriesQuery,
   useDeleteCategoryMutation,
@@ -11,10 +11,12 @@ import AdminListPage from "../components/AdminListPage";
 import Pagination from "../../../components/Pagination";
 import type { Category } from "../../../other/types";
 import type { AdminListColumn } from "../components/AdminListPage";
+import { useConfirm } from "../../../hooks/useConfirm";
+import { useToast } from "../../../hooks/useToast";
 
 const columns: AdminListColumn[] = [
-  { header: "Kategori Adı" },
-  { header: "Oluşturulma Tarihi" },
+  { header: "Kategori Adı", sortField: "name" },
+  { header: "Oluşturulma Tarihi", sortField: "created_at" },
   {
     header: "İşlemler",
     className:
@@ -24,24 +26,48 @@ const columns: AdminListColumn[] = [
 
 export default function AdminCategoriesList() {
   const queryClient = useQueryClient();
+  const confirm = useConfirm();
+  const toast = useToast();
   const [perPage, setPerPage] = useState(15);
   const [page, setPage] = useState(1);
-  const { data: categoriesData, isLoading, isError } = useGetAllCategoriesQuery({ per_page: perPage, page });
+  const [name, setName] = useState("");
+  const [sortBy, setSortBy] = useState("name");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const { data: categoriesData, isLoading, isError } = useGetAllCategoriesQuery({
+    per_page: perPage,
+    page,
+    name: name || undefined,
+    sort_by: sortBy,
+    sort_order: sortOrder,
+  });
   const categories = categoriesData?.data ?? [];
   const deleteMut = useDeleteCategoryMutation();
 
+  const handleSort = (field: string) => {
+    if (sortBy === field) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(field);
+      setSortOrder("asc");
+    }
+    setPage(1);
+  };
+
   const handleDelete = async (id: number) => {
-    if (
-      !window.confirm(
+    const ok = await confirm({
+      title: "Kategoriyi Sil",
+      description:
         "Bu kategoriyi silmek istediğinize emin misiniz? Bu kategoriye ait hizmetler kategorisiz kalacaktır.",
-      )
-    )
-      return;
+      confirmLabel: "Evet, Sil",
+      variant: "danger",
+    });
+    if (!ok) return;
     try {
       await deleteMut.mutateAsync(id);
       queryClient.invalidateQueries({ queryKey: ["categories"] });
+      toast.success("Kategori silindi.");
     } catch {
-      alert("Kategori silinirken bir hata oluştu.");
+      toast.error("Kategori silinirken bir hata oluştu.");
     }
   };
 
@@ -58,6 +84,26 @@ export default function AdminCategoriesList() {
       isLoading={isLoading}
       isError={isError}
       errorMessage="Kategoriler yüklenirken hata oluştu."
+      sortBy={sortBy}
+      sortOrder={sortOrder}
+      onSort={handleSort}
+      toolbar={
+        <div className="card p-3 sm:p-4">
+          <div className="relative max-w-sm">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-main/40" />
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => {
+                setName(e.target.value);
+                setPage(1);
+              }}
+              placeholder="Kategori adına göre ara..."
+              className="input-filter pl-9 focus:border-deep focus:ring-2 focus:ring-deep/20"
+            />
+          </div>
+        </div>
+      }
     >
       {categories.map((category: Category) => (
         <tr key={category.id} className="hover:bg-back transition-colors">

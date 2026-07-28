@@ -7,6 +7,8 @@ import type { CustomerProfile } from "../../other/types";
 import StatusBadge from "../../components/StatusBadge";
 import PageHeader from "../../components/PageHeader";
 import QueryGate from "../../components/QueryGate";
+import { SkeletonStatCard } from "../../components/skeletons/SkeletonPatterns";
+import { Skeleton } from "../../components/skeletons/Skeleton";
 import { formatTime, formatMonthDay } from "../../utils/dates";
 
 export default function AdminHomePage() {
@@ -36,30 +38,38 @@ export default function AdminHomePage() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Total Staff Card */}
-        <div className="card p-6 flex items-center gap-4">
-          <div className="icon-box">
-            <Users className="h-8 w-8" />
+        {staffList ? (
+          <div className="card p-6 flex items-center gap-4">
+            <div className="icon-box">
+              <Users className="h-8 w-8" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-main/60">Toplam Personel</p>
+              <p className="text-2xl sm:text-3xl font-bold text-main">
+                {staffList.data?.length || 0}
+              </p>
+            </div>
           </div>
-          <div>
-            <p className="text-sm font-medium text-main/60">Toplam Personel</p>
-            <p className="text-2xl sm:text-3xl font-bold text-main">
-              {staffList?.data?.length || 0}
-            </p>
-          </div>
-        </div>
+        ) : (
+          <SkeletonStatCard />
+        )}
 
         {/* Total Categories Card */}
-        <div className="card p-6 flex items-center gap-4">
-          <div className="icon-box">
-            <Briefcase className="h-8 w-8" />
+        {categories ? (
+          <div className="card p-6 flex items-center gap-4">
+            <div className="icon-box">
+              <Briefcase className="h-8 w-8" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-main/60">Kategoriler</p>
+              <p className="text-2xl sm:text-3xl font-bold text-main">
+                {categories.data?.length || 0}
+              </p>
+            </div>
           </div>
-          <div>
-            <p className="text-sm font-medium text-main/60">Kategoriler</p>
-            <p className="text-2xl sm:text-3xl font-bold text-main">
-              {categories?.data?.length || 0}
-            </p>
-          </div>
-        </div>
+        ) : (
+          <SkeletonStatCard />
+        )}
 
         {/* Pending Appointments Card */}
         <Link
@@ -139,7 +149,25 @@ export default function AdminHomePage() {
             </Link>
           </div>
 
-          <QueryGate isLoading={loadingAppos} isError={false} errorMessage="">
+          <QueryGate
+            isLoading={loadingAppos}
+            isError={false}
+            errorMessage=""
+            loading={
+              <div className="space-y-3">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="p-4 bg-back rounded-lg border border-main/5 flex items-center gap-4">
+                    <Skeleton className="h-10 w-10 rounded-lg" />
+                    <div className="flex-1 space-y-2">
+                      <Skeleton className="h-3 w-3/4" />
+                      <Skeleton className="h-3 w-1/2" />
+                    </div>
+                    <Skeleton className="h-5 w-16 rounded-full" />
+                  </div>
+                ))}
+              </div>
+            }
+          >
           {pendingAppos.length === 0 ? (
             <p className="text-main/60 text-center py-8 bg-back rounded-lg">
               Onay bekleyen bir randevu yok.

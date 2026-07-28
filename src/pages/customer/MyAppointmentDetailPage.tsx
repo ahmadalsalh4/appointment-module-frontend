@@ -13,12 +13,17 @@ import StatusBadge from "../../components/StatusBadge";
 import Breadcrumb from "../../components/Breadcrumb";
 import QueryGate from "../../components/QueryGate";
 import Avatar from "../../components/Avatar";
+import SkeletonDetail from "../../components/skeletons/SkeletonDetail";
+import { useConfirm } from "../../hooks/useConfirm";
+import { useToast } from "../../hooks/useToast";
 import { formatDateTime } from "../../utils/dates";
 
 export default function MyAppointmentDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const confirm = useConfirm();
+  const toast = useToast();
 
   const { data: appointment, isLoading, isError } = useCustomerGetAppointmentByIdQuery(id || "");
   const cancelMutation = useCancelAppointmentMutation();
@@ -34,18 +39,29 @@ export default function MyAppointmentDetailPage() {
   const { data: categoryStaff } = useGetCategoryStaffQuery(String((appointment?.service as any)?.catagory_id ?? (appointment?.service as any)?.category?.id ?? ""));
 
   const handleCancel = async () => {
-    if (!window.confirm("Randevunuzu iptal etmek istediğinize emin misiniz?")) return;
+    const ok = await confirm({
+      title: "Randevuyu İptal Et",
+      description: "Bu randevuyu iptal etmek istediğinize emin misiniz? Bu işlem geri alınamaz.",
+      confirmLabel: "Evet, İptal Et",
+      variant: "danger",
+    });
+    if (!ok) return;
     try {
       await cancelMutation.mutateAsync(id!);
       queryClient.invalidateQueries({ queryKey: ["appointments", "customer"] });
+      toast.success("Randevu iptal edildi.");
       navigate("/appointments");
     } catch {
-      alert("Randevu iptal edilirken bir hata oluştu.");
+      toast.error("Randevu iptal edilirken bir hata oluştu.");
     }
   };
 
   const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!editStaff && !editDate) {
+      toast.warning("En az bir alanı değiştirmelisiniz.");
+      return;
+    }
     const body: Record<string, unknown> = {};
     if (editStaff) body.staff_id = Number(editStaff);
     if (editDate && editTime) {
@@ -61,8 +77,9 @@ export default function MyAppointmentDetailPage() {
       queryClient.invalidateQueries({ queryKey: ["appointments", "customer"] });
       queryClient.invalidateQueries({ queryKey: ["appointments", "customer", id] });
       setIsEditing(false);
+      toast.success("Randevu güncellendi.");
     } catch {
-      alert("Randevu güncellenirken bir hata oluştu.");
+      toast.error("Randevu güncellenirken bir hata oluştu.");
     }
   };
 
@@ -79,7 +96,7 @@ export default function MyAppointmentDetailPage() {
   const isEditable = appointment.status.name === "pending";
 
   return (
-    <QueryGate isLoading={isLoading} isError={false} errorMessage="">
+    <QueryGate isLoading={isLoading} isError={false} errorMessage="" loading={<SkeletonDetail />}>
     <div className="page-wide">
       <Breadcrumb items={[{ label: "Randevularım", to: "/appointments" }, { label: `#${appointment.id}` }]} />
 

@@ -8,6 +8,8 @@ import PageHeader from "../../components/PageHeader";
 import QueryGate from "../../components/QueryGate";
 import AppointmentFilters from "../admin/components/AppointmentFilters";
 import Pagination from "../../components/Pagination";
+import SortableTh from "../../components/SortableTh";
+import { SkeletonTable } from "../../components/skeletons/SkeletonTableRow";
 import { formatTime, formatDate } from "../../utils/dates";
 
 export default function StaffAppointmentsPage() {
@@ -33,6 +35,16 @@ export default function StaffAppointmentsPage() {
 
   const { data: paginated, isLoading, isError } = useStaffGetAppointmentsQuery(filters);
   const appointments = paginated?.data ?? [];
+
+  const handleSort = (field: string) => {
+    if (sortBy === field) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(field);
+      setSortOrder("asc");
+    }
+    setPage(1);
+  };
 
   const clearFilters = () => {
     setTab("");
@@ -71,16 +83,25 @@ export default function StaffAppointmentsPage() {
         />
       </div>
 
-      <QueryGate isLoading={isLoading} isError={isError} errorMessage="Randevular yüklenirken bir hata oluştu.">
+      <QueryGate
+        isLoading={isLoading}
+        isError={isError}
+        errorMessage="Randevular yüklenirken bir hata oluştu."
+        loading={<SkeletonTable rows={6} columns={5} />}
+      >
         <div className="table-container">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-main/10 text-left text-sm">
               <thead className="bg-back">
                 <tr>
                   <th className="table-cell font-semibold text-main/70 uppercase text-xs tracking-wider">Müşteri</th>
-                  <th className="table-cell font-semibold text-main/70 uppercase text-xs tracking-wider">Tarih / Saat</th>
+                  <SortableTh field="start_date" currentField={sortBy} currentOrder={sortOrder as "asc" | "desc"} onSort={handleSort}>
+                    Tarih / Saat
+                  </SortableTh>
                   <th className="table-cell font-semibold text-main/70 uppercase text-xs tracking-wider">Hizmet</th>
-                  <th className="table-cell font-semibold text-main/70 uppercase text-xs tracking-wider">Durum</th>
+                  <SortableTh field="state_id" currentField={sortBy} currentOrder={sortOrder as "asc" | "desc"} onSort={handleSort}>
+                    Durum
+                  </SortableTh>
                   <th className="table-cell font-semibold text-main/70 uppercase text-xs tracking-wider text-right">İşlem</th>
                 </tr>
               </thead>

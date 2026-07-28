@@ -9,6 +9,7 @@ import EmptyState from "../../components/EmptyState";
 import QueryGate from "../../components/QueryGate";
 import AppointmentFilters from "../admin/components/AppointmentFilters";
 import Pagination from "../../components/Pagination";
+import { SkeletonAppointmentCardList } from "../../components/skeletons/SkeletonPatterns";
 import { formatDateTime, formatMonthDay } from "../../utils/dates";
 
 export default function MyAppointmentsPage() {
@@ -16,6 +17,7 @@ export default function MyAppointmentsPage() {
   const [statusId, setStatusId] = useState<string>("");
   const [staffId, setStaffId] = useState<string>("");
   const [date, setDate] = useState<string>("");
+  const [customerName, setCustomerName] = useState<string>("");
   const [sortBy, setSortBy] = useState<string>("start_date");
   const [sortOrder, setSortOrder] = useState<string>("asc");
   const [perPage, setPerPage] = useState<number>(15);
@@ -26,15 +28,15 @@ export default function MyAppointmentsPage() {
     ...(statusId && { status_id: statusId }),
     ...(staffId && { staff_id: staffId }),
     ...(date && { date }),
+    ...(customerName.trim() && { customer_name: customerName.trim() }),
     sort_by: sortBy,
     sort_order: sortOrder,
     per_page: perPage,
     page,
   };
 
-  const allParams = useMemo(() => ({ per_page: 200 } as ApptFilters), []);
-  const { data: allAppointments } = useCustomerGetAppointmentsQuery(allParams);
   const { data: paginated, isLoading, isError } = useCustomerGetAppointmentsQuery(filters);
+  const { data: allAppointments } = useCustomerGetAppointmentsQuery({ per_page: 200 });
 
   const appointments = paginated?.data ?? [];
 
@@ -59,13 +61,14 @@ export default function MyAppointmentsPage() {
     setStatusId("");
     setStaffId("");
     setDate("");
+    setCustomerName("");
     setSortBy("start_date");
     setSortOrder("asc");
     setPage(1);
   };
 
   return (
-    <div className="page-wide">
+    <div className="page-2xl">
       <div className="mb-8">
         <PageHeader
           title="Randevularım"
@@ -86,13 +89,16 @@ export default function MyAppointmentsPage() {
           onDateChange={setDate}
           tab={tab}
           onTabChange={setTab}
+          customerName={customerName}
+          onCustomerNameChange={setCustomerName}
           sortBy={sortBy}
           onSortByChange={setSortBy}
           sortOrder={sortOrder}
           onSortOrderChange={setSortOrder}
           showSort
+          showCustomerSearch
           onClear={clearFilters}
-          hasActiveFilters={!!(tab || statusId || staffId || date)}
+          hasActiveFilters={!!(tab || statusId || staffId || date || customerName)}
         >
           <div>
             <label className="label-sm">Personel</label>
@@ -112,7 +118,12 @@ export default function MyAppointmentsPage() {
         </AppointmentFilters>
       </div>
 
-      <QueryGate isLoading={isLoading} isError={isError} errorMessage="Randevularınız yüklenirken bir hata oluştu.">
+      <QueryGate
+        isLoading={isLoading}
+        isError={isError}
+        errorMessage="Randevularınız yüklenirken bir hata oluştu."
+        loading={<SkeletonAppointmentCardList count={6} />}
+      >
         {appointments.length === 0 ? (
           <EmptyState
             message={

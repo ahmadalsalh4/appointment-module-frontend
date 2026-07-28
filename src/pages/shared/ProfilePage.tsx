@@ -4,6 +4,7 @@ import { useAuth } from "../../contexts/auth/useAuth";
 import { useGetProfileQuery } from "../../hooks/useProfileQueries";
 import { useLogoutMutation } from "../../hooks/useAuthQueries";
 import Avatar from "../../components/Avatar";
+import { useToast } from "../../hooks/useToast";
 import type { UserRole } from "../../other/types";
 import { formatDate } from "../../utils/dates";
 
@@ -22,8 +23,12 @@ const roleBadgeStyle: Record<UserRole, string> = {
 export default function ProfilePage() {
   const { role } = useAuth();
   const { mutate: logout } = useLogoutMutation();
+  const toast = useToast();
   const handleLogout = () => {
     if (role) logout(role);
+  };
+  const handleChangePasswordClick = () => {
+    toast.info("Şifre değiştirme yakında aktif olacak.");
   };
 
   const { data: profileData, isLoading, isError, error } = useGetProfileQuery(role);
@@ -215,7 +220,7 @@ export default function ProfilePage() {
             <h2 className="text-lg font-bold text-main mb-4">Güvenlik</h2>
             <div className="space-y-2">
               <button
-                onClick={() => alert("Şifre değiştirme yakında aktif olacak.")}
+                onClick={handleChangePasswordClick}
                 className="flex items-center justify-between w-full px-4 py-3 rounded-lg hover:bg-main/5 text-main/70 text-sm font-medium transition-colors text-left"
               >
                 Şifre Değiştir

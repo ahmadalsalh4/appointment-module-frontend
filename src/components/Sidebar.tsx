@@ -1,10 +1,11 @@
-import { Link, useLocation, useNavigate } from "react-router";
+import { Link, useLocation } from "react-router";
 import { useState } from "react";
-import { ChevronDown, LogOut, Menu, X } from "lucide-react";
+import { ChevronDown, LogOut, Menu, RefreshCw, X } from "lucide-react";
 import { useAuth } from "../contexts/auth/useAuth";
 import { useLogoutMutation } from "../hooks/useAuthQueries";
+import { useMyRolesQuery } from "../hooks/useMyRolesQuery";
 import ThemeToggle from "../pages/components/ThemeToggle";
-import authApi from "../api/auth";
+import SwitchRoleDialog from "./SwitchRoleDialog";
 import type { ReactNode } from "react";
 import type { UserRole } from "../other/types";
 
@@ -29,23 +30,16 @@ function SidebarContent({
   onClose,
 }: SidebarProps & { onClose?: () => void }) {
   const location = useLocation();
-  const navigate = useNavigate();
-  const { role, otherRoles, handleSwitchRole } = useAuth();
+  const { role, otherRoles: initialOtherRoles } = useAuth();
+  const { data: myRoles } = useMyRolesQuery();
+  const otherRoles = myRoles?.other_roles ?? initialOtherRoles ?? [];
   const { mutate: logout } = useLogoutMutation();
   const [openMenus, setOpenMenus] = useState<string[]>([]);
+  const [switchTarget, setSwitchTarget] = useState<UserRole | null>(null);
 
-  const handleRoleSwitch = async (targetRole: string) => {
-    const password = window.prompt("Güvenlik için şifrenizi girin:");
-    if (!password) return;
-
-    try {
-      const result = await authApi.switchRole({ role: targetRole as UserRole, password });
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      handleSwitchRole(result as any);
-      navigate(targetRole === "customer" ? "/" : `/${targetRole}`);
-    } catch {
-      alert("Rol değiştirme başarısız oldu. Şifrenizi kontrol edin.");
-    }
+  const openSwitchDialog = (targetRole: UserRole) => {
+    if (onClose) onClose();
+    setSwitchTarget(targetRole);
   };
 
   const toggleMenu = (label: string) => {
@@ -160,9 +154,10 @@ function SidebarContent({
           {otherRoles.map((r) => (
             <button
               key={r}
-              onClick={() => handleRoleSwitch(r)}
-              className="w-full text-left px-4 py-2 text-sm text-main/60 hover:text-deep hover:bg-deep/5 transition-colors"
+              onClick={() => openSwitchDialog(r)}
+              className="w-full text-left px-4 py-2 text-sm text-main/60 hover:text-deep hover:bg-deep/5 transition-colors flex items-center gap-2"
             >
+              <RefreshCw className="h-3.5 w-3.5" />
               {r === "customer" ? "Müşteri paneline geç" : r === "staff" ? "Personel paneline geç" : "Yönetici paneline geç"}
             </button>
           ))}
@@ -184,6 +179,12 @@ function SidebarContent({
           Çıkış Yap
         </button>
       </div>
+
+      <SwitchRoleDialog
+        open={!!switchTarget}
+        targetRole={switchTarget ?? role ?? "customer"}
+        onClose={() => setSwitchTarget(null)}
+      />
     </div>
   );
 }

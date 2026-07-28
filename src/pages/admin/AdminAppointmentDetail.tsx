@@ -11,6 +11,9 @@ import StatusBadge from "../../components/StatusBadge";
 import Breadcrumb from "../../components/Breadcrumb";
 import QueryGate from "../../components/QueryGate";
 import Avatar from "../../components/Avatar";
+import SkeletonDetail from "../../components/skeletons/SkeletonDetail";
+import { useConfirm } from "../../hooks/useConfirm";
+import { useToast } from "../../hooks/useToast";
 import { formatDate, formatTime } from "../../utils/dates";
 import { useGetAllServicesQuery } from "../../hooks/useServiceQueries";
 import { useGetAllStaffQuery } from "../../hooks/useStaffQueries";
@@ -19,6 +22,8 @@ export default function AdminAppointmentDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const confirm = useConfirm();
+  const toast = useToast();
 
   const {
     data: appointment,
@@ -50,24 +55,28 @@ export default function AdminAppointmentDetail() {
         queryKey: ["appointments", "admin", id],
       });
       queryClient.invalidateQueries({ queryKey: ["appointments", "admin"] });
+      toast.success("Durum güncellendi.");
     } catch {
-      alert("Durum güncellenirken bir hata oluştu.");
+      toast.error("Durum güncellenirken bir hata oluştu.");
     }
   };
 
   const handleDelete = async () => {
-    if (
-      !window.confirm(
-        "Bu randevuyu kalıcı olarak silmek istediğinize emin misiniz?",
-      )
-    )
-      return;
+    const ok = await confirm({
+      title: "Randevuyu Sil",
+      description:
+        "Bu randevuyu kalıcı olarak silmek istediğinize emin misiniz? Müşteri ve personel bilgilendirilmeyecektir.",
+      confirmLabel: "Evet, Sil",
+      variant: "danger",
+    });
+    if (!ok) return;
     try {
       await deleteMut.mutateAsync(id!);
       queryClient.invalidateQueries({ queryKey: ["appointments", "admin"] });
-      navigate("/admin/appointments"); // Listeye geri dön
+      toast.success("Randevu silindi.");
+      navigate("/admin/appointments");
     } catch {
-      alert("Randevu silinirken bir hata oluştu.");
+      toast.error("Randevu silinirken bir hata oluştu.");
     }
   };
 
@@ -88,8 +97,9 @@ export default function AdminAppointmentDetail() {
       queryClient.invalidateQueries({ queryKey: ["appointments", "admin", id] });
       queryClient.invalidateQueries({ queryKey: ["appointments", "admin"] });
       setIsEditing(false);
+      toast.success("Randevu güncellendi.");
     } catch {
-      alert("Randevu güncellenirken hata oluştu.");
+      toast.error("Randevu güncellenirken bir hata oluştu.");
     }
   };
 
@@ -108,7 +118,7 @@ export default function AdminAppointmentDetail() {
   }
 
   return (
-    <QueryGate isLoading={isLoading} isError={false} errorMessage="">
+    <QueryGate isLoading={isLoading} isError={false} errorMessage="" loading={<SkeletonDetail />}>
       <Breadcrumb
         items={[
           { label: "Randevular", to: "/admin/appointments" },

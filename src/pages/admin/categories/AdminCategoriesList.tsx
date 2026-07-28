@@ -46,6 +46,7 @@ export default function AdminCategoriesList() {
   };
 
   return (
+    <>
     <AdminListPage
       title="Kategoriler"
       subtitle="Hizmetleri gruplandırmak için kategorileri yönetin."
@@ -96,7 +97,10 @@ export default function AdminCategoriesList() {
           </td>
         </tr>
       ))}
-      {categoriesData && (
+    </AdminListPage>
+
+    {categoriesData && (
+      <div className="page-xl">
         <Pagination
           currentPage={categoriesData.current_page}
           lastPage={categoriesData.last_page}
@@ -107,7 +111,8 @@ export default function AdminCategoriesList() {
           onPageChange={setPage}
           onPerPageChange={(pp) => { setPerPage(pp); setPage(1); }}
         />
-      )}
-    </AdminListPage>
+      </div>
+    )}
+    </>
   );
 }

@@ -2,7 +2,7 @@ import api from "./index";
 
 export function createCrudApi(basePath: string) {
   return {
-    getAll: async () => (await api.get(`/${basePath}`)).data,
+    getAll: async (params?: Record<string, unknown>) => (await api.get(`/${basePath}`, { params })).data,
     getById: async (id: number | string) => (await api.get(`/${basePath}/${id}`)).data,
     create: async (data: unknown) => (await api.post(`/${basePath}`, data)).data,
     update: async ({ id, data }: { id: number | string; data: unknown }) =>

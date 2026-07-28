@@ -41,6 +41,7 @@ export default function AdminServicesList() {
   };
 
   return (
+    <>
     <AdminListPage
       title="Hizmetler"
       subtitle="Sistemdeki tüm hizmetleri görüntüleyin ve yönetin."
@@ -98,7 +99,10 @@ export default function AdminServicesList() {
           </td>
         </tr>
       ))}
-      {servicesData && (
+    </AdminListPage>
+
+    {servicesData && (
+      <div className="page-xl">
         <Pagination
           currentPage={servicesData.current_page}
           lastPage={servicesData.last_page}
@@ -109,7 +113,8 @@ export default function AdminServicesList() {
           onPageChange={setPage}
           onPerPageChange={(pp) => { setPerPage(pp); setPage(1); }}
         />
-      )}
-    </AdminListPage>
+      </div>
+    )}
+    </>
   );
 }

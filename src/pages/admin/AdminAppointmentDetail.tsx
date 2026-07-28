@@ -49,6 +49,7 @@ export default function AdminAppointmentDetail() {
       queryClient.invalidateQueries({
         queryKey: ["appointments", "admin", id],
       });
+      queryClient.invalidateQueries({ queryKey: ["appointments", "admin"] });
     } catch {
       alert("Durum güncellenirken bir hata oluştu.");
     }

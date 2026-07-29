@@ -7,7 +7,7 @@ import {
   useGetServiceStaffQuery,
 } from "../../hooks/useServiceQueries";
 import {
-  useGetAvailabilityMutation,
+  useGetAvailabilityQuery,
   useCreateAppointmentMutation,
 } from "../../hooks/useAppointmentQueries";
 import { useAuth } from "../../contexts/auth/useAuth";
@@ -19,7 +19,6 @@ import QueryGate from "../../components/QueryGate";
 import Avatar from "../../components/Avatar";
 import { formatDate, toLocalIsoString, todayLocalDateInputValue } from "../../utils/dates";
 import type { CustomerProfile, PublicStaff } from "../../other/types";
-import type { GetAvailabilityBody } from "../../other/types";
 
 const STEPS: StepperStep[] = [
   { id: "service", label: "Hizmet" },
@@ -41,17 +40,32 @@ export default function BookAppointmentPage() {
   const [selectedStaffId, setSelectedStaffId] = useState<string>("");
   const [selectedDate, setSelectedDate] = useState<string>("");
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
-  const [slots, setSlots] = useState<string[]>([]);
 
   const { data: service, isLoading, isError } = useGetServiceByIdQuery(serviceId || "");
   // Service-scoped staff is authoritative. The category fallback was
   // removed when catagory_id → category_id was renamed.
   const { data: serviceStaff } = useGetServiceStaffQuery(serviceId || "");
 
-  const availability = useGetAvailabilityMutation();
+  // Real keyed availability query. Auto-fires once all three inputs are
+  // present; the slot picker renders straight from `availability.data`.
+  // Previously a useMutation: the untyped result couldn't be invalidated,
+  // so a successful booking left the picker showing the just-booked slot
+  // until the user manually re-fetched, causing a misleading 409 on retry.
+  const availability = useGetAvailabilityQuery({
+    staff_id: selectedStaffId,
+    service_id: serviceId || "",
+    date: selectedDate,
+  });
   const createAppointment = useCreateAppointmentMutation();
 
   const staffList: PublicStaff[] = serviceStaff ?? [];
+  const slots = availability.data?.available_slots ?? [];
+
+  // If the selected time is no longer in the list (e.g. post-invalidation
+  // re-fetch), clear it so the user can't confirm a stale slot.
+  if (selectedTime && slots.length > 0 && !slots.includes(selectedTime)) {
+    setSelectedTime(null);
+  }
 
   const selectedStaff = staffList.find((s) => String(s.id) === selectedStaffId);
 
@@ -73,22 +87,13 @@ export default function BookAppointmentPage() {
     0,
   );
 
-  const handleCheckAvailability = async () => {
+  const handleCheckAvailability = () => {
+    // Auto-fetched by useGetAvailabilityQuery. Manual refetch is just
+    // "refresh" semantics now.
     if (!selectedDate || !selectedStaffId || !serviceId) return;
-    setSlots([]);
-    setSelectedTime(null);
-    try {
-      const body: GetAvailabilityBody = {
-        staff_id: selectedStaffId,
-        service_id: serviceId,
-        date: selectedDate,
-      };
-      const res = await availability.mutateAsync(body);
-      setSlots(res.available_slots);
-    } catch {
+    availability.refetch().catch(() => {
       toast.error("Müsaitlik kontrolü başarısız oldu.");
-      setSlots([]);
-    }
+    });
   };
 
   const handleConfirm = async () => {
@@ -101,6 +106,10 @@ export default function BookAppointmentPage() {
         start_date,
       });
       queryClient.invalidateQueries({ queryKey: ["appointments", "customer"] });
+      // Drop every cached availability lookup so the just-booked slot
+      // disappears everywhere (this tab, after back-nav, other tabs
+      // sharing the QueryClient cache).
+      queryClient.invalidateQueries({ queryKey: ["availability"] });
       toast.success("Randevunuz başarıyla oluşturuldu.");
       navigate("/appointments");
     } catch (err) {
@@ -197,7 +206,6 @@ export default function BookAppointmentPage() {
                       key={s.id}
                       onClick={() => {
                         setSelectedStaffId(String(s.id));
-                        setSlots([]);
                         setSelectedTime(null);
                       }}
                       className={`text-left p-4 rounded-xl border transition-all flex items-center gap-3 ${
@@ -236,7 +244,6 @@ export default function BookAppointmentPage() {
                   value={selectedDate}
                   onChange={(e) => {
                     setSelectedDate(e.target.value);
-                    setSlots([]);
                     setSelectedTime(null);
                   }}
                   min={today}
@@ -259,13 +266,13 @@ export default function BookAppointmentPage() {
                 <button
                   type="button"
                   onClick={handleCheckAvailability}
-                  disabled={!selectedDate || availability.isPending}
+                  disabled={!selectedDate || availability.isFetching}
                   className="btn-secondary text-sm"
                 >
-                  {availability.isPending ? (
+                  {availability.isFetching ? (
                     <span className="spinner-sm" />
                   ) : (
-                    "Müsait Saatleri Göster"
+                    "Yenile"
                   )}
                 </button>
               </div>
@@ -276,11 +283,11 @@ export default function BookAppointmentPage() {
                 </div>
               )}
 
-              {selectedDate && slots.length === 0 && !availability.isPending && (
+              {selectedDate && slots.length === 0 && !availability.isFetching && (
                 <div className="text-center py-12 bg-back rounded-xl text-main/60">
                   {availability.data
                     ? "Bu tarih için müsait saat bulunamadı. Lütfen başka bir tarih deneyin."
-                    : "Müsait saatleri görmek için yukarıdaki butona tıklayın."}
+                    : "Yukarıdan personel ve tarih seçtikten sonra müsait saatler burada listelenir."}
                 </div>
               )}
 

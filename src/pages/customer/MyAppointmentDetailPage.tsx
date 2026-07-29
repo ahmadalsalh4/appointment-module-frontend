@@ -70,6 +70,8 @@ export default function MyAppointmentDetailPage() {
     try {
       await cancelMutation.mutateAsync(id);
       queryClient.invalidateQueries({ queryKey: ["appointments", "customer"] });
+      // Cancelling frees the previously-booked slot for re-pick.
+      queryClient.invalidateQueries({ queryKey: ["availability"] });
       toast.success("Randevu iptal edildi.");
       navigate("/appointments");
     } catch {
@@ -94,6 +96,8 @@ export default function MyAppointmentDetailPage() {
       await updateMutation.mutateAsync({ id, data: body });
       queryClient.invalidateQueries({ queryKey: ["appointments", "customer"] });
       queryClient.invalidateQueries({ queryKey: ["appointments", "customer", id] });
+      // Edits move or reschedule the slot; availability moves with it.
+      queryClient.invalidateQueries({ queryKey: ["availability"] });
       setIsEditing(false);
       toast.success("Randevu güncellendi.");
     } catch {

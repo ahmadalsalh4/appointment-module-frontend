@@ -122,10 +122,23 @@ export const useAdminDeleteAppointmentMutation = () => {
 };
 
 // --- SHARED/PUBLIC HOOKS ---
-export const useGetAvailabilityMutation = () => {
-  return useMutation<AvailabilityResponse, AxiosError<LaravelErrorResponse>, GetAvailabilityBody>({
-    mutationFn: async (data) => {
-      return await appointmentsApi.getAvailability(data);
+/**
+ * Public availability query. Implemented as a useQuery (not useMutation)
+ * so the result can be invalidated and cached by key. Previously a
+ * mutation, the slot picker would display stale data after a successful
+ * booking until the next manual refresh — leading to subsequent
+ * POST /appointments requests that returned 409 even though the
+ * backend response was correct.
+ */
+export const useGetAvailabilityQuery = (
+  params: GetAvailabilityBody,
+  options?: { enabled?: boolean },
+) => {
+  return useQuery<AvailabilityResponse, AxiosError<LaravelErrorResponse>>({
+    queryKey: ["availability", params.staff_id, params.service_id, params.date],
+    queryFn: async () => {
+      return await appointmentsApi.getAvailability(params);
     },
+    enabled: options?.enabled ?? !!(params.staff_id && params.service_id && params.date),
   });
 };

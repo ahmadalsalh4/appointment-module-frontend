@@ -64,6 +64,8 @@ export default function StaffAppointmentDetailPage() {
       await updateStatus.mutateAsync({ id: Number(id), data: { state_id: newStateId } });
       queryClient.invalidateQueries({ queryKey: ["appointments", "staff"] });
       queryClient.invalidateQueries({ queryKey: ["appointments", "staff", id] });
+      // Cancellations from the staff side free the slot for re-pick.
+      queryClient.invalidateQueries({ queryKey: ["availability"] });
       toast.success("Durum güncellendi.");
     } catch {
       toast.error("Durum güncellenirken bir hata oluştu.");

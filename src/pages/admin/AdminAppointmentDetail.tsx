@@ -109,6 +109,9 @@ export default function AdminAppointmentDetail() {
         queryKey: ["appointments", "admin", id],
       });
       queryClient.invalidateQueries({ queryKey: ["appointments", "admin"] });
+      // Cancelling from admin frees the slot for re-pick on the customer
+      // booking wizard.
+      queryClient.invalidateQueries({ queryKey: ["availability"] });
       toast.success("Durum güncellendi.");
       originalStateId.current = null;
     } catch {
@@ -130,6 +133,8 @@ export default function AdminAppointmentDetail() {
     try {
       await deleteMut.mutateAsync(id);
       queryClient.invalidateQueries({ queryKey: ["appointments", "admin"] });
+      // Free the slot for re-pick.
+      queryClient.invalidateQueries({ queryKey: ["availability"] });
       toast.success("Randevu silindi.");
       navigate("/admin/appointments");
     } catch {
@@ -151,6 +156,8 @@ export default function AdminAppointmentDetail() {
       await updateAppointmentMut.mutateAsync({ id, data: body as any });
       queryClient.invalidateQueries({ queryKey: ["appointments", "admin", id] });
       queryClient.invalidateQueries({ queryKey: ["appointments", "admin"] });
+      // Edits move or reschedule the slot; availability moves with it.
+      queryClient.invalidateQueries({ queryKey: ["availability"] });
       setIsEditing(false);
       toast.success("Randevu güncellendi.");
     } catch {

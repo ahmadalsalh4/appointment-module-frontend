@@ -22,7 +22,7 @@ import {
   formatTime,
   localDateInputValue,
   localTimeInputValue,
-  todayLocalDateInputValue,
+  todayIstanbulDateInputValue,
 } from "../../utils/dates";
 import { useGetAllServicesQuery } from "../../hooks/useServiceQueries";
 import { useGetAllStaffQuery } from "../../hooks/useStaffQueries";
@@ -226,7 +226,7 @@ export default function AdminAppointmentDetail() {
                 </div>
                 <div className="flex flex-col gap-1">
                   <label className="text-xs font-bold uppercase opacity-80">Tarih</label>
-                  <input type="date" value={editDate} onChange={(e) => setEditDate(e.target.value)} min={todayLocalDateInputValue()} className="bg-surface text-main rounded-lg shadow-sm border border-main/20 px-3 py-1.5 text-sm" />
+                  <input type="date" value={editDate} onChange={(e) => setEditDate(e.target.value)} min={todayIstanbulDateInputValue()} className="bg-surface text-main rounded-lg shadow-sm border border-main/20 px-3 py-1.5 text-sm" />
                 </div>
                 <div className="flex flex-col gap-1">
                   <label className="text-xs font-bold uppercase opacity-80">Saat</label>

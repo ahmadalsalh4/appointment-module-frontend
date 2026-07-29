@@ -20,7 +20,7 @@ import {
   formatDateTime,
   localDateInputValue,
   localTimeInputValue,
-  todayLocalDateInputValue,
+  todayIstanbulDateInputValue,
 } from "../../utils/dates";
 
 export default function MyAppointmentDetailPage() {
@@ -164,7 +164,7 @@ export default function MyAppointmentDetailPage() {
               </div>
               <div>
                 <label className="label-sm">Tarih</label>
-                <input type="date" value={editDate} onChange={(e) => setEditDate(e.target.value)} className="input text-sm" min={todayLocalDateInputValue()} />
+                <input type="date" value={editDate} onChange={(e) => setEditDate(e.target.value)} className="input text-sm" min={todayIstanbulDateInputValue()} />
               </div>
               <div className="flex items-end gap-2">
                 <div className="flex-1">

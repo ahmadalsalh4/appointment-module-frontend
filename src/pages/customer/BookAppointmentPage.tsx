@@ -17,7 +17,11 @@ import { useToast } from "../../hooks/useToast";
 import Breadcrumb from "../../components/Breadcrumb";
 import QueryGate from "../../components/QueryGate";
 import Avatar from "../../components/Avatar";
-import { formatDate, toLocalIsoString, todayLocalDateInputValue } from "../../utils/dates";
+import {
+  formatDate,
+  todayIstanbulDateInputValue,
+  toIstanbulNaiveIso,
+} from "../../utils/dates";
 import type { CustomerProfile, PublicStaff } from "../../other/types";
 
 const STEPS: StepperStep[] = [
@@ -38,10 +42,15 @@ export default function BookAppointmentPage() {
   const customerProfile = user && "person" in user ? (user as CustomerProfile) : null;
 
   const [selectedStaffId, setSelectedStaffId] = useState<string>("");
-  const [selectedDate, setSelectedDate] = useState<string>("");
+  // Default the date picker to "today" in Europe/Istanbul — not the
+  // browser-local date, which can be off by a day for users in other
+  // timezones.
+  const [selectedDate, setSelectedDate] = useState<string>(() =>
+    todayIstanbulDateInputValue(),
+  );
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
 
-  const { data: service, isLoading, isError } = useGetServiceByIdQuery(serviceId || "");
+  const { data: service, isLoading, isFetching, isError } = useGetServiceByIdQuery(serviceId || "");
   // Service-scoped staff is authoritative. The category fallback was
   // removed when catagory_id → category_id was renamed.
   const { data: serviceStaff } = useGetServiceStaffQuery(serviceId || "");
@@ -98,7 +107,10 @@ export default function BookAppointmentPage() {
 
   const handleConfirm = async () => {
     if (!selectedTime || !selectedStaffId || !selectedDate || !serviceId) return;
-    const start_date = toLocalIsoString(selectedDate, selectedTime);
+    // Naive wall-clock ISO in Europe/Istanbul — backend parses the value
+    // with Carbon::parse(..., BUSINESS_TIMEZONE), so it never depends on
+    // the user's browser timezone.
+    const start_date = toIstanbulNaiveIso(selectedDate, selectedTime);
     try {
       await createAppointment.mutateAsync({
         staff_id: Number(selectedStaffId),
@@ -118,7 +130,16 @@ export default function BookAppointmentPage() {
     }
   };
 
-  if (isError || (!isLoading && !service)) {
+  // Only render the "Hizmet bulunamadı" fallback once the request has
+  // actually settled with an error or 404 — NOT on the initial render
+  // before the route param has been resolved, and NOT while a refetch is
+  // pending over an already-known service. Previously the condition
+  // (`isError || (!isLoading && !service)`) flashed this error page
+  // during every initial mount because the disabled query returned
+  // `service: undefined` while `isLoading` was `false`.
+  const showNotFound =
+    !!serviceId && !isLoading && !isFetching && !service && (isError || service === null);
+  if (showNotFound) {
     return (
       <div className="page-xl text-center text-canceld">
         <p className="text-xl font-bold">Hizmet bulunamadı.</p>
@@ -129,7 +150,7 @@ export default function BookAppointmentPage() {
     );
   }
 
-  const today = todayLocalDateInputValue();
+  const today = todayIstanbulDateInputValue();
 
   return (
     <QueryGate isLoading={isLoading} isError={false} errorMessage="">

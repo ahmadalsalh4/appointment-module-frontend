@@ -205,7 +205,7 @@ export default function AdminAppointmentDetail() {
       <div className="card-lg overflow-hidden">
         {/* Header Status Bar */}
         <div className={`p-4 sm:p-6 border-b badge badge-${appointment?.status.name ?? ""}`}>
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
             <div>
               <p className="text-sm font-bold uppercase tracking-widest opacity-80">
                 Mevcut Durum
@@ -218,76 +218,87 @@ export default function AdminAppointmentDetail() {
               </h1>
             </div>
 
-            {isEditing ? (
-              <div className="flex flex-wrap items-end gap-3">
-                <div className="flex flex-col gap-1">
-                  <label className="text-xs font-bold uppercase opacity-80">Personel</label>
-                  <select value={editStaff} onChange={(e) => setEditStaff(e.target.value)} className="bg-surface text-main rounded-lg shadow-sm border border-main/20 px-3 py-1.5 text-sm">
-                    <option value="">Değiştirme</option>
-                    {allStaff?.data?.map((s) => (
-                      <option key={s.id} value={s.id}>{s.person?.name} {s.person?.surname}</option>
-                    ))}
-                  </select>
+            {/* Right column: edit button (or edit form) + status dropdown.
+                Grouped so they sit together on the right edge instead of
+                being three siblings that flex distribute awkwardly. */}
+            <div className="flex flex-col sm:flex-row gap-4 sm:items-end">
+              {isEditing ? (
+                <div className="flex flex-wrap items-end gap-3">
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs font-bold uppercase opacity-80">Personel</label>
+                    <select value={editStaff} onChange={(e) => setEditStaff(e.target.value)} className="bg-surface text-main rounded-lg shadow-sm border border-main/20 px-3 py-1.5 text-sm">
+                      <option value="">Değiştirme</option>
+                      {allStaff?.data?.map((s) => (
+                        <option key={s.id} value={s.id}>{s.person?.name} {s.person?.surname}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs font-bold uppercase opacity-80">Hizmet</label>
+                    <select value={editService} onChange={(e) => setEditService(e.target.value)} className="bg-surface text-main rounded-lg shadow-sm border border-main/20 px-3 py-1.5 text-sm">
+                      <option value="">Değiştirme</option>
+                      {allServices?.data?.map((svc) => (
+                        <option key={svc.id} value={svc.id}>{svc.name} ({svc.duration}dk)</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs font-bold uppercase opacity-80">Tarih</label>
+                    <input type="date" value={editDate} onChange={(e) => setEditDate(e.target.value)} min={todayIstanbulDateInputValue()} className="bg-surface text-main rounded-lg shadow-sm border border-main/20 px-3 py-1.5 text-sm" />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs font-bold uppercase opacity-80">Saat</label>
+                    <input type="time" value={editTime} onChange={(e) => setEditTime(e.target.value)} step="900" className="bg-surface text-main rounded-lg shadow-sm border border-main/20 px-3 py-1.5 text-sm" />
+                  </div>
+                  <button
+                    onClick={handleEditSubmit}
+                    disabled={updateAppointmentMut.isPending}
+                    className="bg-deep text-white font-bold rounded-lg px-4 py-2 text-sm hover:bg-deep/80 disabled:opacity-50"
+                  >
+                    {updateAppointmentMut.isPending ? "..." : "Güncelle"}
+                  </button>
+                  <button onClick={() => setIsEditing(false)} className="text-main/60 hover:text-main text-sm px-2 py-1">
+                    İptal
+                  </button>
                 </div>
-                <div className="flex flex-col gap-1">
-                  <label className="text-xs font-bold uppercase opacity-80">Hizmet</label>
-                  <select value={editService} onChange={(e) => setEditService(e.target.value)} className="bg-surface text-main rounded-lg shadow-sm border border-main/20 px-3 py-1.5 text-sm">
-                    <option value="">Değiştirme</option>
-                    {allServices?.data?.map((svc) => (
-                      <option key={svc.id} value={svc.id}>{svc.name} ({svc.duration}dk)</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="flex flex-col gap-1">
-                  <label className="text-xs font-bold uppercase opacity-80">Tarih</label>
-                  <input type="date" value={editDate} onChange={(e) => setEditDate(e.target.value)} min={todayIstanbulDateInputValue()} className="bg-surface text-main rounded-lg shadow-sm border border-main/20 px-3 py-1.5 text-sm" />
-                </div>
-                <div className="flex flex-col gap-1">
-                  <label className="text-xs font-bold uppercase opacity-80">Saat</label>
-                  <input type="time" value={editTime} onChange={(e) => setEditTime(e.target.value)} step="900" className="bg-surface text-main rounded-lg shadow-sm border border-main/20 px-3 py-1.5 text-sm" />
-                </div>
+              ) : (
                 <button
-                  onClick={handleEditSubmit}
-                  disabled={updateAppointmentMut.isPending}
-                  className="bg-deep text-white font-bold rounded-lg px-4 py-2 text-sm hover:bg-deep/80 disabled:opacity-50"
+                  onClick={() => {
+                    setIsEditing(true);
+                    setEditStaff(String(appointment?.staff_id || ""));
+                    setEditService(String(appointment?.service_id || ""));
+                    setEditDate(appointment ? localDateInputValue(appointment.start_date) : "");
+                    setEditTime(appointment ? localTimeInputValue(appointment.start_date) : "");
+                  }}
+                  className="flex items-center gap-1.5 bg-surface text-main font-bold rounded-lg shadow-sm border border-main/20 px-3 py-2 text-sm hover:bg-deep/5 whitespace-nowrap"
                 >
-                  {updateAppointmentMut.isPending ? "..." : "Güncelle"}
+                  <Edit3 className="h-4 w-4" /> Randevuyu Düzenle
                 </button>
-                <button onClick={() => setIsEditing(false)} className="text-main/60 hover:text-main text-sm px-2 py-1">
-                  İptal
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={() => {
-                  setIsEditing(true);
-                  setEditStaff(String(appointment?.staff_id || ""));
-                  setEditService(String(appointment?.service_id || ""));
-                  setEditDate(appointment ? localDateInputValue(appointment.start_date) : "");
-                  setEditTime(appointment ? localTimeInputValue(appointment.start_date) : "");
-                }}
-                className="flex items-center gap-1.5 bg-surface text-main font-bold rounded-lg shadow-sm border border-main/20 px-3 py-2 text-sm hover:bg-deep/5"
-              >
-                <Edit3 className="h-4 w-4" /> Randevuyu Düzenle
-              </button>
-            )}
+              )}
 
-            {/* Admin Action: Status Change Dropdown */}
-            <div className="flex flex-col gap-2">
-              <label className="text-xs font-bold uppercase opacity-80">
-                Durumu Güncelle
-              </label>
-              <select
-                value={appointment?.state_id ?? ""}
-                onChange={handleStatusUpdate}
-                disabled={updateAppointmentMut.isPending}
-                className="bg-surface text-main font-bold rounded-lg shadow-sm border border-main/20 px-4 py-2.5 focus:ring-2 focus:ring-deep/20 focus:border-deep outline-none disabled:bg-main/15 disabled:text-main/40"
-              >
-                <option value="1">Beklemede</option>
-                <option value="2">Onaylandı</option>
-                <option value="3">Tamamlandı</option>
-                <option value="4">İptal Edildi</option>
-              </select>
+              {/* Admin Action: Status Change Dropdown.
+                  Disabled when the appointment is in a terminal state
+                  (matches the list-page dropdown guard). */}
+              <div className="flex flex-col gap-2">
+                <label className="text-xs font-bold uppercase opacity-80">
+                  Durumu Güncelle
+                </label>
+                <select
+                  value={appointment?.state_id ?? ""}
+                  onChange={handleStatusUpdate}
+                  disabled={
+                    updateAppointmentMut.isPending ||
+                    appointment?.status.name === "completed" ||
+                    appointment?.status.name === "cancelled"
+                  }
+                  className="bg-surface text-main font-bold rounded-lg shadow-sm border border-main/20 px-4 py-2.5 focus:ring-2 focus:ring-deep/20 focus:border-deep outline-none disabled:bg-main/15 disabled:text-main/40"
+                >
+                  <option value="1">Beklemede</option>
+                  <option value="2">Onaylandı</option>
+                  <option value="3">Tamamlandı</option>
+                  <option value="4">İptal Edildi</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>

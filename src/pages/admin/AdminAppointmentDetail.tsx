@@ -28,21 +28,15 @@ import { useGetAllServicesQuery } from "../../hooks/useServiceQueries";
 import { useGetAllStaffQuery } from "../../hooks/useStaffQueries";
 
 export default function AdminAppointmentDetail() {
-  const { id } = useParams<{ id: string }>();
+  const { id: rawId } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const confirm = useConfirm();
   const toast = useToast();
 
-  // Guard: bad URL → don't send a request with an invalid id.
-  if (!id || !/^\d+$/.test(id)) {
-    return (
-      <div className="max-w-4xl mx-auto px-4 py-20 text-center text-canceld">
-        <p className="text-xl font-bold">Geçersiz randevu.</p>
-        <Link to="/admin/appointments" className="mt-4 inline-block text-deep hover:underline">Randevulara Dön</Link>
-      </div>
-    );
-  }
+  // Normalise so the hook count is stable. The hooks below always run.
+  // The post-hook guard renders the fallback when rawId is invalid.
+  const id = rawId && /^\d+$/.test(rawId) ? rawId : "";
 
   const {
     data: appointment,
@@ -70,6 +64,16 @@ export default function AdminAppointmentDetail() {
   // customer base this would be the slowest page in the app.
   const { data: allServices } = useGetAllServicesQuery({ per_page: 100 });
   const { data: allStaff } = useGetAllStaffQuery({ per_page: 100 });
+
+  // Guard lives AFTER the hooks so the hook count is stable across renders.
+  if (!id) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-20 text-center text-canceld">
+        <p className="text-xl font-bold">Geçersiz randevu.</p>
+        <Link to="/admin/appointments" className="mt-4 inline-block text-deep hover:underline">Randevulara Dön</Link>
+      </div>
+    );
+  }
 
   const handleStatusUpdate = async (
     e: React.ChangeEvent<HTMLSelectElement>,

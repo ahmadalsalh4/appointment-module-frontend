@@ -21,6 +21,14 @@ export interface Person extends ApiTimestamps {
   phone_number: string;
 }
 
+/**
+ * Person variant returned by the public, unauthenticated staff-listing
+ * endpoints (/api/services/{service}/staff, /api/categories/{category}/staff).
+ * The backend scrubs `phone_number` from these responses; consumers must
+ * never read it back from this shape.
+ */
+export type PublicPerson = Omit<Person, "phone_number">;
+
 // ==========================================
 // ROLE / AUTH SHARED TYPES
 // ==========================================
@@ -277,6 +285,21 @@ export interface StaffEntity extends ApiTimestamps {
 /** Get Staff By ID (Includes the managing admin) */
 export interface StaffEntityDetailed extends StaffEntity {
   managing_admin: ManagingAdminLight;
+}
+
+/**
+ * Staff variant returned by public listing endpoints (see PublicPerson).
+ * The backend scrubs `email`; consumers must never read it back from this
+ * shape. Use `StaffEntity` / `StaffEntityDetailed` for admin-authenticated
+ * calls where email is still required.
+ */
+export interface PublicStaff {
+  id: number;
+  person_id: number;
+  job_title: string;
+  person: PublicPerson;
+  created_at: string;
+  updated_at: string;
 }
 
 /** Post Staff Request Body */

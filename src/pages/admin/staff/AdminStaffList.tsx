@@ -55,6 +55,9 @@ export default function AdminStaffList() {
     try {
       await deleteMut.mutateAsync(id);
       queryClient.invalidateQueries({ queryKey: ["staff"] });
+      // Soft-deleted staff should disappear from the public listings too.
+      queryClient.invalidateQueries({ queryKey: ["services"] });
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
       toast.success("Personel silindi.");
     } catch {
       toast.error("Personel silinirken bir hata oluştu.");

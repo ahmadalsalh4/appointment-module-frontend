@@ -39,11 +39,16 @@ class AppErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState>
   }
 
   override componentDidCatch(error: Error, info: ErrorInfo): void {
-    // eslint-disable-next-line no-console
     console.error("[AppErrorBoundary]", error, info.componentStack);
   }
 
-  reset = (): void => this.setState({ hasError: false, error: undefined });
+  reset = (): void => {
+    this.setState({ hasError: false, error: undefined });
+    // Force a full subtree remount so consumers that re-throw on render
+    // (e.g. detail pages that previously violated rules-of-hooks) don't
+    // immediately re-trip the boundary.
+    window.location.assign("/");
+  };
 
   override render(): ReactNode {
     if (this.state.hasError) {

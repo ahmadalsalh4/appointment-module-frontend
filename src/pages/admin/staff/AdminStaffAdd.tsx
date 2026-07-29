@@ -30,6 +30,11 @@ export default function AdminStaffAdd() {
     try {
       await createMut.mutateAsync(formData);
       queryClient.invalidateQueries({ queryKey: ["staff"] });
+      // Public staff listings are cached under these keys; new staff may
+      // be visible to anonymous browsers on the service/category detail
+      // pages, so drop both caches.
+      queryClient.invalidateQueries({ queryKey: ["services"] });
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
       navigate("/admin/staff");
     } catch (err) {
       const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;

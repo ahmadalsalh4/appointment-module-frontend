@@ -8,7 +8,7 @@ import type {
   CategoryRequestBody,
   DeleteCategoryResponse,
   LaravelErrorResponse,
-  StaffEntity,
+  PublicStaff,
 } from "../other/types";
 
 const {
@@ -30,7 +30,7 @@ export const useDeleteCategoryMutation = () =>
   _useDelete<DeleteCategoryResponse>();
 
 export const useGetCategoryStaffQuery = (categoryId: string | number) =>
-  useQuery<StaffEntity[], AxiosError<LaravelErrorResponse>>({
+  useQuery<PublicStaff[], AxiosError<LaravelErrorResponse>>({
     queryKey: ["categories", categoryId, "staff"],
     queryFn: () => categoriesApi.getCategoryStaff(categoryId),
     enabled: !!categoryId,

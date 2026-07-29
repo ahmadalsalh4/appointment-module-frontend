@@ -18,7 +18,7 @@ import Breadcrumb from "../../components/Breadcrumb";
 import QueryGate from "../../components/QueryGate";
 import Avatar from "../../components/Avatar";
 import { formatDate, toLocalIsoString, todayLocalDateInputValue } from "../../utils/dates";
-import type { StaffEntity, CustomerProfile } from "../../other/types";
+import type { CustomerProfile, PublicStaff } from "../../other/types";
 import type { GetAvailabilityBody } from "../../other/types";
 
 const STEPS: StepperStep[] = [
@@ -51,7 +51,7 @@ export default function BookAppointmentPage() {
   const availability = useGetAvailabilityMutation();
   const createAppointment = useCreateAppointmentMutation();
 
-  const staffList: StaffEntity[] = serviceStaff ?? [];
+  const staffList: PublicStaff[] = serviceStaff ?? [];
 
   const selectedStaff = staffList.find((s) => String(s.id) === selectedStaffId);
 

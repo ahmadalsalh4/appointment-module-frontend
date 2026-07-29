@@ -40,6 +40,10 @@ function StaffEditForm({ staff }: { staff: StaffEntityDetailed }) {
       };
       await updateMut.mutateAsync({ id, data: payload });
       queryClient.invalidateQueries({ queryKey: ["staff"] });
+      // Staff category change affects both the public per-service and
+      // per-category staff lists; invalidate both.
+      queryClient.invalidateQueries({ queryKey: ["services"] });
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
       navigate("/admin/staff");
     } catch (err) {
       const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;

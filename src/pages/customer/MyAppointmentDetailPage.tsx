@@ -24,23 +24,16 @@ import {
 } from "../../utils/dates";
 
 export default function MyAppointmentDetailPage() {
-  const { id } = useParams<{ id: string }>();
+  const { id: rawId } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const confirm = useConfirm();
   const toast = useToast();
 
-  // Guard: don't send a request with an invalid id. A bad URL otherwise
-  // triggers a confusing 404 (or worse, a request with the string
-  // "undefined").
-  if (!id || !/^\d+$/.test(id)) {
-    return (
-      <div className="page-wide text-center text-canceld">
-        <p className="text-xl font-bold">Geçersiz randevu.</p>
-        <Link to="/appointments" className="mt-4 inline-block text-deep hover:underline">Randevularıma Dön</Link>
-      </div>
-    );
-  }
+  // Normalise once: a bad URL becomes a sentinel id so React's hook order
+  // stays stable across renders. Validation lives in the guard below the
+  // hooks.
+  const id = rawId && /^\d+$/.test(rawId) ? rawId : "";
 
   const { data: appointment, isLoading, isError } = useCustomerGetAppointmentByIdQuery(id);
   const cancelMutation = useCancelAppointmentMutation();
@@ -55,6 +48,16 @@ export default function MyAppointmentDetailPage() {
   // Service-scoped staff is authoritative after the catagory_id → category_id
   // rename. Drop the category-fallback lookup entirely — admin-side
   // cross-category reassignment is now explicit and via PUT /staff-members/{id}.
+
+  // Guard lives AFTER the hooks so the hook count is stable across renders.
+  if (!id) {
+    return (
+      <div className="page-wide text-center text-canceld">
+        <p className="text-xl font-bold">Geçersiz randevu.</p>
+        <Link to="/appointments" className="mt-4 inline-block text-deep hover:underline">Randevularıma Dön</Link>
+      </div>
+    );
+  }
 
   const handleCancel = async () => {
     const ok = await confirm({

@@ -8,7 +8,7 @@ import type {
   ServiceRequestBody,
   DeleteServiceResponse,
   LaravelErrorResponse,
-  StaffEntity,
+  PublicStaff,
 } from "../other/types";
 
 const {
@@ -30,7 +30,7 @@ export const useDeleteServiceMutation = () =>
   _useDelete<DeleteServiceResponse>();
 
 export const useGetServiceStaffQuery = (serviceId: string | number) =>
-  useQuery<StaffEntity[], AxiosError<LaravelErrorResponse>>({
+  useQuery<PublicStaff[], AxiosError<LaravelErrorResponse>>({
     queryKey: ["services", serviceId, "staff"],
     queryFn: () => servicesApi.getServiceStaff(serviceId),
     enabled: !!serviceId,

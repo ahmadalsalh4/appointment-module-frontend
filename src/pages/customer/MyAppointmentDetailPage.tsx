@@ -35,7 +35,7 @@ export default function MyAppointmentDetailPage() {
   // hooks.
   const id = rawId && /^\d+$/.test(rawId) ? rawId : "";
 
-  const { data: appointment, isLoading, isError } = useCustomerGetAppointmentByIdQuery(id);
+  const { data: appointment, isLoading, isFetching, isError } = useCustomerGetAppointmentByIdQuery(id);
   const cancelMutation = useCancelAppointmentMutation();
   const updateMutation = useUpdateMyAppointmentMutation();
 
@@ -105,7 +105,12 @@ export default function MyAppointmentDetailPage() {
     }
   };
 
-  if (isError || !appointment) {
+  // Only fall through to the not-found page once the query has settled
+  // without data. While the initial request is in flight, the QueryGate
+  // below renders the loading skeleton. Previously the `!appointment`
+  // check fired during the loading window and flashed the error page.
+  const showNotFound = !!id && !isLoading && !isFetching && !appointment && isError;
+  if (showNotFound) {
     return (
       <div className="page-wide text-center text-canceld">
         <p className="text-xl font-bold">Randevu bulunamadı.</p>
@@ -114,29 +119,29 @@ export default function MyAppointmentDetailPage() {
     );
   }
 
-  const isCancellable = appointment.status.name === "pending" || appointment.status.name === "confirmed";
-  const isEditable = appointment.status.name === "pending";
+  const isCancellable = appointment?.status.name === "pending" || appointment?.status.name === "confirmed";
+  const isEditable = appointment?.status.name === "pending";
 
   return (
-    <QueryGate isLoading={isLoading} isError={false} errorMessage="" loading={<SkeletonDetail />}>
+    <QueryGate isLoading={isLoading} isError={isError} errorMessage="Randevu bulunamadı." loading={<SkeletonDetail />}>
     <div className="page-wide">
-      <Breadcrumb items={[{ label: "Randevularım", to: "/appointments" }, { label: `#${appointment.id}` }]} />
+      <Breadcrumb items={[{ label: "Randevularım", to: "/appointments" }, { label: `#${appointment?.id ?? ""}` }]} />
 
       <div className="card-lg overflow-hidden">
         <div className={`p-4 sm:p-6 border-b ${
-          appointment.status.name === "confirmed" ? "bg-completed/10 border-completed/20 text-completed" :
-          appointment.status.name === "completed" ? "bg-deep/10 border-deep/20 text-deep" :
-          appointment.status.name === "cancelled" ? "bg-canceld/10 border-canceld/20 text-canceld" :
+          appointment?.status.name === "confirmed" ? "bg-completed/10 border-completed/20 text-completed" :
+          appointment?.status.name === "completed" ? "bg-deep/10 border-deep/20 text-deep" :
+          appointment?.status.name === "cancelled" ? "bg-canceld/10 border-canceld/20 text-canceld" :
           "bg-waiting/10 border-waiting/20 text-waiting"
         }`}>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <p className="text-sm font-bold uppercase tracking-widest opacity-80">Durum</p>
-              <h1 className="text-3xl sm:text-4xl font-extrabold mt-1 text-balance"><StatusBadge status={appointment.status.name} /></h1>
+              <h1 className="text-3xl sm:text-4xl font-extrabold mt-1 text-balance"><StatusBadge status={appointment?.status.name ?? ""} /></h1>
             </div>
             <div className="flex gap-2">
               {isEditable && (
-                <button onClick={() => { setIsEditing(!isEditing); setEditStaff(String(appointment.staff_id || "")); setEditDate(appointment ? localDateInputValue(appointment.start_date) : ""); setEditTime(appointment ? localTimeInputValue(appointment.start_date) : ""); }} className="btn-primary flex items-center gap-1.5">
+                <button onClick={() => { setIsEditing(!isEditing); setEditStaff(String(appointment?.staff_id || "")); setEditDate(appointment ? localDateInputValue(appointment.start_date) : ""); setEditTime(appointment ? localTimeInputValue(appointment.start_date) : ""); }} className="btn-primary flex items-center gap-1.5">
                   <Edit3 className="h-4 w-4" /> Düzenle
                 </button>
               )}
@@ -186,19 +191,19 @@ export default function MyAppointmentDetailPage() {
               <span className="icon-box shrink-0"><Calendar className="h-6 w-6" /></span>
               <div>
                 <p className="detail-label">Tarih ve Saat</p>
-                <p className="detail-value">{formatDateTime(appointment.start_date)}</p>
+                <p className="detail-value">{appointment?.start_date ? formatDateTime(appointment.start_date) : "—"}</p>
               </div>
             </div>
             <div className="flex items-start gap-4">
               <span className="icon-box shrink-0"><Clock className="h-6 w-6" /></span>
               <div>
                 <p className="detail-label">Hizmet ve Süre</p>
-                <p className="detail-value">{appointment.service.name} <span className="text-main/40 font-normal">({appointment.service.duration} dk)</span></p>
+                <p className="detail-value">{appointment?.service.name ?? "—"} <span className="text-main/40 font-normal">({appointment?.service.duration ?? "—"})</span></p>
               </div>
             </div>
           </div>
 
-          {appointment.staff && (
+          {appointment?.staff && (
             <div className="section-gap-sm">
               <h2 className="section-header">Personel Bilgileri</h2>
               <div className="flex items-center gap-4 bg-back p-4 rounded-xl">

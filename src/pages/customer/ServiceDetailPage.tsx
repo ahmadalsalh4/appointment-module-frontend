@@ -14,7 +14,7 @@ export default function ServiceDetailPage() {
   const navigate = useNavigate();
   const { token } = useAuth();
 
-  const { data: service, isLoading, isError } = useGetServiceByIdQuery(id || "");
+  const { data: service, isLoading, isFetching, isError } = useGetServiceByIdQuery(id || "");
 
   const { data: serviceStaff } = useGetServiceStaffQuery(id || "");
   const { data: categoryStaff } = useGetCategoryStaffQuery(
@@ -26,7 +26,14 @@ export default function ServiceDetailPage() {
       ? serviceStaff
       : categoryStaff ?? [];
 
-  if (isError || !service) {
+  // Only show the not-found fallback after the request has fully settled
+  // with no data. Previously the `if (isError || !service)` check fired
+  // during the initial loading window because `service` is undefined
+  // until React Query has a response, even when `isLoading` is true.
+  // QueryGate (below) renders a loader while `isLoading`, so we only
+  // need to handle the post-load 404 case here.
+  const showNotFound = !!id && !isLoading && !isFetching && !service && isError;
+  if (showNotFound) {
     return (
       <div className="page-xl text-center text-canceld">
         <p className="text-xl font-bold">Hizmet bulunamadı.</p>
@@ -38,33 +45,33 @@ export default function ServiceDetailPage() {
   }
 
   return (
-    <QueryGate isLoading={isLoading} isError={false} errorMessage="">
+    <QueryGate isLoading={isLoading} isError={isError} errorMessage="Hizmet bulunamadı.">
       <div className="page-xl">
-        <Breadcrumb
+          <Breadcrumb
           items={[
             { label: "Hizmetler", to: "/services" },
-            { label: service.name },
+            { label: service?.name ?? "" },
           ]}
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8">
           <div className="lg:col-span-2">
             <div className="card-lg p-4 sm:p-6 lg:p-8 lg:sticky lg:top-8">
-              {service.category && (
+              {service?.category && (
                 <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-deep/10 text-deep uppercase tracking-wide mb-6">
                   {service.category.name}
                 </span>
               )}
 
               <h1 className="text-3xl sm:text-4xl font-extrabold text-main mb-4 text-balance">
-                {service.name}
+                {service?.name ?? ""}
               </h1>
 
               <div className="flex items-center text-main/80 bg-back rounded-lg p-4 mb-6">
                 <Clock className="h-6 w-6 mr-3 text-deep" />
                 <div>
                   <p className="text-xs text-main/60 uppercase font-semibold">Süre</p>
-                  <p className="text-lg font-bold">{service.duration} Dakika</p>
+                  <p className="text-lg font-bold">{service?.duration ?? "—"} Dakika</p>
                 </div>
               </div>
 

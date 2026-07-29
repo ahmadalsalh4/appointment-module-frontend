@@ -41,6 +41,7 @@ export default function AdminAppointmentDetail() {
   const {
     data: appointment,
     isLoading,
+    isFetching,
     isError,
   } = useAdminGetAppointmentByIdQuery(id);
   const updateAppointmentMut = useAdminUpdateAppointmentMutation();
@@ -165,7 +166,10 @@ export default function AdminAppointmentDetail() {
     }
   };
 
-  if (isError || !appointment) {
+  // Only fall through to the not-found page once the query has settled
+  // without data. QueryGate (below) renders the loader while isLoading.
+  const showNotFound = !!id && !isLoading && !isFetching && !appointment && isError;
+  if (showNotFound) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-20 text-center text-canceld">
         <p className="text-xl font-bold">Randevu bulunamadı.</p>
@@ -180,17 +184,17 @@ export default function AdminAppointmentDetail() {
   }
 
   return (
-    <QueryGate isLoading={isLoading} isError={false} errorMessage="" loading={<SkeletonDetail />}>
+    <QueryGate isLoading={isLoading} isError={isError} errorMessage="Randevu bulunamadı." loading={<SkeletonDetail />}>
       <Breadcrumb
         items={[
           { label: "Randevular", to: "/admin/appointments" },
-          { label: `#${appointment.id}` },
+          { label: `#${appointment?.id ?? ""}` },
         ]}
       />
 
       <div className="card-lg overflow-hidden">
         {/* Header Status Bar */}
-        <div className={`p-4 sm:p-6 border-b badge badge-${appointment.status.name}`}>
+        <div className={`p-4 sm:p-6 border-b badge badge-${appointment?.status.name ?? ""}`}>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div>
               <p className="text-sm font-bold uppercase tracking-widest opacity-80">
@@ -198,7 +202,7 @@ export default function AdminAppointmentDetail() {
               </p>
               <h1 className="text-3xl sm:text-4xl font-extrabold mt-1 text-balance">
                 <StatusBadge
-                  status={appointment.status.name}
+                  status={appointment?.status.name ?? ""}
                   className="text-lg px-4 py-1.5"
                 />
               </h1>
@@ -247,8 +251,8 @@ export default function AdminAppointmentDetail() {
               <button
                 onClick={() => {
                   setIsEditing(true);
-                  setEditStaff(String(appointment.staff_id || ""));
-                  setEditService(String(appointment.service_id || ""));
+                  setEditStaff(String(appointment?.staff_id || ""));
+                  setEditService(String(appointment?.service_id || ""));
                   setEditDate(appointment ? localDateInputValue(appointment.start_date) : "");
                   setEditTime(appointment ? localTimeInputValue(appointment.start_date) : "");
                 }}
@@ -264,7 +268,7 @@ export default function AdminAppointmentDetail() {
                 Durumu Güncelle
               </label>
               <select
-                value={appointment.state_id}
+                value={appointment?.state_id ?? ""}
                 onChange={handleStatusUpdate}
                 disabled={updateAppointmentMut.isPending}
                 className="bg-surface text-main font-bold rounded-lg shadow-sm border border-main/20 px-4 py-2.5 focus:ring-2 focus:ring-deep/20 focus:border-deep outline-none disabled:bg-main/15 disabled:text-main/40"
@@ -292,10 +296,10 @@ export default function AdminAppointmentDetail() {
                   <div>
                     <p className="detail-label">Tarih ve Saat</p>
                     <p className="detail-value">
-                      {formatDate(appointment.start_date)}
+                      {appointment?.start_date ? formatDate(appointment.start_date) : "—"}
                     </p>
                     <p className="text-lg sm:text-xl font-bold text-deep">
-                      {formatTime(appointment.start_date)}
+                      {appointment?.start_date ? formatTime(appointment.start_date) : "—"}
                     </p>
                   </div>
                 </div>
@@ -306,9 +310,9 @@ export default function AdminAppointmentDetail() {
                   </div>
                   <div>
                     <p className="detail-label">Hizmet ve Süre</p>
-                    <p className="detail-value">{appointment.service.name}</p>
+                    <p className="detail-value">{appointment?.service.name ?? "—"}</p>
                     <p className="text-sm text-main/60">
-                      {appointment.service.duration} Dakika
+                      {appointment?.service.duration ?? "—"} Dakika
                     </p>
                   </div>
                 </div>
@@ -316,7 +320,7 @@ export default function AdminAppointmentDetail() {
             </div>
 
             {/* Customer Info */}
-            {appointment.customer && (
+            {appointment?.customer && (
               <div>
                 <h2 className="section-header">Müşteri Bilgileri</h2>
                 <div className="flex items-center gap-4 bg-back p-4 rounded-xl">
@@ -345,7 +349,7 @@ export default function AdminAppointmentDetail() {
           {/* RIGHT: Staff Info & Danger Zone */}
           <div className="space-y-8">
             {/* Staff Info */}
-            {appointment.staff && (
+            {appointment?.staff && (
               <div>
                 <h2 className="section-header">Personel Bilgileri</h2>
                 <div className="flex items-center gap-4 bg-back p-4 rounded-xl">

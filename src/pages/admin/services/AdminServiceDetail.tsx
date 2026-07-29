@@ -10,10 +10,14 @@ export default function AdminServiceDetail() {
   const {
     data: service,
     isLoading,
+    isFetching,
     isError,
   } = useGetServiceByIdQuery(id || "");
 
-  if (isError || !service) {
+  // Only show the not-found fallback once the request has settled.
+  // QueryGate (below) renders the loader during the loading window.
+  const showNotFound = !!id && !isLoading && !isFetching && !service && isError;
+  if (showNotFound) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-20 text-center text-canceld">
         <p className="text-xl font-bold">Hizmet bulunamadı.</p>
@@ -28,28 +32,28 @@ export default function AdminServiceDetail() {
   }
 
   return (
-    <QueryGate isLoading={isLoading} isError={false} errorMessage="">
+    <QueryGate isLoading={isLoading} isError={isError} errorMessage="Hizmet bulunamadı.">
     <div className="page-wide">
       <Breadcrumb items={[
         { label: "Hizmetler", to: "/admin/services" },
-        { label: service.name },
+        { label: service?.name ?? "" },
       ]} />
 
       <div className="card-lg p-4 sm:p-6 lg:p-8">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8 border-b border-main/5 pb-6">
           <div>
-            {service.category && (
+            {service?.category && (
               <span className="badge badge-completed mb-4">
                 {service.category.name}
               </span>
             )}
             <h1 className="page-header">
-              {service.name}
+              {service?.name ?? ""}
             </h1>
           </div>
           <div className="flex gap-3">
             <Link
-              to={`/admin/services/${service.id}/edit`}
+              to={`/admin/services/${service?.id ?? ""}/edit`}
               className="btn-secondary"
             >
               Düzenle
@@ -65,7 +69,7 @@ export default function AdminServiceDetail() {
             <div>
               <p className="detail-label">Süre</p>
               <p className="text-xl sm:text-2xl font-bold text-main">
-                {service.duration}{" "}
+                {service?.duration ?? "—"}{" "}
                 <span className="text-base font-normal text-main/60">
                   Dakika
                 </span>
@@ -80,7 +84,7 @@ export default function AdminServiceDetail() {
             <div>
               <p className="detail-label">Oluşturulma Tarihi</p>
               <p className="detail-value">
-                {formatDate(service.created_at)}
+                {service?.created_at ? formatDate(service.created_at) : "—"}
               </p>
             </div>
           </div>

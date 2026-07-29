@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { create } from "./createStore";
 import type { ConfirmVariant } from "../components/ConfirmDialog";
 
@@ -13,10 +14,6 @@ interface ConfirmState extends ConfirmOptions {
   open: boolean;
 }
 
-// `resolve` is stored in a module-level queue rather than the React
-// store state, because storing a function in a "state" object (one
-// passed through useSyncExternalStore) breaks reference equality and
-// forces every subscriber to re-render on every confirm.
 interface PendingResolve {
   resolve: (value: boolean) => void;
 }
@@ -30,7 +27,7 @@ const initialState: ConfirmState = {
   variant: "danger",
 };
 
-const [useConfirmStore, setConfirmStore, getConfirmState] = create<ConfirmState>(initialState);
+const [useConfirmStore, setConfirmStore] = create<ConfirmState>(initialState);
 
 // Queue of pending resolves. Each new confirm() call enqueues its
 // resolver; closeConfirm() drains the head of the queue. This prevents
@@ -41,11 +38,15 @@ const pending: PendingResolve[] = [];
 const drainHead = (result: boolean) => {
   const head = pending.shift();
   if (head) head.resolve(result);
-  setConfirmStore({ ...initialState, open: false });
+  // Use the functional updater so a concurrent closeConfirm/reset
+  // can't lose our state.
+  setConfirmStore((s) => ({ ...s, ...initialState, open: false }));
 };
 
 export function useConfirm() {
-  return (options: ConfirmOptions): Promise<boolean> => {
+  // Wrap in useCallback so consumers passing it as a prop don't churn
+  // memoised children on every render.
+  return useCallback((options: ConfirmOptions): Promise<boolean> => {
     return new Promise((resolve) => {
       pending.push({ resolve });
       setConfirmStore({
@@ -54,7 +55,7 @@ export function useConfirm() {
         open: true,
       });
     });
-  };
+  }, []);
 }
 
 export function useConfirmState() {
@@ -66,9 +67,8 @@ export function useConfirmState() {
 // closed via escape / backdrop without an explicit cancel call from
 // the consumer).
 export function closeConfirm(result: boolean) {
-  // If no one is waiting, just close the dialog visually.
   if (pending.length === 0) {
-    setConfirmStore({ ...getConfirmState(), open: false });
+    setConfirmStore((s) => ({ ...s, open: false }));
     return;
   }
   drainHead(result);

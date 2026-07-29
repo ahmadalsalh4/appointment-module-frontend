@@ -16,7 +16,7 @@ import SkeletonDetail from "../../components/skeletons/SkeletonDetail";
 import { useConfirm } from "../../hooks/useConfirm";
 import { useToast } from "../../hooks/useToast";
 import {
-  combineLocal,
+  combineBackendIso,
   formatDateTime,
   localDateInputValue,
   localTimeInputValue,
@@ -89,7 +89,7 @@ export default function MyAppointmentDetailPage() {
     if (editStaff) body.staff_id = Number(editStaff);
     if (editDate) {
       const fallbackTime = appointment ? localTimeInputValue(appointment.start_date) : "09:00";
-      body.start_date = combineLocal(editDate, editTime, fallbackTime);
+      body.start_date = combineBackendIso(editDate, editTime, fallbackTime);
     }
 
     try {

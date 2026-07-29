@@ -9,9 +9,8 @@ export interface ToastInput {
   duration?: number;
 }
 
-interface ToastItem extends Required<Omit<ToastInput, "duration">> {
+interface ToastItem extends Required<ToastInput> {
   id: string;
-  duration: number;
 }
 
 interface ToastState {
@@ -22,21 +21,41 @@ const initialState: ToastState = { items: [] };
 
 const [useToastStore, setToastStore] = create<ToastState>(initialState);
 
-const newId = (): string =>
-  typeof crypto !== "undefined" && "randomUUID" in crypto
-    ? crypto.randomUUID()
-    : `toast-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+// Monotonic counter used in the `crypto.randomUUID` fallback so two
+// toasts pushed synchronously in the same millisecond get distinct IDs.
+let monotonicFallback = 0;
+
+const newId = (): string => {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return crypto.randomUUID();
+  }
+  monotonicFallback += 1;
+  return `toast-${Date.now()}-${monotonicFallback}`;
+};
+
+// Dedup policy: if the same `(variant, message)` already exists in the
+// queue, return its existing id instead of stacking a duplicate.
+function findDuplicate(items: ToastItem[], message: string, variant: ToastVariant): string | null {
+  for (const i of items) {
+    if (i.message === message && i.variant === variant) return i.id;
+  }
+  return null;
+}
 
 function push(input: ToastInput): string {
-  const id = newId();
-  const item: ToastItem = {
-    id,
-    message: input.message,
-    variant: input.variant ?? "info",
-    duration: input.duration ?? 4000,
-  };
-  setToastStore((s) => ({ items: [...s.items, item] }));
-  return id;
+  const variant = input.variant ?? "info";
+  const duration = input.duration ?? 4000;
+  let dedupedId: string | null = null;
+  setToastStore((s) => {
+    dedupedId = findDuplicate(s.items, input.message, variant);
+    if (dedupedId) return s;
+    const id = newId();
+    const item: ToastItem = { id, message: input.message, variant, duration };
+    return { items: [...s.items, item] };
+  });
+  // We rely on setState being synchronous in this store; if it ever
+  // becomes async this would need to be revisited.
+  return dedupedId ?? "";
 }
 
 function dismiss(id: string) {

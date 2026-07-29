@@ -17,7 +17,6 @@ export default function MyAppointmentsPage() {
   const [statusId, setStatusId] = useState<string>("");
   const [staffId, setStaffId] = useState<string>("");
   const [date, setDate] = useState<string>("");
-  const [customerName, setCustomerName] = useState<string>("");
   const [sortBy, setSortBy] = useState<string>("start_date");
   const [sortOrder, setSortOrder] = useState<string>("asc");
   const [perPage, setPerPage] = useState<number>(15);
@@ -29,14 +28,16 @@ export default function MyAppointmentsPage() {
   const setStatusIdP = (v: string) => { setStatusId(v); setPage(1); };
   const setStaffIdP = (v: string) => { setStaffId(v); setPage(1); };
   const setDateP = (v: string) => { setDate(v); setPage(1); };
-  const setCustomerNameP = (v: string) => { setCustomerName(v); setPage(1); };
+  // Wrappers for the sort handlers — match the pattern used by the
+  // admin/staff appointment pages.
+  const setSortByP = (v: string) => { setSortBy(v); setPage(1); };
+  const setSortOrderP = (v: string) => { setSortOrder(v); setPage(1); };
 
   const filters: ApptFilters = {
     ...(tab && { tab }),
     ...(statusId && { status_id: statusId }),
     ...(staffId && { staff_id: staffId }),
     ...(date && { date }),
-    ...(customerName.trim() && { customer_name: customerName.trim() }),
     sort_by: sortBy,
     sort_order: sortOrder,
     per_page: perPage,
@@ -69,11 +70,14 @@ export default function MyAppointmentsPage() {
     setStatusId("");
     setStaffId("");
     setDate("");
-    setCustomerName("");
     setSortBy("start_date");
     setSortOrder("asc");
     setPage(1);
   };
+
+  // Customer's own appointments only — a "Müşteri Ara" filter was
+  // confusing (it always matches their own name). Removed.
+  const hasActiveFilters = !!(tab || statusId || staffId || date);
 
   return (
     <div className="page-2xl">
@@ -97,20 +101,18 @@ export default function MyAppointmentsPage() {
           onDateChange={setDateP}
           tab={tab}
           onTabChange={setTabP}
-          customerName={customerName}
-          onCustomerNameChange={setCustomerNameP}
           sortBy={sortBy}
-          onSortByChange={setSortBy}
+          onSortByChange={setSortByP}
           sortOrder={sortOrder}
-          onSortOrderChange={setSortOrder}
+          onSortOrderChange={setSortOrderP}
           showSort
-          showCustomerSearch
           onClear={clearFilters}
-          hasActiveFilters={!!(tab || statusId || staffId || date || customerName)}
+          hasActiveFilters={hasActiveFilters}
         >
           <div>
-            <label className="label-sm">Personel</label>
+            <label className="label-sm" htmlFor="my-appts-staff-filter">Personel</label>
             <select
+              id="my-appts-staff-filter"
               value={staffId}
               onChange={(e) => setStaffIdP(e.target.value)}
               className="input-filter focus:border-deep focus:ring-2 focus:ring-deep/20"
@@ -135,12 +137,12 @@ export default function MyAppointmentsPage() {
         {appointments.length === 0 ? (
           <EmptyState
             message={
-              tab || statusId || staffId || date
+              hasActiveFilters
                 ? "Seçili filtrelerle eşleşen randevu bulunamadı."
                 : "Henüz bir randevunuz bulunmuyor."
             }
             action={
-              !tab && !statusId && !staffId && !date ? (
+              !hasActiveFilters ? (
                 <Link to="/services" className="text-deep font-semibold hover:underline">
                   İlk randevunuzu oluşturun
                 </Link>

@@ -16,14 +16,16 @@ import { useConfirm } from "../../hooks/useConfirm";
 import { useToast } from "../../hooks/useToast";
 import { STATUS_LABELS, STATUS_NAME_BY_ID } from "../../other/constants";
 import type { AppointmentStatusId } from "../../other/constants";
+import type { UpdateAppointmentStateBody } from "../../other/types";
 import {
-  combineLocal,
+  combineBackendIso,
   formatDate,
   formatTime,
   localDateInputValue,
   localTimeInputValue,
   todayIstanbulDateInputValue,
 } from "../../utils/dates";
+import { getErrorMessage } from "../../utils/errors";
 import { useGetAllServicesQuery } from "../../hooks/useServiceQueries";
 import { useGetAllStaffQuery } from "../../hooks/useStaffQueries";
 
@@ -85,7 +87,6 @@ export default function AdminAppointmentDetail() {
     if (originalStateId.current === null) {
       originalStateId.current = appointment?.state_id ?? null;
     }
-    const previousStateId = originalStateId.current;
     const targetName = STATUS_NAME_BY_ID[newStateId as AppointmentStatusId] ?? "";
     const targetLabel = STATUS_LABELS[targetName] ?? "bilinmiyor";
     const variant: "primary" | "success" | "danger" =
@@ -98,7 +99,9 @@ export default function AdminAppointmentDetail() {
       variant,
     });
     if (!ok) {
-      e.target.value = String(previousStateId ?? "");
+      // Reset the captured original so a future change re-captures it
+      // from the (still-current) appointment state.
+      originalStateId.current = null;
       return;
     }
     try {
@@ -115,9 +118,8 @@ export default function AdminAppointmentDetail() {
       queryClient.invalidateQueries({ queryKey: ["availability"] });
       toast.success("Durum güncellendi.");
       originalStateId.current = null;
-    } catch {
-      toast.error("Durum güncellenirken bir hata oluştu.");
-      e.target.value = String(previousStateId ?? "");
+    } catch (err) {
+      toast.error(getErrorMessage(err, "Durum güncellenirken bir hata oluştu."));
       originalStateId.current = null;
     }
   };
@@ -138,31 +140,39 @@ export default function AdminAppointmentDetail() {
       queryClient.invalidateQueries({ queryKey: ["availability"] });
       toast.success("Randevu silindi.");
       navigate("/admin/appointments");
-    } catch {
-      toast.error("Randevu silinirken bir hata oluştu.");
+    } catch (err) {
+      toast.error(getErrorMessage(err, "Randevu silinirken bir hata oluştu."));
     }
   };
 
   const handleEditSubmit = async () => {
-    const body: Record<string, unknown> = {};
+    // Build a strictly-typed payload. Refuse to submit if a date is
+    // provided without a matching time (or vice versa) — silently
+    // dropping the time previously meant a visible edit could produce
+    // no time change.
+    const body: UpdateAppointmentStateBody = {};
     if (editStaff) body.staff_id = Number(editStaff);
     if (editService) body.service_id = Number(editService);
-    if (editDate) {
-      const fallbackTime = appointment ? localTimeInputValue(appointment.start_date) : "09:00";
-      body.start_date = combineLocal(editDate, editTime, fallbackTime);
+    if (editDate && editTime) {
+      body.start_date = combineBackendIso(editDate, editTime, "09:00");
+    } else if (editDate || editTime) {
+      // Mismatched pair — refuse. Treat the field as "unchanged" so
+      // the user gets a clearer signal: clearing the date without
+      // clearing the time (or vice versa) is meaningless.
+      toast.error("Tarih ve saat birlikte değiştirilmelidir.");
+      return;
     }
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await updateAppointmentMut.mutateAsync({ id, data: body as any });
+      await updateAppointmentMut.mutateAsync({ id, data: body });
       queryClient.invalidateQueries({ queryKey: ["appointments", "admin", id] });
       queryClient.invalidateQueries({ queryKey: ["appointments", "admin"] });
       // Edits move or reschedule the slot; availability moves with it.
       queryClient.invalidateQueries({ queryKey: ["availability"] });
       setIsEditing(false);
       toast.success("Randevu güncellendi.");
-    } catch {
-      toast.error("Randevu güncellenirken bir hata oluştu.");
+    } catch (err) {
+      toast.error(getErrorMessage(err, "Randevu güncellenirken bir hata oluştu."));
     }
   };
 

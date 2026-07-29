@@ -8,6 +8,7 @@ import {
 } from "../../../hooks/useServiceQueries";
 import { useGetAllCategoriesQuery } from "../../../hooks/useCategoryQueries";
 import { useToast } from "../../../hooks/useToast";
+import { getErrorMessage } from "../../../utils/errors";
 import AdminFormPage from "../components/AdminFormPage";
 import Loading from "../../components/Loading";
 
@@ -105,8 +106,7 @@ export default function AdminServiceEdit() {
       queryClient.invalidateQueries({ queryKey: ["services"] });
       navigate("/admin/services");
     } catch (err) {
-      const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
-      toast.error(message || "Hizmet güncellenirken bir hata oluştu.");
+      toast.error(getErrorMessage(err, "Hizmet güncellenirken bir hata oluştu."));
     }
   };
 

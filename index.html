@@ -7,14 +7,17 @@
     <title>Randevu Sistemi</title>
     <!--
       Theme application moved to /public/theme-init.js so the strict CSP
-      (`script-src 'self'`) in netlify.toml permits it. Loading here, not
-      in <body>, still prevents the flash because the script runs before
-      React paints.
+      (`script-src 'self'`) in netlify.toml permits it. `defer` keeps
+      parsing non-blocking; the script still runs before React paints.
     -->
-    <script src="/theme-init.js"></script>
+    <script src="/theme-init.js" defer></script>
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      Bu uygulamayı görüntülemek için JavaScript etkin olmalıdır. Lütfen
+      tarayıcı ayarlarınızdan JavaScript'i etkinleştirin.
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

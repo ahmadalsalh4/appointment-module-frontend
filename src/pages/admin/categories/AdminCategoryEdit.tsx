@@ -7,6 +7,7 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import type { CategoryRequestBody, CategoryWithServices } from "../../../other/types";
 import { useToast } from "../../../hooks/useToast";
+import { getErrorMessage } from "../../../utils/errors";
 import AdminFormPage from "../components/AdminFormPage";
 import Loading from "../../components/Loading";
 
@@ -70,8 +71,7 @@ export default function AdminCategoryEdit() {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
       navigate("/admin/categories");
     } catch (err) {
-      const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
-      toast.error(message || "Kategori güncellenirken bir hata oluştu.");
+      toast.error(getErrorMessage(err, "Kategori güncellenirken bir hata oluştu."));
     }
   };
 

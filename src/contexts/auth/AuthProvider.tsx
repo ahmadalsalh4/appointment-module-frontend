@@ -44,9 +44,17 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<AnyUser | null>(null);
   const [otherRoles, setOtherRoles] = useState<UserRole[]>([]);
 
-  // Use a ref-based "already loaded once" flag so the rehydrate effect
-  // doesn't run on every `user` state change.
-  const rehydrated = useRef(false);
+  // Mirror token/role into refs so the rehydrate effect can detect
+  // when its in-flight response targets a stale pair (e.g. a fast
+  // role-switch resolved before a previous role's profile fetch).
+  const tokenRef = useRef(token);
+  const roleRef = useRef(role);
+  useEffect(() => {
+    tokenRef.current = token;
+  }, [token]);
+  useEffect(() => {
+    roleRef.current = role;
+  }, [role]);
 
   const saveToken = useCallback((newToken: string | null) => {
     if (newToken && !isValidToken(newToken)) {
@@ -72,7 +80,6 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     saveRole(null);
     setUser(null);
     setOtherRoles([]);
-    rehydrated.current = false;
   }, [saveToken, saveRole]);
 
   const handleLoginSuccess = useCallback(
@@ -89,6 +96,10 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     (data: UnifiedLoginResponse) => {
       saveToken(data.token);
       saveRole(data.role);
+      // Trust the unified-login response's user payload — it already
+      // includes the new role's profile. Setting `user` directly avoids
+      // a redundant network round-trip and any race against the
+      // rehydrate effect's "already-loaded" guard.
       setUser(extractUser(data));
       setOtherRoles(data.other_roles ?? []);
     },
@@ -107,41 +118,46 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     return () => setAuthConsumer({});
   }, [handleLogout, navigate]);
 
-  // Rehydrate the user object on hard refresh. We call the same
-  // `profiles.get(role)` helper used everywhere else, so the response is
-  // wrapped in `{ role, data }` and `data` resolves to the user model
-  // (the old raw-fetch path received the unwrapped model and crashed on
-  // `.data` accesses — see audit C1).
+  // Rehydrate the user object on hard refresh OR when the token/role
+  // changes (e.g. after a successful switch-role). We use ref-mirrors
+  // to detect stale responses: if the latest token/role no longer match
+  // the snapshot this fetch started with, the response is dropped.
   useEffect(() => {
-    if (!token || !role) {
-      rehydrated.current = false;
-      return;
-    }
-    if (rehydrated.current) return;
-    rehydrated.current = true;
+    if (!token || !role) return;
 
+    const snapshotToken = token;
+    const snapshotRole = role;
     let cancelled = false;
+
     profiles
       .get(role)
       .then((profile) => {
-        if (!cancelled) setUser(profile.data);
+        // Drop stale responses: if the token/role has changed since
+        // this fetch was issued, ignore the result so the UI doesn't
+        // briefly flash the previous role's profile.
+        if (cancelled) return;
+        if (tokenRef.current !== snapshotToken || roleRef.current !== snapshotRole) return;
+        setUser(profile.data);
       })
-      .catch(() => {
-        // The 401 interceptor's onUnauthorized will already have run
-        // and cleared local state. Just reset the ref so a future login
-        // can rehydrate again.
-        rehydrated.current = false;
-      });
+      // The 401 interceptor's onUnauthorized will already have run and
+      // cleared local state. Nothing else to do here.
+      .catch(() => undefined);
+
     return () => {
       cancelled = true;
     };
   }, [token, role]);
 
+  // Derive the exposed user: when there's no token/role, force null
+  // regardless of what's in `user`. This avoids a setState-in-effect
+  // and keeps logout semantics crisp.
+  const effectiveUser: AnyUser | null = token && role ? user : null;
+
   const value = useMemo(
     () => ({
       token,
       role,
-      user,
+      user: effectiveUser,
       otherRoles,
       saveToken,
       saveRole,
@@ -152,7 +168,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     [
       token,
       role,
-      user,
+      effectiveUser,
       otherRoles,
       saveToken,
       saveRole,

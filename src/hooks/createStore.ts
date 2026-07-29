@@ -1,4 +1,4 @@
-import { useCallback, useSyncExternalStore } from "react";
+import { useCallback, useMemo, useSyncExternalStore } from "react";
 
 type Updater<T> = (state: T) => T;
 
@@ -27,9 +27,17 @@ export function create<T>(initial: T) {
 
   function useStore(): T;
   function useStore<U>(selector: (s: T) => U): U;
-  function useStore<U>(selector: (s: T) => U = (s) => s as unknown as U): U {
-    const getSelected = useCallback(() => selector(getState()), [selector]);
-    const getServerSelected = useCallback(() => selector(initial), [selector]);
+  function useStore<U>(selector?: (s: T) => U): U | T {
+    // Memoise the defaulted selector so the underlying useCallback deps
+    // don't churn on every render. Consumers who pass a fresh selector
+    // each render will still trigger churn here, but consumers who
+    // don't pass one won't.
+    const sel = useMemo(
+      () => selector ?? ((s: T) => s as unknown as T & U),
+      [selector],
+    );
+    const getSelected = useCallback(() => sel(getState()), [sel]);
+    const getServerSelected = useCallback(() => sel(initial), [sel]);
     return useSyncExternalStore(subscribe, getSelected, getServerSelected);
   }
 

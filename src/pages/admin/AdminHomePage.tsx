@@ -12,14 +12,26 @@ import { Skeleton } from "../../components/skeletons/Skeleton";
 import { formatTime, formatMonthDay } from "../../utils/dates";
 
 export default function AdminHomePage() {
-  // The dashboard only needs the latest 4 pending appointments and a
-  // count of staff/categories. We use a small per_page and filter
-  // client-side so we don't load the entire table on every visit.
-  // (Previously used per_page: 9999 which is dangerous at scale.)
-  const { data: appointments, isLoading: loadingAppos } =
-    useAdminGetAppointmentsQuery({ per_page: 50, tab: "pending" });
-  const { data: staffList } = useGetAllStaffQuery({ per_page: 1 });
-  const { data: categories } = useGetAllCategoriesQuery({ per_page: 1 });
+  // The dashboard needs the latest pending appointments to render the
+  // list AND the paginated `total` for the count card. We use a small
+  // per_page for the list itself and trust the metadata for the count.
+  // (Previously used per_page: 9999 which is dangerous at scale and
+  // also hid the real pending count when there were more than 9999.)
+  const {
+    data: appointments,
+    isLoading: loadingAppos,
+    isError: appointmentsError,
+  } = useAdminGetAppointmentsQuery({ per_page: 50, tab: "pending" });
+  const {
+    data: staffList,
+    isLoading: loadingStaff,
+    isError: staffError,
+  } = useGetAllStaffQuery({ per_page: 1 });
+  const {
+    data: categories,
+    isLoading: loadingCategories,
+    isError: categoriesError,
+  } = useGetAllCategoriesQuery({ per_page: 1 });
 
   const pendingAppos =
     appointments?.data?.filter((a) => a.status.name === "pending") ?? [];
@@ -31,9 +43,11 @@ export default function AdminHomePage() {
   const uniqueCustomersMap = new Map<number, CustomerProfile>(customerEntries);
   const totalCustomers = Array.from(uniqueCustomersMap.values());
 
-  // With per_page: 1 we only get the metadata back, not the data array.
-  // Read the totals from the paginated response so the count cards
-  // stay accurate without loading every row.
+  // The paginated `total` is the source of truth for the pending-count
+  // card; `pendingAppos.length` would undercount when more than 50
+  // appointments are pending. With per_page: 1 we get the same `total`
+  // for staff/categories without loading every row.
+  const totalPending = appointments?.total ?? 0;
   const totalStaff = staffList?.total ?? 0;
   const totalCategories = categories?.total ?? 0;
 
@@ -47,7 +61,11 @@ export default function AdminHomePage() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Total Staff Card */}
-        {staffList ? (
+        {loadingStaff ? (
+          <SkeletonStatCard />
+        ) : staffError ? (
+          <div className="card p-6 text-canceld text-sm">Personel sayısı yüklenemedi.</div>
+        ) : (
           <div className="card p-6 flex items-center gap-4">
             <div className="icon-box">
               <Users className="h-8 w-8" />
@@ -59,12 +77,14 @@ export default function AdminHomePage() {
               </p>
             </div>
           </div>
-        ) : (
-          <SkeletonStatCard />
         )}
 
         {/* Total Categories Card */}
-        {categories ? (
+        {loadingCategories ? (
+          <SkeletonStatCard />
+        ) : categoriesError ? (
+          <div className="card p-6 text-canceld text-sm">Kategori sayısı yüklenemedi.</div>
+        ) : (
           <div className="card p-6 flex items-center gap-4">
             <div className="icon-box">
               <Briefcase className="h-8 w-8" />
@@ -76,25 +96,29 @@ export default function AdminHomePage() {
               </p>
             </div>
           </div>
-        ) : (
-          <SkeletonStatCard />
         )}
 
         {/* Pending Appointments Card */}
-        <Link
-          to="/admin/appointments"
-          className="card p-6 flex items-center gap-4 hover:shadow-md transition-shadow"
-        >
-          <div className="p-3 bg-waiting/10 rounded-lg text-waiting">
-            <Clock className="h-8 w-8" />
-          </div>
-          <div>
-            <p className="text-sm font-medium text-main/60">Onay Bekleyen</p>
-            <p className="text-2xl sm:text-3xl font-bold text-main">
-              {pendingAppos.length}
-            </p>
-          </div>
-        </Link>
+        {loadingAppos ? (
+          <SkeletonStatCard />
+        ) : appointmentsError ? (
+          <div className="card p-6 text-canceld text-sm">Bekleyen randevu sayısı yüklenemedi.</div>
+        ) : (
+          <Link
+            to="/admin/appointments"
+            className="card p-6 flex items-center gap-4 hover:shadow-md transition-shadow"
+          >
+            <div className="p-3 bg-waiting/10 rounded-lg text-waiting">
+              <Clock className="h-8 w-8" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-main/60">Onay Bekleyen</p>
+              <p className="text-2xl sm:text-3xl font-bold text-main">
+                {totalPending}
+              </p>
+            </div>
+          </Link>
+        )}
 
         {/* Total Customers Card */}
         <div className="card p-6 flex items-center gap-4">
@@ -103,7 +127,7 @@ export default function AdminHomePage() {
           </div>
           <div>
             <p className="text-sm font-medium text-main/60">
-              Aktif Müşteriler
+              Bekleyen Randevulu Müşteriler
             </p>
             <p className="text-2xl sm:text-3xl font-bold text-main">
               {totalCustomers.length}
@@ -160,8 +184,8 @@ export default function AdminHomePage() {
 
           <QueryGate
             isLoading={loadingAppos}
-            isError={false}
-            errorMessage=""
+            isError={appointmentsError}
+            errorMessage="Bekleyen randevular yüklenemedi."
             loading={
               <div className="space-y-3">
                 {Array.from({ length: 3 }).map((_, i) => (

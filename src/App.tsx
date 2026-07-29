@@ -1,5 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
-import { Route, Routes } from "react-router";
+import { Link, Route, Routes } from "react-router";
 import PublicLayout from "./pages/layouts/PublicLayout";
 import CustomerLayout from "./pages/layouts/CustomerLayout";
 import StaffLayout from "./pages/layouts/StaffLayout";
@@ -43,11 +43,10 @@ class AppErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState>
   }
 
   reset = (): void => {
+    // Reset the error state and stay on the current URL — using a
+    // router Link instead of window.location preserves QueryClient
+    // cache, AuthProvider state, and scroll position.
     this.setState({ hasError: false, error: undefined });
-    // Force a full subtree remount so consumers that re-throw on render
-    // (e.g. detail pages that previously violated rules-of-hooks) don't
-    // immediately re-trip the boundary.
-    window.location.assign("/");
   };
 
   override render(): ReactNode {
@@ -67,7 +66,7 @@ class AppErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState>
             >
               Tekrar Dene
             </button>
-            <a href="/" className="btn-secondary">Ana Sayfa</a>
+            <Link to="/" className="btn-secondary">Ana Sayfa</Link>
           </div>
         </div>
       );

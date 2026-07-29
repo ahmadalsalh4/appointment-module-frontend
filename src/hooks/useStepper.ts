@@ -15,12 +15,25 @@ export function useStepper(steps: StepperStep[], initialStep = 0) {
   const [requestedStep, setRequestedStep] = useState(() => clamp(initialStep));
   const currentStep = useMemo(() => clamp(requestedStep), [clamp, requestedStep]);
 
-  const canAdvanceCurrent = steps[currentStep]?.canAdvance?.() ?? true;
+  const isGateValid = useCallback(
+    (stepIndex: number): boolean => {
+      // A step's gate is only meaningful for the CURRENT data — the
+      // user can't pre-validate steps they've never reached.
+      const idx = clamp(stepIndex);
+      return steps[idx]?.canAdvance?.() ?? true;
+    },
+    [steps, clamp],
+  );
 
   const next = useCallback(() => {
-    if (!canAdvanceCurrent) return;
+    // Re-check every gate up to and including the current step before
+    // advancing. This catches the "user changed step 0 and step 1's
+    // gate would now fail" case.
+    for (let i = 0; i <= currentStep; i++) {
+      if (!isGateValid(i)) return;
+    }
     setRequestedStep((i) => clamp(i + 1));
-  }, [canAdvanceCurrent, clamp]);
+  }, [currentStep, isGateValid, clamp]);
 
   const prev = useCallback(() => {
     setRequestedStep((i) => clamp(i - 1));
@@ -28,24 +41,35 @@ export function useStepper(steps: StepperStep[], initialStep = 0) {
 
   const goTo = useCallback(
     (index: number) => {
-      // Only allow jumping to a step that has already been completed
-      // (or to the current one). The Stepper component also enforces
-      // this on click; we repeat it here so programmatic goTo() calls
-      // can't bypass the gate.
       const target = clamp(index);
-      if (target <= currentStep) {
+      // Only allow jumping backwards. Forward jumps are reserved for
+      // `next()` so gate enforcement can't be bypassed. `target !==
+      // currentStep` guards against the redundant "click the current
+      // step" re-render.
+      if (target < currentStep && target !== currentStep) {
         setRequestedStep(target);
       }
     },
     [currentStep, clamp],
   );
 
+  // The "canAdvance" the consumer checks before rendering the next
+  // button must reflect ALL gates up to the current step, not just the
+  // current one — see comment above. `isGateValid` closes over `steps`
+  // so listing it as a dep is sufficient.
+  const canAdvance = useMemo(() => {
+    for (let i = 0; i <= currentStep; i++) {
+      if (!isGateValid(i)) return false;
+    }
+    return true;
+  }, [currentStep, isGateValid]);
+
   return {
     currentStep,
     next,
     prev,
     goTo,
-    canAdvance: canAdvanceCurrent,
+    canAdvance,
     isFirst: currentStep === 0,
     isLast: steps.length === 0 || currentStep === steps.length - 1,
   };

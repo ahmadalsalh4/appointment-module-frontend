@@ -5,6 +5,7 @@ import type { Category, ServiceRequestBody } from "../../../other/types";
 import { useCreateServiceMutation } from "../../../hooks/useServiceQueries";
 import { useGetAllCategoriesQuery } from "../../../hooks/useCategoryQueries";
 import { useToast } from "../../../hooks/useToast";
+import { getErrorMessage } from "../../../utils/errors";
 import AdminFormPage from "../components/AdminFormPage";
 
 export default function AdminServiceAdd() {
@@ -27,8 +28,7 @@ export default function AdminServiceAdd() {
       queryClient.invalidateQueries({ queryKey: ["services"] });
       navigate("/admin/services");
     } catch (err) {
-      const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
-      toast.error(message || "Hizmet eklenirken bir hata oluştu.");
+      toast.error(getErrorMessage(err, "Hizmet eklenirken bir hata oluştu."));
     }
   };
 

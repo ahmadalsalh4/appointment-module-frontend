@@ -8,6 +8,7 @@ import { useGetAllCategoriesQuery } from "../../../hooks/useCategoryQueries";
 import { useQueryClient } from "@tanstack/react-query";
 import type { Category, UpdateStaffRequestBody, StaffEntityDetailed } from "../../../other/types";
 import { useToast } from "../../../hooks/useToast";
+import { getErrorMessage } from "../../../utils/errors";
 import Breadcrumb from "../../../components/Breadcrumb";
 import FormActions from "../../../components/FormActions";
 import QueryGate from "../../../components/QueryGate";
@@ -46,8 +47,7 @@ function StaffEditForm({ staff }: { staff: StaffEntityDetailed }) {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
       navigate("/admin/staff");
     } catch (err) {
-      const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
-      toast.error(message || "Personel güncellenirken bir hata oluştu.");
+      toast.error(getErrorMessage(err, "Personel güncellenirken bir hata oluştu."));
     }
   };
 

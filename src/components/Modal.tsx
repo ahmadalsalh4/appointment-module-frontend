@@ -26,15 +26,6 @@ const SIZE_CLASSES: Record<ModalSize, string> = {
 const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
-// Module-level counter so stacked modals don't fight over body overflow.
-// Each open() bumps the count; the first close that takes it to 0
-// restores the original overflow. Previously each modal independently
-// saved/restored body.style.overflow, so opening a second modal on
-// top of the first would restore the body to scrolling behind the
-// second one.
-let openModalCount = 0;
-let savedBodyOverflow = "";
-
 export default function Modal({
   open,
   onClose,
@@ -51,6 +42,12 @@ export default function Modal({
   const titleId = useId();
   const descriptionId = useId();
 
+  // Per-instance body-overflow guard. Previously module-scoped counters
+  // meant a re-render with `closeOnEscape` flipping from true → false
+  // would save "hidden" as the original overflow and permanently lock
+  // body scroll after the modal closed.
+  const savedBodyOverflow = useRef<string>("");
+
   // Keep the latest onClose in a ref so we can attach a stable
   // keydown listener that doesn't churn on every parent render.
   const onCloseRef = useRef(onClose);
@@ -62,16 +59,17 @@ export default function Modal({
     if (!open) return;
 
     previousActive.current = document.activeElement as HTMLElement | null;
-    if (openModalCount === 0) {
-      savedBodyOverflow = document.body.style.overflow;
-    }
-    openModalCount += 1;
+    savedBodyOverflow.current = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
     const getFocusable = () =>
       dialogRef.current?.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR);
 
-    getFocusable()?.[0]?.focus();
+    // Defer focus to next paint so screen readers announce the dialog
+    // before focus moves.
+    const focusTimer = window.setTimeout(() => {
+      getFocusable()?.[0]?.focus();
+    }, 0);
 
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === "Escape" && closeOnEscape) {
@@ -96,11 +94,9 @@ export default function Modal({
     document.addEventListener("keydown", handleKey);
 
     return () => {
+      window.clearTimeout(focusTimer);
       document.removeEventListener("keydown", handleKey);
-      openModalCount = Math.max(0, openModalCount - 1);
-      if (openModalCount === 0) {
-        document.body.style.overflow = savedBodyOverflow;
-      }
+      document.body.style.overflow = savedBodyOverflow.current;
       previousActive.current?.focus();
     };
   }, [open, closeOnEscape]);

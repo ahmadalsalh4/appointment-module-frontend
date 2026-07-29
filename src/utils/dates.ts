@@ -79,46 +79,74 @@ function partsInTz(
   };
 }
 
-export function formatTime(isoString: string): string {
-  const d = parseDate(isoString);
-  return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+// ============================================================
+// Istanbul-aware formatters
+// ------------------------------------------------------------
+// All formatters below project the timestamp into Europe/Istanbul
+// before formatting. The legacy `formatTime`/`formatDate` etc.
+// functions used `Date#getHours()`/`getDate()` which return values
+// in the browser's local zone — wrong for any non-Istanbul user.
+// New code should prefer the *Istanbul variants. The legacy names
+// are kept as thin aliases so existing call sites keep compiling;
+// each legacy name now delegates to the Istanbul variant.
+// ============================================================
+
+/**
+ * Format the time-of-day (HH:mm) of an ISO timestamp as observed in
+ * Europe/Istanbul, not the browser's local timezone.
+ */
+export function formatTimeIstanbul(isoString: string): string {
+  const { h, mi } = partsInTz(parseDate(isoString), BUSINESS_TIMEZONE);
+  return `${pad(h)}:${pad(mi)}`;
 }
 
-export function formatDate(isoString: string): string {
-  const d = parseDate(isoString);
-  return `${d.getDate()} ${MONTHS_LONG[d.getMonth()]} ${d.getFullYear()}`;
+/**
+ * Format the calendar date in long Turkish format ("29 Temmuz 2026")
+ * as observed in Europe/Istanbul.
+ */
+export function formatDateIstanbul(isoString: string): string {
+  const { y, mo, d } = partsInTz(parseDate(isoString), BUSINESS_TIMEZONE);
+  const monthName = MONTHS_LONG[mo - 1] ?? "";
+  return `${d} ${monthName} ${y}`;
 }
 
-export function formatDateTime(isoString: string): string {
-  return `${formatDate(isoString)} - ${formatTime(isoString)}`;
+/**
+ * Format the date + time as observed in Europe/Istanbul.
+ */
+export function formatDateTimeIstanbul(isoString: string): string {
+  return `${formatDateIstanbul(isoString)} - ${formatTimeIstanbul(isoString)}`;
 }
 
-export function formatMonthDay(isoString: string): { day: number; month: string } {
-  const d = parseDate(isoString);
-  // MONTHS_SHORT is a fixed array of 12 strings; index 0-11 always
-  // exists, but noUncheckedIndexedAccess still widens the type to
-  // `string | undefined`. The `?? "Ara"` only fires for an off-by-one
-  // edge case where getDate()/getMonth() ever returned NaN.
-  const monthIndex = d.getMonth();
+/**
+ * Return day-of-month + short Turkish month name in Europe/Istanbul.
+ */
+export function formatMonthDayIstanbul(
+  isoString: string,
+): { day: number; month: string } {
+  const { mo, d } = partsInTz(parseDate(isoString), BUSINESS_TIMEZONE);
+  const monthIndex = mo - 1;
   return {
-    day: d.getDate(),
+    day: d,
     month: MONTHS_SHORT[monthIndex] ?? MONTHS_SHORT[0] ?? "",
   };
 }
 
-export function localDateInputValue(isoString: string): string {
-  const d = parseDate(isoString);
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+/**
+ * Format the calendar date as a YYYY-MM-DD string in Europe/Istanbul.
+ * Use this to set the `value` of an <input type="date">.
+ */
+export function localDateInputValueIstanbul(isoString: string): string {
+  const { y, mo, d } = partsInTz(parseDate(isoString), BUSINESS_TIMEZONE);
+  return `${y}-${pad(mo)}-${pad(d)}`;
 }
 
-export function localTimeInputValue(isoString: string): string {
-  const d = parseDate(isoString);
-  return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
-}
-
-export function todayLocalDateInputValue(): string {
-  const d = new Date();
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+/**
+ * Format the time-of-day as HH:mm in Europe/Istanbul.
+ * Use this to set the `value` of an <input type="time">.
+ */
+export function localTimeInputValueIstanbul(isoString: string): string {
+  const { h, mi } = partsInTz(parseDate(isoString), BUSINESS_TIMEZONE);
+  return `${pad(h)}:${pad(mi)}`;
 }
 
 /**
@@ -144,6 +172,12 @@ export function todayIstanbulDateInputValue(): string {
  * UTC).
  */
 export function toIstanbulNaiveIso(dateStr: string, timeStr: string): string {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+    throw new Error(`Invalid date string: ${dateStr}`);
+  }
+  if (!/^\d{2}:\d{2}$/.test(timeStr)) {
+    throw new Error(`Invalid time string: ${timeStr}`);
+  }
   const [rawY, rawMo, rawD] = dateStr.split("-").map(Number);
   const [rawH, rawMi] = timeStr.split(":").map(Number);
   const y = rawY ?? 1970;
@@ -163,12 +197,29 @@ export function combineIstanbul(
   timeStr: string,
   fallbackTime: string,
 ): string {
-  const effectiveTime = timeStr || fallbackTime;
+  const effectiveTime = timeStr.trim() ? timeStr : fallbackTime;
   if (dateStr) return toIstanbulNaiveIso(dateStr, effectiveTime);
   return toIstanbulNaiveIso(todayIstanbulDateInputValue(), effectiveTime);
 }
 
-// Backwards-compatible aliases. Existing call sites that haven't migrated
-// yet still compile; new code should prefer the Istanbul helpers.
-export const toLocalIsoString = toIstanbulNaiveIso;
-export const combineLocal = combineIstanbul;
+// ============================================================
+// Legacy aliases — kept so existing call sites keep compiling.
+// These now delegate to the Istanbul-aware implementations so
+// every consumer (regardless of browser timezone) sees the right
+// time. New code should prefer the *Istanbul variants directly.
+// ============================================================
+
+export const formatTime = formatTimeIstanbul;
+export const formatDate = formatDateIstanbul;
+export const formatDateTime = formatDateTimeIstanbul;
+export const formatMonthDay = formatMonthDayIstanbul;
+export const localDateInputValue = localDateInputValueIstanbul;
+export const localTimeInputValue = localTimeInputValueIstanbul;
+export const todayLocalDateInputValue = todayIstanbulDateInputValue;
+
+// Backend-bound aliases — the names lie about their semantics
+// (they actually emit Istanbul-wall-clock strings, not browser-local).
+// Keep for backward compatibility but the Istanbul variants are
+// preferred for new code.
+export const toBackendIsoString = toIstanbulNaiveIso;
+export const combineBackendIso = combineIstanbul;

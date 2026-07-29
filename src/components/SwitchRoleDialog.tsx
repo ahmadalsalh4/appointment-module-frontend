@@ -6,6 +6,7 @@ import { useMyRolesQuery } from "../hooks/useMyRolesQuery";
 import { useAuth } from "../contexts/auth/useAuth";
 import authApi from "../api/auth";
 import { ROLE_HOME } from "../utils/roleHome";
+import { getErrorMessage } from "../utils/errors";
 import type { UserRole } from "../other/types";
 
 interface SwitchRoleDialogProps {
@@ -35,11 +36,14 @@ export default function SwitchRoleDialog({ open, onClose, targetRole }: SwitchRo
     try {
       const result = await authApi.switchRole({ role: targetRole, password });
       handleSwitchRole(result);
-      await refetchMyRoles();
+      // Fire-and-forget the me-roles refetch: the role switch has
+      // already succeeded, so a refetch failure (e.g. transient 500)
+      // must not block navigation or show a misleading "wrong password"
+      // error. The next page mount will retry the query.
+      void refetchMyRoles();
       navigate(ROLE_HOME[targetRole], { replace: true });
     } catch (err) {
-      const e2 = err as { response?: { data?: { message?: string } } };
-      setError(e2?.response?.data?.message || "Rol değiştirme başarısız oldu. Şifrenizi kontrol edin.");
+      setError(getErrorMessage(err, "Rol değiştirme başarısız oldu. Şifrenizi kontrol edin."));
     } finally {
       setSubmitting(false);
     }

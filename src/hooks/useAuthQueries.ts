@@ -14,10 +14,18 @@ import type {
 import { useAuth } from "../contexts/auth/useAuth";
 
 export const useLoginMutation = () => {
+  const queryClient = useQueryClient();
+
   return useMutation<UnifiedLoginResponse, AxiosError<LaravelErrorResponse>, Pick<LoginBody, "email" | "password">>({
     mutationFn: async (formData) => {
       const res = await authApi.login(formData);
       return res;
+    },
+    onSuccess: () => {
+      // Invalidate me-roles so the Sidebar's switch-role affordance
+      // refreshes immediately after login (previously it stayed empty
+      // until the user manually opened the dialog).
+      queryClient.invalidateQueries({ queryKey: ["auth", "me-roles"] });
     },
   });
 };
@@ -25,7 +33,7 @@ export const useLoginMutation = () => {
 export const useLogoutMutation = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const { handleLogout } = useAuth();
+  const { token, handleLogout } = useAuth();
 
   return useMutation<LogoutResponse, AxiosError<LaravelErrorResponse>, UserRole>({
     mutationFn: async (role) => {
@@ -38,9 +46,14 @@ export const useLogoutMutation = () => {
     // window event; now we call handleLogout() directly through context
     // so the interceptor's auth consumer doesn't need to know about it.
     onSettled: () => {
-      handleLogout();
-      queryClient.clear();
-      navigate("/login", { replace: true });
+      // Guard against the interceptor's onUnauthorized already having
+      // logged us out (token === null). Otherwise we'd double-navigate
+      // and double-clear.
+      if (token) {
+        handleLogout();
+        queryClient.clear();
+        navigate("/login", { replace: true });
+      }
     },
   });
 };

@@ -43,6 +43,7 @@ export type Role = UserRole;
 
 /** Used for Get Customer Profile */
 export interface CustomerProfile extends ApiTimestamps {
+  role?: "customer";
   id: number;
   person_id: number;
   email: string;
@@ -51,6 +52,7 @@ export interface CustomerProfile extends ApiTimestamps {
 
 /** Used for Get Admin Profile */
 export interface AdminProfile extends ApiTimestamps {
+  role?: "admin";
   id: number;
   person_id: number;
   email: string;
@@ -66,6 +68,7 @@ export interface ManagingAdminLight extends ApiTimestamps {
 
 /** Used for Get Staff Profile */
 export interface StaffProfile extends ApiTimestamps {
+  role?: "staff";
   id: number;
   person_id: number;
   job_title: string;
@@ -352,6 +355,11 @@ export interface AppointmentStatus extends ApiTimestamps {
  * - Customer endpoints DON'T return the 'customer' object
  * - Staff endpoints DON'T return the 'staff' object
  * - Admin endpoints return BOTH
+ *
+ * `service` is `ServiceWithCategory` because all consuming pages read
+ * `service.category.name` (BookAppointmentPage summary, MyAppointments,
+ * AdminAppointmentsList, etc.). The backend includes the category in
+ * the eager-loaded payload.
  */
 export interface Appointment extends ApiTimestamps {
   id: number;
@@ -362,7 +370,7 @@ export interface Appointment extends ApiTimestamps {
   start_date: string;
   end_date: string;
 
-  service: Service;
+  service: ServiceWithCategory;
   status: AppointmentStatus;
 
   // Optional based on who is requesting

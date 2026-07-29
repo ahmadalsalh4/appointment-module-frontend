@@ -5,6 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import type { Category, CreateStaffRequestBody } from "../../../other/types";
 import { useGetAllCategoriesQuery } from "../../../hooks/useCategoryQueries";
 import { useToast } from "../../../hooks/useToast";
+import { getErrorMessage } from "../../../utils/errors";
 import Breadcrumb from "../../../components/Breadcrumb";
 import FormActions from "../../../components/FormActions";
 
@@ -37,8 +38,7 @@ export default function AdminStaffAdd() {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
       navigate("/admin/staff");
     } catch (err) {
-      const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
-      toast.error(message || "Personel eklenirken bir hata oluştu.");
+      toast.error(getErrorMessage(err, "Personel eklenirken bir hata oluştu."));
     }
   };
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, ArrowRight, Calendar, Check, Clock, User, UserCheck, Users } from "lucide-react";
@@ -22,6 +22,7 @@ import {
   todayIstanbulDateInputValue,
   toIstanbulNaiveIso,
 } from "../../utils/dates";
+import { getErrorMessage } from "../../utils/errors";
 import type { CustomerProfile, PublicStaff } from "../../other/types";
 
 const STEPS: StepperStep[] = [
@@ -68,13 +69,17 @@ export default function BookAppointmentPage() {
   const createAppointment = useCreateAppointmentMutation();
 
   const staffList: PublicStaff[] = serviceStaff ?? [];
-  const slots = availability.data?.available_slots ?? [];
+  const slots = useMemo(
+    () => availability.data?.available_slots ?? [],
+    [availability.data],
+  );
 
-  // If the selected time is no longer in the list (e.g. post-invalidation
-  // re-fetch), clear it so the user can't confirm a stale slot.
-  if (selectedTime && slots.length > 0 && !slots.includes(selectedTime)) {
-    setSelectedTime(null);
-  }
+  // Derived: if the selected time is no longer in the list (e.g. post-
+  // invalidation re-fetch OR an empty result), treat it as null so the
+  // user can't confirm a stale slot. Pure derivation — no effect, no
+  // setState.
+  const effectiveSelectedTime =
+    selectedTime && slots.includes(selectedTime) ? selectedTime : null;
 
   const selectedStaff = staffList.find((s) => String(s.id) === selectedStaffId);
 
@@ -86,7 +91,7 @@ export default function BookAppointmentPage() {
       return { ...step, canAdvance: () => !!selectedDate };
     }
     if (step.id === "time") {
-      return { ...step, canAdvance: () => !!selectedTime };
+      return { ...step, canAdvance: () => !!effectiveSelectedTime };
     }
     return step;
   });
@@ -100,17 +105,19 @@ export default function BookAppointmentPage() {
     // Auto-fetched by useGetAvailabilityQuery. Manual refetch is just
     // "refresh" semantics now.
     if (!selectedDate || !selectedStaffId || !serviceId) return;
-    availability.refetch().catch(() => {
+    // TanStack Query's refetch() resolves with a QueryObserverResult
+    // even on failure; use throwOnError to actually surface errors.
+    availability.refetch({ throwOnError: true }).catch(() => {
       toast.error("Müsaitlik kontrolü başarısız oldu.");
     });
   };
 
   const handleConfirm = async () => {
-    if (!selectedTime || !selectedStaffId || !selectedDate || !serviceId) return;
+    if (!effectiveSelectedTime || !selectedStaffId || !selectedDate || !serviceId) return;
     // Naive wall-clock ISO in Europe/Istanbul — backend parses the value
     // with Carbon::parse(..., BUSINESS_TIMEZONE), so it never depends on
     // the user's browser timezone.
-    const start_date = toIstanbulNaiveIso(selectedDate, selectedTime);
+    const start_date = toIstanbulNaiveIso(selectedDate, effectiveSelectedTime);
     try {
       await createAppointment.mutateAsync({
         staff_id: Number(selectedStaffId),
@@ -125,8 +132,7 @@ export default function BookAppointmentPage() {
       toast.success("Randevunuz başarıyla oluşturuldu.");
       navigate("/appointments");
     } catch (err) {
-      const e = err as { response?: { data?: { message?: string } } };
-      toast.error(e?.response?.data?.message || "Randevu oluşturulurken bir hata oluştu.");
+      toast.error(getErrorMessage(err, "Randevu oluşturulurken bir hata oluştu."));
     }
   };
 
@@ -323,7 +329,7 @@ export default function BookAppointmentPage() {
                         key={time}
                         onClick={() => setSelectedTime(time)}
                         className={`py-2.5 px-3 text-sm font-medium rounded-lg border transition-all duration-200 ${
-                          selectedTime === time
+                          effectiveSelectedTime === time
                             ? "bg-deep text-white border-deep shadow-md scale-105"
                             : "bg-surface text-main/80 border-main/10 hover:border-deep/30 hover:bg-deep/5"
                         }`}
@@ -360,7 +366,7 @@ export default function BookAppointmentPage() {
                 />
                 <SummaryItem label="Kategori" value={service.category?.name ?? "—"} />
                 <SummaryItem label="Tarih" value={selectedDate ? formatDate(selectedDate) : "—"} />
-                <SummaryItem label="Saat" value={selectedTime ?? "—"} />
+                <SummaryItem label="Saat" value={effectiveSelectedTime ?? "—"} />
               </div>
 
               <div className="border-t border-main/10 pt-4">
@@ -416,7 +422,7 @@ export default function BookAppointmentPage() {
               type="button"
               onClick={handleConfirm}
               disabled={
-                !selectedTime ||
+                !effectiveSelectedTime ||
                 !selectedStaffId ||
                 !selectedDate ||
                 !customerProfile ||

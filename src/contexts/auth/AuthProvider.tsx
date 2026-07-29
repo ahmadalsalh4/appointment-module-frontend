@@ -1,10 +1,12 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { FC, ReactNode } from "react";
+import { useNavigate } from "react-router";
+import api, { setAuthConsumer } from "../../api";
+import profiles from "../../api/profiles";
 import type {
   AnyUser,
   UserRole,
   UnifiedLoginResponse,
-  AnyProfileResponse,
 } from "../../other/types";
 import { AuthContext } from "./Authcontext";
 
@@ -24,11 +26,6 @@ const extractUser = (data: UnifiedLoginResponse | null): AnyUser | null => {
   return data.user ?? null;
 };
 
-const profileDataToUser = (profile: AnyProfileResponse | null): AnyUser | null => {
-  if (!profile) return null;
-  return profile.data;
-};
-
 const readInitialToken = (): string | null => {
   const raw = localStorage.getItem("token");
   return isValidToken(raw) ? raw : null;
@@ -40,17 +37,18 @@ const readInitialRole = (): UserRole | null => {
 };
 
 export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
+  const navigate = useNavigate();
+
   const [token, setToken] = useState<string | null>(readInitialToken);
   const [role, setRole] = useState<UserRole | null>(readInitialRole);
   const [user, setUser] = useState<AnyUser | null>(null);
   const [otherRoles, setOtherRoles] = useState<UserRole[]>([]);
 
   // Use a ref-based "already loaded once" flag so the rehydrate effect
-  // doesn't run on every `user` state change (it previously had `user`
-  // in the dep array, causing a refetch loop on certain profile updates).
+  // doesn't run on every `user` state change.
   const rehydrated = useRef(false);
 
-  const saveToken = (newToken: string | null) => {
+  const saveToken = useCallback((newToken: string | null) => {
     if (newToken && !isValidToken(newToken)) {
       // Don't accept malformed tokens.
       return;
@@ -58,52 +56,62 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     setToken(newToken);
     if (newToken) localStorage.setItem("token", newToken);
     else localStorage.removeItem("token");
-  };
+  }, []);
 
-  const saveRole = (newRole: UserRole | null) => {
+  const saveRole = useCallback((newRole: UserRole | null) => {
     if (newRole !== null && !isValidRole(newRole)) {
       return;
     }
     setRole(newRole);
     if (newRole) localStorage.setItem("role", newRole);
     else localStorage.removeItem("role");
-  };
+  }, []);
 
-  const handleLoginSuccess = (data: UnifiedLoginResponse) => {
-    saveToken(data.token);
-    saveRole(data.role);
-    setUser(extractUser(data));
-    setOtherRoles(data.other_roles ?? []);
-  };
-
-  const handleSwitchRole = (data: UnifiedLoginResponse) => {
-    saveToken(data.token);
-    saveRole(data.role);
-    setUser(extractUser(data));
-    setOtherRoles(data.other_roles ?? []);
-  };
-
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     saveToken(null);
     saveRole(null);
     setUser(null);
     setOtherRoles([]);
     rehydrated.current = false;
-  };
+  }, [saveToken, saveRole]);
 
-  // Listen for the logout event dispatched by the axios interceptor when
-  // a 401 is detected, so the local state stays in sync without the
-  // interceptor needing a direct dependency on this provider.
+  const handleLoginSuccess = useCallback(
+    (data: UnifiedLoginResponse) => {
+      saveToken(data.token);
+      saveRole(data.role);
+      setUser(extractUser(data));
+      setOtherRoles(data.other_roles ?? []);
+    },
+    [saveToken, saveRole],
+  );
+
+  const handleSwitchRole = useCallback(
+    (data: UnifiedLoginResponse) => {
+      saveToken(data.token);
+      saveRole(data.role);
+      setUser(extractUser(data));
+      setOtherRoles(data.other_roles ?? []);
+    },
+    [saveToken, saveRole],
+  );
+
+  // Register an "onUnauthorized" callback so the axios interceptor can
+  // clear local state atomically without dispatching window events.
   useEffect(() => {
-    const onAuthLogout = () => handleLogout();
-    window.addEventListener("auth:logout", onAuthLogout);
-    return () => window.removeEventListener("auth:logout", onAuthLogout);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    setAuthConsumer({
+      onUnauthorized: () => {
+        handleLogout();
+        navigate("/login", { replace: true });
+      },
+    });
+    return () => setAuthConsumer({});
+  }, [handleLogout, navigate]);
 
-  // Rehydrate the user object on hard refresh. The deps are intentionally
-  // [token, role] only — `user` is excluded so subsequent renders don't
-  // refetch. The ref guard ensures we only do this once per token+role.
+  // Rehydrate the user object on hard refresh. We call the same
+  // `profiles.get(role)` helper used everywhere else, so the response is
+  // wrapped in `{ role, data }` and `data` resolves to the user model
+  // (the old raw-fetch path received the unwrapped model and crashed on
+  // `.data` accesses — see audit C1).
   useEffect(() => {
     if (!token || !role) {
       rehydrated.current = false;
@@ -113,19 +121,15 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     rehydrated.current = true;
 
     let cancelled = false;
-    const apiBase =
-      (import.meta.env.VITE_API_BASE_URL as string | undefined) ||
-      "http://appointment_module_backend.test/api";
-    fetch(`${apiBase}/${role}/profile`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => (res.ok ? res.json() : Promise.reject(res)))
-      .then((data: AnyProfileResponse) => {
-        if (!cancelled) setUser(profileDataToUser(data));
+    profiles
+      .get(role)
+      .then((profile) => {
+        if (!cancelled) setUser(profile.data);
       })
       .catch(() => {
-        // The 401 interceptor will dispatch auth:logout; nothing else
-        // to do here.
+        // The 401 interceptor's onUnauthorized will already have run
+        // and cleared local state. Just reset the ref so a future login
+        // can rehydrate again.
         rehydrated.current = false;
       });
     return () => {
@@ -133,8 +137,6 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     };
   }, [token, role]);
 
-  // Memoize the context value so consumers don't re-render on every
-  // parent state change.
   const value = useMemo(
     () => ({
       token,
@@ -147,8 +149,17 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
       handleSwitchRole,
       handleLogout,
     }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [token, role, user, otherRoles],
+    [
+      token,
+      role,
+      user,
+      otherRoles,
+      saveToken,
+      saveRole,
+      handleLoginSuccess,
+      handleSwitchRole,
+      handleLogout,
+    ],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

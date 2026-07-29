@@ -20,7 +20,7 @@ interface ServiceEditFormProps {
 
 function ServiceEditForm({ service, categories, onSubmit, isPending }: ServiceEditFormProps) {
   const [formData, setFormData] = useState<ServiceRequestBody>({
-    catagory_id: service.catagory_id ?? "",
+    category_id: service.category_id ?? "",
     name: service.name ?? "",
     duration: service.duration ?? 30,
   });
@@ -59,8 +59,8 @@ function ServiceEditForm({ service, categories, onSubmit, isPending }: ServiceEd
         <label className="label">Kategori</label>
         <select
           required
-          value={formData.catagory_id}
-          onChange={(e) => setFormData({ ...formData, catagory_id: e.target.value })}
+          value={formData.category_id}
+          onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
           className="input focus:border-deep focus:ring-2 focus:ring-deep/20"
         >
           <option value="">Kategori Seçin...</option>

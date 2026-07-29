@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { type AxiosError } from "axios";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ||
@@ -33,9 +33,25 @@ const AUTH_FREE_PATHS = [
   "/customer/register",
 ];
 
+/**
+ * Consumer hook installed by the AuthProvider at app startup. This avoids
+ * the previous `window.dispatchEvent('auth:logout')` plumbing — the
+ * AuthProvider subscribes a real callback so the interceptor doesn't need
+ * to know about React or react-router.
+ */
+export type AuthConsumer = {
+  onUnauthorized?: () => void;
+};
+
+let authConsumer: AuthConsumer = {};
+
+export function setAuthConsumer(consumer: AuthConsumer): void {
+  authConsumer = consumer;
+}
+
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
+  (error: AxiosError) => {
     const status = error.response?.status;
     const requestUrl = error.config?.url ?? "";
 
@@ -44,13 +60,7 @@ api.interceptors.response.use(
       if (isAuthFree) {
         return Promise.reject(error);
       }
-      // Stale/expired token — clear local state and let the app route
-      // to /login via the React Router navigate below. We dispatch a
-      // custom event so AuthProvider can clear user/role without
-      // creating an import cycle here.
-      localStorage.removeItem("token");
-      localStorage.removeItem("role");
-      window.dispatchEvent(new CustomEvent("auth:logout"));
+      authConsumer.onUnauthorized?.();
     }
 
     return Promise.reject(error);

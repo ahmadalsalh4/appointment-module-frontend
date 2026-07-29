@@ -15,7 +15,7 @@ import { useToast } from "../../../hooks/useToast";
 
 const columns: AdminListColumn[] = [
   { header: "Hizmet Adı", sortField: "name" },
-  { header: "Kategori", sortField: "catagory_id" },
+  { header: "Kategori", sortField: "category_id" },
   { header: "Süre", sortField: "duration" },
   {
     header: "İşlemler",

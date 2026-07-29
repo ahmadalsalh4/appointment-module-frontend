@@ -21,7 +21,7 @@ export default function AdminStaffAdd() {
     email: "",
     phone_number: "",
     password: "",
-    catagory_id: "",
+    category_id: "",
     job_title: "",
   });
 
@@ -113,8 +113,8 @@ export default function AdminStaffAdd() {
               İlgili Olduğu Kategori
             </label>
             <select
-              value={formData.catagory_id}
-              onChange={(e) => updateField("catagory_id", e.target.value)}
+              value={formData.category_id}
+              onChange={(e) => updateField("category_id", e.target.value)}
               className="input focus:border-deep focus:ring-2 focus:ring-deep/20"
             >
               <option value="">Kategori Seçin (Opsiyonel)</option>

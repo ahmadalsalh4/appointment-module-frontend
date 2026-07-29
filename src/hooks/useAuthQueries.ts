@@ -11,6 +11,7 @@ import type {
   LogoutResponse,
   UserRole,
 } from "../other/types";
+import { useAuth } from "../contexts/auth/useAuth";
 
 export const useLoginMutation = () => {
   return useMutation<UnifiedLoginResponse, AxiosError<LaravelErrorResponse>, Pick<LoginBody, "email" | "password">>({
@@ -24,6 +25,7 @@ export const useLoginMutation = () => {
 export const useLogoutMutation = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const { handleLogout } = useAuth();
 
   return useMutation<LogoutResponse, AxiosError<LaravelErrorResponse>, UserRole>({
     mutationFn: async (role) => {
@@ -32,13 +34,12 @@ export const useLogoutMutation = () => {
     },
     // Use onSettled (not onSuccess) so the local state is always cleaned
     // up, even if the server-side logout call failed (e.g. expired
-    // token, network error). The previous code only cleaned up on
-    // success, leaving the token in localStorage on failure.
+    // token, network error). The previous implementation used a global
+    // window event; now we call handleLogout() directly through context
+    // so the interceptor's auth consumer doesn't need to know about it.
     onSettled: () => {
-      localStorage.removeItem("token");
-      localStorage.removeItem("role");
+      handleLogout();
       queryClient.clear();
-      window.dispatchEvent(new CustomEvent("auth:logout"));
       navigate("/login", { replace: true });
     },
   });

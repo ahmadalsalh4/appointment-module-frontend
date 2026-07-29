@@ -6,7 +6,6 @@ import {
   useGetServiceByIdQuery,
   useGetServiceStaffQuery,
 } from "../../hooks/useServiceQueries";
-import { useGetCategoryStaffQuery } from "../../hooks/useCategoryQueries";
 import {
   useGetAvailabilityMutation,
   useCreateAppointmentMutation,
@@ -45,18 +44,14 @@ export default function BookAppointmentPage() {
   const [slots, setSlots] = useState<string[]>([]);
 
   const { data: service, isLoading, isError } = useGetServiceByIdQuery(serviceId || "");
+  // Service-scoped staff is authoritative. The category fallback was
+  // removed when catagory_id → category_id was renamed.
   const { data: serviceStaff } = useGetServiceStaffQuery(serviceId || "");
-  const { data: categoryStaff } = useGetCategoryStaffQuery(
-    String(service?.category?.id ?? ""),
-  );
 
   const availability = useGetAvailabilityMutation();
   const createAppointment = useCreateAppointmentMutation();
 
-  const staffList: StaffEntity[] =
-    serviceStaff && serviceStaff.length > 0
-      ? serviceStaff
-      : categoryStaff ?? [];
+  const staffList: StaffEntity[] = serviceStaff ?? [];
 
   const selectedStaff = staffList.find((s) => String(s.id) === selectedStaffId);
 

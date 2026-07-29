@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Error from "../components/Error";
 import { Link, useNavigate } from "react-router";
 import { useLoginMutation } from "../../hooks/useAuthQueries";
@@ -15,26 +15,33 @@ export default function Login() {
   const { handleLoginSuccess, token, role } = useAuth();
   const navigate = useNavigate();
 
-  // If the user is already logged in, send them to their home —
-  // before this fix a logged-in user could re-submit the login form
-  // and accidentally replace their session.
+  // Tracks whether we already navigated for *this* data object, so a
+  // React re-render that fires the effect twice doesn't push a second
+  // navigation (which previously caused double-route "flash" bugs).
+  const navigatedFor = useRef<unknown>(null);
+
   useEffect(() => {
+    // If a session already exists, route to the role home — covers both
+    // the initial-render and any subsequent in-memory rehydrate.
     if (token && role) {
-      navigate(ROLE_HOME[role], { replace: true });
+      if (navigatedFor.current !== `existing-${role}`) {
+        navigatedFor.current = `existing-${role}`;
+        navigate(ROLE_HOME[role], { replace: true });
+      }
+      return;
     }
-  }, [token, role, navigate]);
+    // Session-less: handle a successful login response.
+    if (data && navigatedFor.current !== data) {
+      navigatedFor.current = data;
+      handleLoginSuccess(data);
+      navigate(ROLE_HOME[data.role] ?? "/login", { replace: true });
+    }
+  }, [token, role, data, handleLoginSuccess, navigate]);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     login(form);
   }
-
-  useEffect(() => {
-    if (data) {
-      handleLoginSuccess(data);
-      navigate(ROLE_HOME[data.role] ?? "/login", { replace: true });
-    }
-  }, [data, handleLoginSuccess, navigate]);
 
   return (
     <div className="flex items-center justify-center p-4 py-12 sm:py-16 bg-back">

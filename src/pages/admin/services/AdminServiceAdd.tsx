@@ -15,7 +15,7 @@ export default function AdminServiceAdd() {
   const toast = useToast();
 
   const [formData, setFormData] = useState<ServiceRequestBody>({
-    catagory_id: "",
+    category_id: "",
     name: "",
     duration: 30,
   });
@@ -66,9 +66,9 @@ export default function AdminServiceAdd() {
         </label>
         <select
           required
-          value={formData.catagory_id}
+          value={formData.category_id}
           onChange={(e) =>
-            setFormData({ ...formData, catagory_id: e.target.value })
+            setFormData({ ...formData, category_id: e.target.value })
           }
           className="input focus:border-deep focus:ring-2 focus:ring-deep/20"
         >

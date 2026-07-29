@@ -65,7 +65,7 @@ export interface StaffProfile extends ApiTimestamps {
   admin_id: number;
   person: Person;
   managing_admin: ManagingAdminLight;
-  catagory_id?: string | number | null;
+  category_id?: string | number | null;
   category?: Category | null;
 }
 
@@ -230,13 +230,12 @@ export type DeleteCategoryResponse = MessageResponse;
 
 /**
  * Base Service shape.
- * NOTE: `catagory_id` is a backend typo (should be `category_id`) kept as-is
- * to match the actual API response. Do not "fix" the spelling here without
- * confirming the backend field name has also changed.
+ * `category_id` is the FK to `categories` (renamed from a historical
+ * `category_id` typo on 2026_08_15).
  */
 export interface Service extends ApiTimestamps {
   id: number;
-  catagory_id: number;
+  category_id: number;
   name: string;
   duration: number;
 }
@@ -248,11 +247,11 @@ export interface ServiceWithCategory extends Service {
 
 /**
  * Post / Put Service Request Body.
- * `catagory_id` is allowed as string|number here because it may come
+ * `category_id` is allowed as string|number here because it may come
  * straight from a <select> or form input before being sent to the API.
  */
 export interface ServiceRequestBody {
-  catagory_id: string | number;
+  category_id: string | number;
   name: string;
   duration: number;
 }
@@ -271,7 +270,7 @@ export interface StaffEntity extends ApiTimestamps {
   email: string;
   admin_id: number;
   person: Person;
-  catagory_id?: string | number | null;
+  category_id?: string | number | null;
   category?: Category | null;
 }
 
@@ -288,14 +287,14 @@ export interface CreateStaffRequestBody {
   phone_number: string;
   password: string;
   job_title: string;
-  catagory_id?: string | number;
+  category_id?: string | number;
 }
 
 /** Put Staff Request Body (Partial update) */
 export interface UpdateStaffRequestBody {
   job_title?: string;
   email?: string;
-  catagory_id?: string | number | null;
+  category_id?: string | number | null;
 }
 
 /** Put Staff Response (Note: Does not include 'person' object) */
@@ -305,7 +304,7 @@ export interface UpdateStaffResponse extends ApiTimestamps {
   job_title: string;
   email: string;
   admin_id: number;
-  catagory_id?: string | number;
+  category_id?: string | number;
 }
 
 export type DeleteStaffResponse = MessageResponse;

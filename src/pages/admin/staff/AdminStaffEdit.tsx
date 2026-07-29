@@ -23,7 +23,7 @@ function StaffEditForm({ staff }: { staff: StaffEntityDetailed }) {
   const [formData, setFormData] = useState<UpdateStaffRequestBody>({
     job_title: staff.job_title || "",
     email: staff.email || "",
-    catagory_id: staff.catagory_id ?? "",
+    category_id: staff.category_id ?? "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -33,10 +33,10 @@ function StaffEditForm({ staff }: { staff: StaffEntityDetailed }) {
       const payload: UpdateStaffRequestBody = {
         job_title: formData.job_title,
         email: formData.email,
-        catagory_id:
-          formData.catagory_id === "" || formData.catagory_id === null
+        category_id:
+          formData.category_id === "" || formData.category_id === null
             ? null
-            : formData.catagory_id,
+            : formData.category_id,
       };
       await updateMut.mutateAsync({ id, data: payload });
       queryClient.invalidateQueries({ queryKey: ["staff"] });
@@ -72,9 +72,9 @@ function StaffEditForm({ staff }: { staff: StaffEntityDetailed }) {
               İlgili Olduğu Kategori
             </label>
             <select
-              value={formData.catagory_id ?? ""}
+              value={formData.category_id ?? ""}
               onChange={(e) =>
-                setFormData({ ...formData, catagory_id: e.target.value })
+                setFormData({ ...formData, category_id: e.target.value })
               }
               className="input focus:border-deep focus:ring-2 focus:ring-deep/20"
             >
@@ -133,12 +133,20 @@ function StaffEditForm({ staff }: { staff: StaffEntityDetailed }) {
 
 export default function AdminStaffEdit() {
   const { id } = useParams<{ id: string }>();
-  const { data: staff, isLoading: isLoadingStaff } = useGetStaffByIdQuery(
+  const { data: staff, isLoading, isError, error } = useGetStaffByIdQuery(
     id || "",
   );
 
   return (
-    <QueryGate isLoading={isLoadingStaff} isError={!staff} errorMessage="Personel bulunamadı.">
+    <QueryGate
+      isLoading={isLoading}
+      isError={isError || !staff}
+      errorMessage={
+        error
+          ? "Personel yüklenirken bir hata oluştu. Lütfen tekrar deneyin."
+          : "Personel bulunamadı."
+      }
+    >
       {staff && <StaffEditForm key={staff.id} staff={staff} />}
     </QueryGate>
   );

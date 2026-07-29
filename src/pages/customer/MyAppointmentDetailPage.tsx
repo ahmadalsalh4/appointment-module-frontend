@@ -7,7 +7,6 @@ import {
   useUpdateMyAppointmentMutation,
 } from "../../hooks/useAppointmentQueries";
 import { useGetServiceStaffQuery } from "../../hooks/useServiceQueries";
-import { useGetCategoryStaffQuery } from "../../hooks/useCategoryQueries";
 import { useQueryClient } from "@tanstack/react-query";
 import StatusBadge from "../../components/StatusBadge";
 import Breadcrumb from "../../components/Breadcrumb";
@@ -53,8 +52,9 @@ export default function MyAppointmentDetailPage() {
   const [editTime, setEditTime] = useState("");
 
   const { data: serviceStaff } = useGetServiceStaffQuery(String(appointment?.service_id ?? ""));
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: categoryStaff } = useGetCategoryStaffQuery(String((appointment?.service as any)?.catagory_id ?? (appointment?.service as any)?.category?.id ?? ""));
+  // Service-scoped staff is authoritative after the catagory_id → category_id
+  // rename. Drop the category-fallback lookup entirely — admin-side
+  // cross-category reassignment is now explicit and via PUT /staff-members/{id}.
 
   const handleCancel = async () => {
     const ok = await confirm({
@@ -88,8 +88,7 @@ export default function MyAppointmentDetailPage() {
     }
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await updateMutation.mutateAsync({ id, data: body as any });
+      await updateMutation.mutateAsync({ id, data: body });
       queryClient.invalidateQueries({ queryKey: ["appointments", "customer"] });
       queryClient.invalidateQueries({ queryKey: ["appointments", "customer", id] });
       setIsEditing(false);
@@ -151,12 +150,7 @@ export default function MyAppointmentDetailPage() {
                 <label className="label-sm">Personel</label>
                 <select value={editStaff} onChange={(e) => setEditStaff(e.target.value)} className="input text-sm">
                   <option value="">Değiştirme</option>
-                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                  {serviceStaff?.map((s: any) => (
-                    <option key={s.id} value={s.id}>{s.person.name} {s.person.surname}</option>
-                  ))}
-                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                  {categoryStaff?.map((s: any) => (
+                  {serviceStaff?.map((s) => (
                     <option key={s.id} value={s.id}>{s.person.name} {s.person.surname}</option>
                   ))}
                 </select>

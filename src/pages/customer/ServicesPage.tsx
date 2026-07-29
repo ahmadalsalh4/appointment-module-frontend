@@ -16,7 +16,7 @@ export default function ServicesPage() {
   const [categoryId, setCategoryId] = useState<string>("");
 
   const params: Record<string, unknown> = { per_page: perPage, page };
-  if (categoryId) params.catagory_id = categoryId;
+  if (categoryId) params.category_id = categoryId;
 
   const { data: services, isLoading, isError } = useGetAllServicesQuery(params);
   const { data: categories } = useGetAllCategoriesQuery({ per_page: 100 });

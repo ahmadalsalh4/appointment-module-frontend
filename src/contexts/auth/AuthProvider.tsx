@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { FC, ReactNode } from "react";
 import { useNavigate } from "react-router";
-import api, { setAuthConsumer } from "../../api";
+import { setAuthConsumer } from "../../api";
 import profiles from "../../api/profiles";
 import type {
   AnyUser,

@@ -52,9 +52,14 @@ export function formatDateTime(isoString: string): string {
 
 export function formatMonthDay(isoString: string): { day: number; month: string } {
   const d = parseDate(isoString);
+  // MONTHS_SHORT is a fixed array of 12 strings; index 0-11 always
+  // exists, but noUncheckedIndexedAccess still widens the type to
+  // `string | undefined`. The `?? "Ara"` only fires for an off-by-one
+  // edge case where getDate()/getMonth() ever returned NaN.
+  const monthIndex = d.getMonth();
   return {
     day: d.getDate(),
-    month: MONTHS_SHORT[d.getMonth()],
+    month: MONTHS_SHORT[monthIndex] ?? MONTHS_SHORT[0] ?? "",
   };
 }
 
@@ -74,9 +79,17 @@ export function todayLocalDateInputValue(): string {
 }
 
 export function toLocalIsoString(dateStr: string, timeStr: string): string {
-  const [y, mo, d] = dateStr.split("-").map(Number);
-  const [h, mi] = timeStr.split(":").map(Number);
-  const local = new Date(y, (mo ?? 1) - 1, d ?? 1, h ?? 0, mi ?? 0, 0, 0);
+  const [rawY, rawMo, rawD] = dateStr.split("-").map(Number);
+  const [rawH, rawMi] = timeStr.split(":").map(Number);
+  // Defaults keep strict-mode happy. The Date constructor itself
+  // tolerates undefined, but noUncheckedIndexedAccess widens the tuple
+  // elements to number|undefined so we coalesce explicitly.
+  const y = rawY ?? new Date().getFullYear();
+  const mo = (rawMo ?? 1) - 1;
+  const d = rawD ?? 1;
+  const h = rawH ?? 0;
+  const mi = rawMi ?? 0;
+  const local = new Date(y, mo, d, h, mi, 0, 0);
   return local.toISOString();
 }
 

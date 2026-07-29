@@ -6,7 +6,6 @@ import {
   useAdminDeleteAppointmentMutation,
 } from "../../hooks/useAppointmentQueries";
 import { useGetAllStaffQuery } from "../../hooks/useStaffQueries";
-import { useQueryClient } from "@tanstack/react-query";
 import type { Appointment } from "../../other/types";
 import PageHeader from "../../components/PageHeader";
 import QueryGate from "../../components/QueryGate";
@@ -19,9 +18,13 @@ import { useToast } from "../../hooks/useToast";
 import { STATUS_LABELS, STATUS_NAME_BY_ID } from "../../other/constants";
 import type { AppointmentStatusId } from "../../other/constants";
 import { formatDate, formatTime } from "../../utils/dates";
+import { getErrorMessage } from "../../utils/errors";
+
+// Mirrors AppointmentStateMachine on the backend: terminal statuses
+// accept no further transitions.
+const TERMINAL_STATUSES = new Set(["completed", "cancelled"]);
 
 export default function AdminAppointmentsList() {
-  const queryClient = useQueryClient();
   const confirm = useConfirm();
   const toast = useToast();
 
@@ -58,6 +61,8 @@ export default function AdminAppointmentsList() {
 
   const { data: staffList } = useGetAllStaffQuery();
   const { data: paginated, isLoading, isError } = useAdminGetAppointmentsQuery(filters);
+  // The mutation hooks now invalidate the cache automatically on
+  // success — explicit invalidation here would just double-refresh.
   const updateMut = useAdminUpdateAppointmentMutation();
   const deleteMut = useAdminDeleteAppointmentMutation();
 
@@ -90,10 +95,9 @@ export default function AdminAppointmentsList() {
     setChangingId(appointmentId);
     try {
       await updateMut.mutateAsync({ id: appointmentId, data: { state_id: newStateId } });
-      queryClient.invalidateQueries({ queryKey: ["appointments", "admin"] });
       toast.success("Durum güncellendi.");
-    } catch {
-      toast.error("Durum güncellenirken hata oluştu.");
+    } catch (err) {
+      toast.error(getErrorMessage(err, "Durum güncellenirken bir hata oluştu."));
     } finally {
       setChangingId(null);
     }
@@ -109,10 +113,9 @@ export default function AdminAppointmentsList() {
     if (!ok) return;
     try {
       await deleteMut.mutateAsync(id);
-      queryClient.invalidateQueries({ queryKey: ["appointments", "admin"] });
       toast.success("Randevu silindi.");
-    } catch {
-      toast.error("Randevu silinirken hata oluştu.");
+    } catch (err) {
+      toast.error(getErrorMessage(err, "Randevu silinirken bir hata oluştu."));
     }
   };
 
@@ -204,9 +207,18 @@ export default function AdminAppointmentsList() {
                         {changingId === appo.id ? (
                           <div className="spinner-sm"></div>
                         ) : (
-                          <select value={appo.state_id} onChange={(e) => handleStatusChange(appo.id, Number(e.target.value))}
-                            disabled={changingId !== null}
-                            className={`badge badge-${appo.status.name} cursor-pointer focus:ring-2 focus:ring-offset-1 disabled:opacity-50`}>
+                          <select
+                            value={appo.state_id}
+                            onChange={(e) => handleStatusChange(appo.id, Number(e.target.value))}
+                            disabled={changingId !== null || TERMINAL_STATUSES.has(appo.status.name)}
+                            // Once an appointment reaches a terminal
+                            // state (completed/cancelled) the backend
+                            // rejects any further status change. Lock
+                            // the dropdown so the user can't trigger
+                            // the 422 in the first place.
+                            aria-label={`Randevu #${appo.id} durumunu güncelle`}
+                            className={`badge badge-${appo.status.name} ${TERMINAL_STATUSES.has(appo.status.name) ? "cursor-not-allowed" : "cursor-pointer"} focus:ring-2 focus:ring-offset-1 disabled:opacity-70`}
+                          >
                             <option value="1">Beklemede</option>
                             <option value="2">Onaylandı</option>
                             <option value="3">Tamamlandı</option>
